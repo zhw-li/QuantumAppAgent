@@ -50,6 +50,8 @@ def temp_config_dir(tmp_path, monkeypatch):
         "EVOSCIENTIST_MEMORY_OBSERVATIONS_ENABLED",
         "EVOSCIENTIST_MEMORY_OBSERVATION_WRITER",
         "EVOSCIENTIST_MEMORY_WORKERS_ENABLED",
+        "EVOSCIENTIST_AUXILIARY_MODEL",
+        "EVOSCIENTIST_AUXILIARY_PROVIDER",
     ]:
         monkeypatch.delenv(key, raising=False)
     return config_dir
@@ -69,6 +71,8 @@ def clean_env(monkeypatch):
         "EVOSCIENTIST_MEMORY_OBSERVATIONS_ENABLED",
         "EVOSCIENTIST_MEMORY_OBSERVATION_WRITER",
         "EVOSCIENTIST_MEMORY_WORKERS_ENABLED",
+        "EVOSCIENTIST_AUXILIARY_MODEL",
+        "EVOSCIENTIST_AUXILIARY_PROVIDER",
     ]:
         monkeypatch.delenv(key, raising=False)
 
@@ -590,3 +594,39 @@ class TestApplyConfigToEnv:
         apply_config_to_env(config)
 
         assert os.environ.get("OLLAMA_BASE_URL") == "http://existing:11434"
+
+
+class TestAuxiliaryModelConfig:
+    """auxiliary_model / auxiliary_provider config fields (plain str, optional)."""
+
+    def test_defaults_empty(self):
+        cfg = EvoScientistConfig()
+        assert cfg.auxiliary_model == ""
+        assert cfg.auxiliary_provider == ""
+
+    def test_save_and_load_round_trip(self, temp_config_dir, clean_env):
+        save_config(
+            EvoScientistConfig(
+                auxiliary_model="claude-haiku-4-5",
+                auxiliary_provider="anthropic",
+            )
+        )
+        loaded = load_config()
+        assert loaded.auxiliary_model == "claude-haiku-4-5"
+        assert loaded.auxiliary_provider == "anthropic"
+
+    def test_get_set_value(self, temp_config_dir, clean_env):
+        save_config(EvoScientistConfig())
+        assert set_config_value("auxiliary_model", "qwen3.6-flash") is True
+        assert set_config_value("auxiliary_provider", "dashscope") is True
+        assert get_config_value("auxiliary_model") == "qwen3.6-flash"
+        assert get_config_value("auxiliary_provider") == "dashscope"
+
+    def test_env_overrides_file(self, temp_config_dir, monkeypatch):
+        save_config(EvoScientistConfig(auxiliary_model="claude-haiku-4-5"))
+        monkeypatch.setenv("EVOSCIENTIST_AUXILIARY_MODEL", "gpt-5.5")
+        monkeypatch.setenv("EVOSCIENTIST_AUXILIARY_PROVIDER", "openai")
+
+        config = get_effective_config()
+        assert config.auxiliary_model == "gpt-5.5"
+        assert config.auxiliary_provider == "openai"
