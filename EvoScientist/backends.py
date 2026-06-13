@@ -3,6 +3,7 @@
 import os
 import re
 import shlex
+import sys
 import uuid
 from pathlib import Path
 
@@ -594,20 +595,65 @@ def _skills_tier_paths() -> tuple[Path, Path | None, Path]:
     return (paths.USER_SKILLS_DIR, paths.GLOBAL_SKILLS_DIR, _BUILTIN_SKILLS_DIR)
 
 
+def _is_windows() -> bool:
+    return sys.platform == "win32"
+
+
+def _cmd_quote(s: str) -> str:
+    """Quote *s* for cmd.exe using double-quote wrapping.
+
+    cmd.exe strips outer double quotes; content between them is taken
+    literally. Backslashes are not escape chars inside double quotes, so
+    Windows paths pass through unchanged. Embedded ``"`` is escaped as
+    ``\"``; bare paths with no shell-special chars need no quoting at all.
+
+    .. note::
+
+       ``%VAR%`` expansion is **not** neutralised here.  Variable expansion
+       happens before quote processing in cmd.exe, and ``%%`` collapsing
+       only occurs inside ``.bat``/``.cmd`` files — not via ``cmd /c``.
+       This is acceptable because virtual-mount paths (skills, memories)
+       should never contain percent signs in practice.
+
+    Mirrors the role of :func:`shlex.quote` for the Windows shell so the
+    sandbox command can pass a single token through :func:`subprocess.run`
+    with ``shell=True`` (which on Windows invokes cmd.exe, not /bin/sh).
+    """
+    if not s:
+        return '""'
+    if not any(c in s for c in ' \t\n"&|<>^()'):
+        return s
+    return '"' + s.replace('"', '\\"') + '"'
+
+
+def _platform_quote(s: str) -> str:
+    """Quote *s* for the host's default shell.
+
+    On POSIX, delegates to :func:`shlex.quote` (single-quote wrapping).
+    On Windows, uses double-quote wrapping compatible with cmd.exe —
+    see :func:`_cmd_quote`. The platform check is read at call time, so
+    tests can swap it via ``monkeypatch.setattr(backends, "_is_windows", ...)``
+    without mutating :mod:`sys` module state.
+    """
+    if _is_windows():
+        return _cmd_quote(s)
+    return shlex.quote(s)
+
+
 def _resolve_virtual_mount_path(token: str) -> str | None:
     """Resolve a virtual mount token to a shell-safe token, or ``None`` when
     *token* is not a registered virtual mount.
 
     For ``/skills/...``: walks ``_skills_tier_paths()`` priority (USER →
-    GLOBAL → BUILTIN), returning ``shlex.quote`` of the first tier where the
-    path exists. On miss, returns a workspace-relative ``./skills/<rel>``
-    form — agent typed a virtual path, so the shell error should reference a
-    location they recognise (`USER_SKILLS_DIR` defaults to
+    GLOBAL → BUILTIN), returning :func:`_platform_quote` of the first tier
+    where the path exists. On miss, returns a workspace-relative
+    ``./skills/<rel>`` form — agent typed a virtual path, so the shell error
+    should reference a location they recognise (`USER_SKILLS_DIR` defaults to
     ``WORKSPACE_ROOT / "skills"``, which is also where ``MergedSkillsBackend``
     would write a new skill).
 
     For ``/memories/...``: single tier (``paths.MEMORIES_DIR``), always
-    absolute and ``shlex.quote``-wrapped. Memories live outside the
+    absolute and :func:`_platform_quote`-wrapped. Memories live outside the
     workspace, so a relative form would point at an unrelated location.
     """
     rel = _subpath_under_mount(token, "/skills")
@@ -617,12 +663,12 @@ def _resolve_virtual_mount_path(token: str) -> str | None:
                 continue
             candidate = Path(tier) / rel
             if candidate.exists():
-                return shlex.quote(str(candidate))
-        return shlex.quote("./skills/" + rel if rel else "./skills")
+                return _platform_quote(str(candidate))
+        return _platform_quote("./skills/" + rel if rel else "./skills")
 
     rel = _subpath_under_mount(token, "/memories")
     if rel is not None:
-        return shlex.quote(str(Path(paths.MEMORIES_DIR) / rel))
+        return _platform_quote(str(Path(paths.MEMORIES_DIR) / rel))
 
     return None
 
