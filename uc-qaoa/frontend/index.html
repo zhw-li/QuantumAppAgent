@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UC-QAOA 机组组合量子优化平台</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@3.4.21/dist/vue.global.prod.js"></script>
+</head>
+<body>
+<div id="app">
+    <!-- Banner -->
+    <section class="page-banner">
+        <div class="container">
+            <h1 class="banner-title">UC-QAOA 机组组合量子优化</h1>
+            <p class="banner-desc">基于QAOA量子近似优化算法，求解多时段机组组合(Unit Commitment)问题，实现发电成本最小化</p>
+        </div>
+    </section>
+
+    <div class="container">
+        <!-- Step 1: Generator Selection -->
+        <section class="section-card">
+            <div class="section-header">
+                <span class="step-badge">1</span>
+                <h2 class="section-title">选择发电机组</h2>
+                <span class="section-hint">选择 2-4 个发电机组参与优化</span>
+            </div>
+            <div class="gen-grid">
+                <div v-for="gen in generators" :key="gen.id"
+                     class="gen-card"
+                     :class="{ selected: selectedGens.includes(gen.id), disabled: !selectedGens.includes(gen.id) && selectedGens.length >= 4 }"
+                     @click="toggleGen(gen.id)">
+                    <div class="gen-id">{{ gen.id }}</div>
+                    <div class="gen-name">机组{{ gen.id }}</div>
+                    <div class="gen-spec">
+                        <div class="spec-row">
+                            <span class="spec-label">最大出力</span>
+                            <span class="spec-value">{{ gen.p_max }} MW</span>
+                        </div>
+                        <div class="spec-row">
+                            <span class="spec-label">成本函数</span>
+                            <span class="spec-value spec-formula">{{ gen.a }}+{{ gen.b }}P+{{ gen.c }}P&sup2;</span>
+                        </div>
+                        <div class="spec-row">
+                            <span class="spec-label">满载成本</span>
+                            <span class="spec-value spec-cost">{{ formatCost(fullCost(gen)) }} $</span>
+                        </div>
+                    </div>
+                    <div class="gen-check" v-if="selectedGens.includes(gen.id)"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Step 2: Period Load Config -->
+        <section class="section-card">
+            <div class="section-header">
+                <span class="step-badge">2</span>
+                <h2 class="section-title">配置时段负载</h2>
+                <span class="section-hint">设置每个时段的负载需求 (MW)</span>
+            </div>
+            <div class="period-config">
+                <div class="period-row" v-for="(load, idx) in loads" :key="idx">
+                    <span class="period-label">Hour {{ idx + 1 }}</span>
+                    <div class="load-options">
+                        <button v-for="opt in loadOptions" :key="opt"
+                                class="load-btn"
+                                :class="{ active: loads[idx] === opt }"
+                                @click="loads[idx] = opt">
+                            {{ opt }} MW
+                        </button>
+                        <button class="remove-btn" v-if="loads.length > 1" @click="removePeriod(idx)" title="删除此时段">&times;</button>
+                    </div>
+                </div>
+                <button class="add-btn" v-if="loads.length < 6" @click="addPeriod" :disabled="selectedGens.length === 0">
+                    + 添加时段
+                </button>
+            </div>
+            <div class="qubit-info">
+                <span class="qubit-label">量子比特:</span>
+                <span>{{ selectedGens.length }} &times; {{ loads.length }} = <strong>{{ qubitCount }}</strong></span>
+            </div>
+        </section>
+
+        <!-- Step 3: QAOA Params -->
+        <section class="section-card">
+            <div class="section-header">
+                <span class="step-badge">3</span>
+                <h2 class="section-title">QAOA 参数设置</h2>
+            </div>
+            <div class="params-grid">
+                <div class="param-item">
+                    <label class="param-label">QAOA 层数 (p)</label>
+                    <div class="param-control">
+                        <input type="range" min="1" max="5" v-model.number="qaoaLayers">
+                        <span class="param-value">{{ qaoaLayers }}</span>
+                    </div>
+                    <p class="param-desc">层数越多精度越高，但优化参数也越多</p>
+                </div>
+                <div class="param-item">
+                    <label class="param-label">优化重启次数</label>
+                    <div class="param-control">
+                        <input type="range" min="5" max="30" step="5" v-model.number="restarts">
+                        <span class="param-value">{{ restarts }}</span>
+                    </div>
+                    <p class="param-desc">更多重启可提高找到全局最优的概率</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Solve -->
+        <div class="solve-section">
+            <button class="solve-btn" @click="solve"
+                    :disabled="!canSolve || solving"
+                    :class="{ solving: solving }">
+                <span v-if="solving" class="spinner"></span>
+                <span v-if="solving">QAOA 优化中...</span>
+                <span v-else>启动 QAOA 量子求解</span>
+            </button>
+        </div>
+
+        <!-- Error -->
+        <div class="error-alert" v-if="error">
+            <span class="error-text">{{ error }}</span>
+            <button class="error-close" @click="error = ''">&times;</button>
+        </div>
+
+        <!-- Result -->
+        <section class="section-card result-section" v-if="result">
+            <div class="section-header">
+                <span class="step-badge step-badge--success">OK</span>
+                <h2 class="section-title">优化结果</h2>
+                <span class="result-tag" :class="result.status === 'success' ? 'result-tag--success' : 'result-tag--danger'">
+                    {{ result.status === 'success' ? '求解成功' : '无可行解' }}
+                </span>
+            </div>
+
+            <!-- Metrics -->
+            <div class="metrics-grid">
+                <div class="metric-card metric-card--highlight">
+                    <div class="metric-label">QAOA 总成本</div>
+                    <div class="metric-value metric-value--primary">{{ formatCost(result.total_cost) }} $</div>
+                </div>
+                <div class="metric-card" v-if="result.classical_optimal_cost > 0">
+                    <div class="metric-label">经典最优成本</div>
+                    <div class="metric-value metric-value--warning">{{ formatCost(result.classical_optimal_cost) }} $</div>
+                </div>
+                <div class="metric-card" v-if="result.optimality_gap >= 0">
+                    <div class="metric-label">最优性差距</div>
+                    <div class="metric-value" :class="gapClass">{{ result.optimality_gap.toFixed(2) }}%</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">量子比特数</div>
+                    <div class="metric-value">{{ result.qubit_count }}</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">QAOA 层数</div>
+                    <div class="metric-value">p = {{ result.qaoa_layers }}</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">求解耗时</div>
+                    <div class="metric-value">{{ result.solve_time.toFixed(1) }}s</div>
+                </div>
+            </div>
+
+            <!-- Compare Chart -->
+            <div class="chart-block" v-if="result.classical_optimal_cost > 0">
+                <h3 class="chart-title">QAOA vs 经典最优对比</h3>
+                <div id="compare-chart" class="chart-box"></div>
+            </div>
+
+            <!-- Schedule Heatmap -->
+            <div class="chart-block">
+                <h3 class="chart-title">调度方案 (蓝色=开机)</h3>
+                <div id="schedule-chart" class="chart-box"></div>
+            </div>
+
+            <!-- Schedule Table -->
+            <div class="table-block">
+                <h3 class="chart-title">详细调度表</h3>
+                <table class="schedule-table">
+                    <thead>
+                        <tr>
+                            <th>时段</th>
+                            <th v-for="gen in selectedGenDetails" :key="gen.id">
+                                机组{{ gen.id }}<br><small>{{ gen.p_max }}MW</small>
+                            </th>
+                            <th>总出力</th>
+                            <th>负载需求</th>
+                            <th>状态</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="t in loads.length" :key="t">
+                            <td class="td-period">Hour {{ t }}</td>
+                            <td v-for="gen in selectedGenDetails" :key="gen.id"
+                                :class="getGenStatus(t, gen.id) ? 'td-on' : 'td-off'">
+                                <template v-if="getGenStatus(t, gen.id)">
+                                    ON<br><small>{{ getGenPower(t, gen.id).toFixed(0) }} MW</small>
+                                </template>
+                                <template v-else>OFF</template>
+                            </td>
+                            <td class="td-power">{{ getTotalPower(t).toFixed(0) }} MW</td>
+                            <td class="td-load">{{ loads[t-1] }} MW</td>
+                            <td>
+                                <span :class="getTotalPower(t) >= loads[t-1] ? 'tag-ok' : 'tag-fail'">
+                                    {{ getTotalPower(t) >= loads[t-1] ? '满足' : '不足' }}
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Cost Chart -->
+            <div class="chart-block">
+                <h3 class="chart-title">各时段成本分布</h3>
+                <div id="cost-chart" class="chart-box"></div>
+            </div>
+        </section>
+    </div>
+
+    <footer class="page-footer">
+        <p>UC-QAOA 机组组合量子优化平台 | 基于 cqlib SDK + QAOA 量子近似优化算法</p>
+    </footer>
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
