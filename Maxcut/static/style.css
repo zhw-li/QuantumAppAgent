@@ -1,0 +1,340 @@
+/* ========================================
+   QAOA MaxCut 量子优化求解器 - 样式表
+   遵循天衍云平台 UI 设计规范
+   ======================================== */
+
+/* --- CSS 变量（设计 Token）--- */
+:root {
+  --primary: #1664FF;
+  --primary-deep: #4F9DF7;
+  --link-blue: #1F84FC;
+  --danger: #FB4214;
+  --cyan: #00C7E7;
+  --text-title: #020814;
+  --text-sub: #41464F;
+  --text-body: #939AAB;
+  --page-bg: #F4F7FC;
+  --card-bg: #FFFFFF;
+  --card-bg-blue: #F3F7FF;
+  --border-line: #DCE0EB;
+  --extend2: #BB79E1;
+  --extend3: #A58DF8;
+  --extend4: #4A86FF;
+
+  --radius-btn: 4px;
+  --radius-tag: 6px;
+  --radius-card: 8px;
+
+  --base20: 20px;
+  --base30: 30px;
+}
+
+/* --- 全局重置 --- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+  font-size: 18px;
+  color: var(--text-sub);
+  background-color: var(--page-bg);
+  line-height: 1.6;
+}
+
+#app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- 顶部横幅 --- */
+.header-banner {
+  background: linear-gradient(135deg, var(--primary), var(--primary-deep));
+  padding: 60px 0 50px;
+  text-align: center;
+}
+
+.header-banner h1 {
+  font-size: 40px;
+  font-weight: bold;
+  color: #FFFFFF;
+  margin-bottom: 12px;
+  letter-spacing: 2px;
+}
+
+.header-banner p {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: regular;
+}
+
+/* --- 内容容器 --- */
+.main-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 30px 20px 60px;
+  width: 100%;
+}
+
+/* --- 通用卡片 --- */
+.section-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border-line);
+  padding: 24px 30px;
+  margin-bottom: var(--base30);
+}
+
+.section-card .card-title {
+  font-size: 24px;
+  font-weight: regular;
+  color: var(--text-title);
+  margin-bottom: var(--base20);
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-line);
+}
+
+/* --- 图选择区 --- */
+.graph-selector-row {
+  display: flex;
+  align-items: center;
+  gap: var(--base20);
+  margin-bottom: var(--base20);
+  flex-wrap: wrap;
+}
+
+.graph-selector-row .el-select {
+  min-width: 240px;
+}
+
+.graph-info {
+  display: flex;
+  gap: 30px;
+  margin-top: var(--base20);
+}
+
+.graph-info-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.graph-info-item .info-value {
+  font-size: 30px;
+  color: var(--primary);
+  font-weight: regular;
+}
+
+.graph-info-item .info-label {
+  font-size: 14px;
+  color: var(--text-body);
+  margin-top: 4px;
+}
+
+/* --- 图表容器（必须明确高度）--- */
+.chart-container {
+  width: 100%;
+  height: 400px;
+}
+
+.chart-container-small {
+  width: 100%;
+  height: 300px;
+}
+
+/* --- 参数配置区 --- */
+.param-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--base20);
+  margin-bottom: var(--base20);
+}
+
+.param-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.param-label {
+  font-size: 16px;
+  color: var(--text-sub);
+  margin-bottom: 8px;
+}
+
+.btn-row {
+  display: flex;
+  gap: var(--base20);
+}
+
+/* --- 结果区 --- */
+.result-section .el-tabs__item {
+  font-size: 16px;
+}
+
+.result-section .el-tabs__item.is-active {
+  color: var(--primary);
+}
+
+/* --- 割集结果高亮 --- */
+.cut-value-display {
+  text-align: center;
+  padding: 20px 0;
+  margin-bottom: var(--base20);
+}
+
+.cut-value-display .cut-number {
+  font-size: 48px;
+  font-weight: bold;
+  color: var(--primary);
+}
+
+.cut-value-display .cut-label {
+  font-size: 16px;
+  color: var(--text-body);
+  margin-top: 4px;
+}
+
+/* --- 分区方案 --- */
+.partition-section {
+  padding: 16px 20px;
+  background: var(--card-bg-blue);
+  border-radius: var(--radius-tag);
+  margin-bottom: var(--base20);
+  line-height: 2;
+}
+
+.partition-label {
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--text-title);
+}
+
+/* --- QAOA 参数网格 --- */
+.params-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+}
+
+.param-item-inline {
+  background: var(--card-bg-blue);
+  padding: 6px 14px;
+  border-radius: var(--radius-btn);
+}
+
+.param-item-inline .param-name {
+  font-size: 14px;
+  color: var(--text-body);
+  margin-right: 6px;
+}
+
+.param-item-inline .param-val {
+  font-size: 14px;
+  color: var(--primary);
+  font-weight: bold;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+
+/* --- 对比表格 --- */
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.comparison-table th,
+.comparison-table td {
+  padding: 12px 16px;
+  text-align: center;
+  border: 1px solid var(--border-line);
+  font-size: 16px;
+}
+
+.comparison-table th {
+  background: var(--card-bg-blue);
+  color: var(--text-title);
+  font-weight: regular;
+}
+
+.comparison-table td {
+  color: var(--text-sub);
+}
+
+.comparison-table .highlight-value {
+  color: var(--primary);
+  font-weight: bold;
+}
+
+/* --- 指标卡片网格 --- */
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--base20);
+  margin-bottom: var(--base20);
+}
+
+.metric-card {
+  background: var(--card-bg-blue);
+  border-radius: var(--radius-tag);
+  padding: 16px 20px;
+  text-align: center;
+}
+
+.metric-card .metric-value {
+  font-size: 30px;
+  color: var(--primary);
+  font-weight: regular;
+}
+
+.metric-card .metric-label {
+  font-size: 14px;
+  color: var(--text-body);
+  margin-top: 4px;
+}
+
+/* --- 概率分布高亮 --- */
+.best-bitstring-tag {
+  display: inline-block;
+  background: var(--primary);
+  color: #FFFFFF;
+  padding: 2px 8px;
+  border-radius: var(--radius-tag);
+  font-size: 14px;
+  margin-left: 8px;
+}
+
+/* --- 空状态 --- */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-body);
+  font-size: 16px;
+}
+
+.empty-state .empty-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  color: var(--border-line);
+}
+
+/* --- Element Plus 覆盖 --- */
+.el-card {
+  border-radius: var(--radius-card) !important;
+  border-color: var(--border-line) !important;
+}
+
+.el-button--primary {
+  --el-button-bg-color: var(--primary) !important;
+  --el-button-border-color: var(--primary) !important;
+  border-radius: var(--radius-btn) !important;
+}
+
+.el-button--default {
+  border-radius: var(--radius-btn) !important;
+}
+
+.el-input-number {
+  width: 100%;
+}

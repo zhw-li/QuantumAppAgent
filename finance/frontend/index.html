@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>量子组合投资优化云平台</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-content">
+        <h1 class="app-title">量子组合投资优化云平台</h1>
+        <p class="app-subtitle">Quantum Portfolio Optimization Platform</p>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="app-main">
+      <el-tabs v-model="activeTab" @tab-change="onTabChange" class="main-tabs">
+
+        <!-- ==================== Tab 1: 数据概览 ==================== -->
+        <el-tab-pane label="数据概览" name="dashboard">
+          <!-- Tier Selector -->
+          <div class="controls-bar" style="margin-bottom:20px;">
+            <span style="font-size:14px;color:#939AAB;">数据规模:</span>
+            <el-radio-group v-model="dashboardTier" size="small" @change="loadDashboard">
+              <el-radio-button label="demo">Demo (5 stocks)</el-radio-button>
+              <el-radio-button label="standard">Standard (8 stocks)</el-radio-button>
+              <el-radio-button label="full">Full (12 stocks)</el-radio-button>
+            </el-radio-group>
+          </div>
+
+          <!-- Price Trend Chart -->
+          <div class="card">
+            <div class="section-title">股票价格走势</div>
+            <div id="priceChart" class="chart-container"></div>
+          </div>
+
+          <!-- Stock Cards Grid -->
+          <div class="card">
+            <div class="section-title">成分股概览</div>
+            <div v-if="stocks.length === 0" style="text-align:center;padding:40px;color:#939AAB;">
+              暂无数据，请选择数据规模
+            </div>
+            <div class="grid-4" v-else>
+              <div class="stock-card" v-for="stock in stocks" :key="stock.symbol">
+                <div class="stock-symbol">{{ stock.symbol }}</div>
+                <div class="stock-name">{{ stock.name || '' }}</div>
+                <div class="stock-price">${{ formatNum(stock.latest_price, 2) }}</div>
+                <div class="stock-return" :class="stock.total_return >= 0 ? 'positive' : 'negative'">
+                  {{ stock.total_return >= 0 ? '+' : '' }}{{ formatNum(stock.total_return * 100, 2) }}%
+                </div>
+                <div class="sparkline-container" :id="'spark-' + stock.symbol"></div>
+              </div>
+            </div>
+          </div>
+        </el-tab-pane>
+
+        <!-- ==================== Tab 2: 统计分析 ==================== -->
+        <el-tab-pane label="统计分析" name="statistics">
+          <div class="controls-bar" style="margin-bottom:20px;">
+            <span style="font-size:14px;color:#939AAB;">数据规模:</span>
+            <el-radio-group v-model="statsTier" size="small" @change="loadStatistics">
+              <el-radio-button label="demo">Demo</el-radio-button>
+              <el-radio-button label="standard">Standard</el-radio-button>
+              <el-radio-button label="full">Full</el-radio-button>
+            </el-radio-group>
+          </div>
+
+          <div class="grid-2">
+            <!-- Annualized Returns Bar Chart -->
+            <div class="card">
+              <div class="section-title">年化收益率</div>
+              <div id="returnsChart" class="chart-container"></div>
+            </div>
+
+            <!-- Correlation Heatmap -->
+            <div class="card">
+              <div class="section-title">相关性热力图</div>
+              <div id="correlationChart" class="chart-container"></div>
+            </div>
+          </div>
+
+          <!-- Risk-Return Scatter -->
+          <div class="card">
+            <div class="section-title">风险-收益散点图</div>
+            <div id="riskReturnChart" class="chart-container"></div>
+          </div>
+
+          <!-- Statistics Table -->
+          <div class="card">
+            <div class="section-title">统计指标明细</div>
+            <el-table :data="statsTableData" stripe style="width:100%" v-if="statsTableData.length > 0"
+                      :header-cell-style="{background:'#F3F7FF',color:'#020814',fontWeight:600}">
+              <el-table-column prop="symbol" label="股票代码" width="120"></el-table-column>
+              <el-table-column prop="annual_return" label="年化收益率" width="140">
+                <template #default="scope">
+                  <span :style="{color: scope.row.annual_return >= 0 ? '#FB4214' : '#67C23A'}">
+                    {{ formatNum(scope.row.annual_return * 100, 2) }}%
+                  </span>
+                </template>
+              </el-table-column>
+              <el-table-column prop="annual_volatility" label="年化波动率" width="140">
+                <template #default="scope">{{ formatNum(scope.row.annual_volatility * 100, 2) }}%</template>
+              </el-table-column>
+              <el-table-column prop="sharpe_ratio" label="夏普比率" width="120">
+                <template #default="scope">{{ formatNum(scope.row.sharpe_ratio, 3) }}</template>
+              </el-table-column>
+              <el-table-column prop="max_drawdown" label="最大回撤" width="140">
+                <template #default="scope">
+                  <span style="color:#FB4214">{{ formatNum(scope.row.max_drawdown * 100, 2) }}%</span>
+                </template>
+              </el-table-column>
+              <el-table-column prop="total_return" label="累计收益率">
+                <template #default="scope">
+                  <span :style="{color: scope.row.total_return >= 0 ? '#FB4214' : '#67C23A'}">
+                    {{ formatNum(scope.row.total_return * 100, 2) }}%
+                  </span>
+                </template>
+              </el-table-column>
+            </el-table>
+            <el-empty v-else description="请选择数据规模以加载统计信息"></el-empty>
+          </div>
+        </el-tab-pane>
+
+        <!-- ==================== Tab 3: 经典优化 ==================== -->
+        <el-tab-pane label="经典优化" name="classical">
+          <!-- Controls -->
+          <div class="card">
+            <div class="section-title">参数设置</div>
+            <div class="controls-bar">
+              <span style="font-size:14px;color:#939AAB;">数据规模:</span>
+              <el-select v-model="classicalParams.tier" size="default" style="width:150px">
+                <el-option label="Demo (5)" value="demo"></el-option>
+                <el-option label="Standard (8)" value="standard"></el-option>
+                <el-option label="Full (12)" value="full"></el-option>
+              </el-select>
+
+              <span style="font-size:14px;color:#939AAB;">选股数 k:</span>
+              <el-input-number v-model="classicalParams.k" :min="2" :max="10" size="default"></el-input-number>
+
+              <span style="font-size:14px;color:#939AAB;">风险厌恶 q:</span>
+              <el-input-number v-model="classicalParams.q" :min="0.1" :max="10" :step="0.1" :precision="1" size="default"></el-input-number>
+
+              <el-button type="primary" @click="runClassical" :loading="classicalLoading" size="default">
+                运行经典优化
+              </el-button>
+            </div>
+          </div>
+
+          <!-- Results -->
+          <template v-if="classicalResult">
+            <div class="grid-2">
+              <!-- Efficient Frontier -->
+              <div class="card">
+                <div class="section-title">有效前沿</div>
+                <div id="frontierChart" class="chart-container"></div>
+              </div>
+
+              <!-- Portfolio Weights Pie -->
+              <div class="card">
+                <div class="section-title">投资组合权重</div>
+                <div id="classicalWeightsPie" class="chart-container"></div>
+              </div>
+            </div>
+
+            <!-- Metrics -->
+            <div class="grid-3">
+              <div class="metric-card">
+                <div class="metric-label">组合收益率</div>
+                <div class="metric-value primary">{{ formatNum(classicalResult.portfolio_return * 100, 2) }}%</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">组合风险</div>
+                <div class="metric-value danger">{{ formatNum(classicalResult.portfolio_risk * 100, 2) }}%</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">夏普比率</div>
+                <div class="metric-value cyan">{{ formatNum(classicalResult.sharpe_ratio, 3) }}</div>
+              </div>
+            </div>
+
+            <!-- Selected Stocks -->
+            <div class="card" style="margin-top:20px;">
+              <div class="section-title">选中的股票</div>
+              <div class="selected-stocks">
+                <span class="selected-stock-tag" v-for="s in classicalResult.selected_stocks" :key="s">
+                  {{ s }}
+                </span>
+              </div>
+              <div class="weights-grid" style="margin-top:12px;">
+                <div class="weight-item" v-for="(w, s) in classicalResult.weights" :key="s">
+                  <span class="weight-symbol">{{ s }}</span>
+                  <span class="weight-value">{{ formatNum(w * 100, 2) }}%</span>
+                </div>
+              </div>
+            </div>
+          </template>
+          <el-empty v-else-if="!classicalLoading" description="请设置参数并运行经典优化"></el-empty>
+        </el-tab-pane>
+
+        <!-- ==================== Tab 4: 量子优化 ==================== -->
+        <el-tab-pane label="量子优化" name="quantum">
+          <!-- Controls -->
+          <div class="card">
+            <div class="section-title">QAOA 参数设置</div>
+            <div class="controls-bar">
+              <span style="font-size:14px;color:#939AAB;">数据规模:</span>
+              <el-select v-model="quantumParams.tier" size="default" style="width:150px">
+                <el-option label="Demo (5)" value="demo"></el-option>
+                <el-option label="Standard (8)" value="standard"></el-option>
+                <el-option label="Full (12)" value="full"></el-option>
+              </el-select>
+
+              <span style="font-size:14px;color:#939AAB;">选股数 k:</span>
+              <el-input-number v-model="quantumParams.k" :min="2" :max="10" size="default"></el-input-number>
+
+              <span style="font-size:14px;color:#939AAB;">风险厌恶 q:</span>
+              <el-input-number v-model="quantumParams.q" :min="0.1" :max="10" :step="0.1" :precision="1" size="default"></el-input-number>
+
+              <span style="font-size:14px;color:#939AAB;">QAOA深度:</span>
+              <el-input-number v-model="quantumParams.depth" :min="1" :max="5" size="default"></el-input-number>
+
+              <span style="font-size:14px;color:#939AAB;">重启次数:</span>
+              <el-input-number v-model="quantumParams.restarts" :min="1" :max="20" size="default"></el-input-number>
+
+              <el-button type="primary" @click="runQuantum" :loading="quantumLoading" size="default">
+                运行量子优化
+              </el-button>
+            </div>
+          </div>
+
+          <!-- Results -->
+          <template v-if="quantumResult">
+            <div class="grid-2">
+              <!-- Probability Distribution -->
+              <div class="card">
+                <div class="section-title">QAOA 概率分布 (Top Bitstrings)</div>
+                <div id="probDistChart" class="chart-container"></div>
+              </div>
+
+              <!-- Portfolio Weights Pie -->
+              <div class="card">
+                <div class="section-title">量子投资组合权重</div>
+                <div id="quantumWeightsPie" class="chart-container"></div>
+              </div>
+            </div>
+
+            <!-- QAOA Details -->
+            <div class="card">
+              <div class="section-title">QAOA 详情</div>
+              <div class="qaoa-info-grid">
+                <div class="qaoa-info-item">
+                  <div class="info-label">惩罚权重 lambda</div>
+                  <div class="info-value">{{ formatNum(quantumResult.penalty_weight, 2) }}</div>
+                </div>
+                <div class="qaoa-info-item">
+                  <div class="info-label">归一化因子</div>
+                  <div class="info-value">{{ formatNum(quantumResult.norm_factor, 4) }}</div>
+                </div>
+                <div class="qaoa-info-item">
+                  <div class="info-label">使用量子比特数</div>
+                  <div class="info-value">{{ quantumResult.n_qubits }}</div>
+                </div>
+                <div class="qaoa-info-item">
+                  <div class="info-label">QAOA深度 p</div>
+                  <div class="info-value">{{ quantumResult.depth }}</div>
+                </div>
+                <div class="qaoa-info-item">
+                  <div class="info-label">Cost Gap vs 暴力</div>
+                  <div class="info-value" :style="{color: quantumResult.cost_gap === 0 ? '#67C23A' : '#E6A23C'}">
+                    {{ formatNum(quantumResult.cost_gap, 2) }}%
+                  </div>
+                </div>
+                <div class="qaoa-info-item">
+                  <div class="info-label">最优能量</div>
+                  <div class="info-value">{{ formatNum(quantumResult.optimal_energy, 4) }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Metrics -->
+            <div class="grid-3" style="margin-top:20px;">
+              <div class="metric-card">
+                <div class="metric-label">组合收益率</div>
+                <div class="metric-value primary">{{ formatNum(quantumResult.portfolio_return * 100, 2) }}%</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">组合风险</div>
+                <div class="metric-value danger">{{ formatNum(quantumResult.portfolio_risk * 100, 2) }}%</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">夏普比率</div>
+                <div class="metric-value cyan">{{ formatNum(quantumResult.sharpe_ratio, 3) }}</div>
+              </div>
+            </div>
+
+            <!-- Selected Stocks -->
+            <div class="card" style="margin-top:20px;">
+              <div class="section-title">量子选中的股票</div>
+              <div class="selected-stocks">
+                <span class="selected-stock-tag" v-for="s in quantumResult.selected_stocks" :key="s">
+                  {{ s }}
+                </span>
+              </div>
+              <div class="weights-grid" style="margin-top:12px;">
+                <div class="weight-item" v-for="(w, s) in quantumResult.weights" :key="s">
+                  <span class="weight-symbol">{{ s }}</span>
+                  <span class="weight-value">{{ formatNum(w * 100, 2) }}%</span>
+                </div>
+              </div>
+            </div>
+          </template>
+          <el-empty v-else-if="!quantumLoading" description="请设置参数并运行量子优化"></el-empty>
+        </el-tab-pane>
+
+        <!-- ==================== Tab 5: 对比分析 ==================== -->
+        <el-tab-pane label="对比分析" name="compare">
+          <!-- Controls -->
+          <div class="card">
+            <div class="section-title">对比参数设置</div>
+            <div class="controls-bar">
+              <span style="font-size:14px;color:#939AAB;">数据规模:</span>
+              <el-select v-model="compareParams.tier" size="default" style="width:150px">
+                <el-option label="Demo (5)" value="demo"></el-option>
+                <el-option label="Standard (8)" value="standard"></el-option>
+                <el-option label="Full (12)" value="full"></el-option>
+              </el-select>
+
+              <span style="font-size:14px;color:#939AAB;">选股数 k:</span>
+              <el-input-number v-model="compareParams.k" :min="2" :max="10" size="default"></el-input-number>
+
+              <span style="font-size:14px;color:#939AAB;">风险厌恶 q:</span>
+              <el-input-number v-model="compareParams.q" :min="0.1" :max="10" :step="0.1" :precision="1" size="default"></el-input-number>
+
+              <span style="font-size:14px;color:#939AAB;">QAOA深度:</span>
+              <el-input-number v-model="compareParams.depth" :min="1" :max="5" size="default"></el-input-number>
+
+              <span style="font-size:14px;color:#939AAB;">重启次数:</span>
+              <el-input-number v-model="compareParams.restarts" :min="1" :max="20" size="default"></el-input-number>
+
+              <el-button type="primary" @click="runCompare" :loading="compareLoading" size="default">
+                运行对比分析
+              </el-button>
+            </div>
+          </div>
+
+          <!-- Results -->
+          <template v-if="compareResult">
+            <!-- Metrics Comparison Table -->
+            <div class="card">
+              <div class="section-title">指标对比</div>
+              <el-table :data="compareTableData" stripe style="width:100%"
+                        :header-cell-style="{background:'#F3F7FF',color:'#020814',fontWeight:600}">
+                <el-table-column prop="metric" label="指标" width="160"></el-table-column>
+                <el-table-column label="经典优化" align="center">
+                  <template #default="scope">
+                    <span style="color:#00C7E7;font-weight:600;">{{ scope.row.classical }}</span>
+                  </template>
+                </el-table-column>
+                <el-table-column label="量子优化 (QAOA)" align="center">
+                  <template #default="scope">
+                    <span style="color:#1664FF;font-weight:600;">{{ scope.row.quantum }}</span>
+                  </template>
+                </el-table-column>
+                <el-table-column label="暴力搜索" align="center">
+                  <template #default="scope">
+                    <span style="color:#FB4214;font-weight:600;">{{ scope.row.bruteforce }}</span>
+                  </template>
+                </el-table-column>
+              </el-table>
+            </div>
+
+            <!-- Cost Gap -->
+            <div class="card">
+              <div class="section-title">Cost Gap 分析</div>
+              <div class="cost-gap-highlight" :class="compareResult.quantum.cost_gap === 0 ? 'zero' : 'nonzero'">
+                {{ formatNum(compareResult.quantum.cost_gap, 2) }}%
+              </div>
+              <p style="text-align:center;color:#939AAB;font-size:14px;">
+                QAOA求解结果与暴力搜索最优解之间的成本差距
+              </p>
+            </div>
+
+            <!-- Risk-Return Comparison Scatter -->
+            <div class="card">
+              <div class="section-title">风险-收益对比散点图</div>
+              <div id="comparisonScatterChart" class="chart-container-lg"></div>
+            </div>
+
+            <!-- Portfolio Composition Comparison -->
+            <div class="grid-2">
+              <div class="card">
+                <div class="section-title">经典组合构成</div>
+                <div id="compareClassicalPie" class="chart-container-sm"></div>
+              </div>
+              <div class="card">
+                <div class="section-title">量子组合构成</div>
+                <div id="compareQuantumPie" class="chart-container-sm"></div>
+              </div>
+            </div>
+
+            <!-- Selected Stocks Comparison -->
+            <div class="card">
+              <div class="section-title">选股对比</div>
+              <div class="grid-3">
+                <div>
+                  <div class="compare-section-title classical">经典优化</div>
+                  <div class="selected-stocks">
+                    <span class="selected-stock-tag classical" v-for="s in compareResult.classical.selected_stocks" :key="s">{{ s }}</span>
+                  </div>
+                </div>
+                <div>
+                  <div class="compare-section-title quantum">量子优化</div>
+                  <div class="selected-stocks">
+                    <span class="selected-stock-tag quantum" v-for="s in compareResult.quantum.selected_stocks" :key="s">{{ s }}</span>
+                  </div>
+                </div>
+                <div>
+                  <div class="compare-section-title bruteforce">暴力搜索</div>
+                  <div class="selected-stocks">
+                    <span class="selected-stock-tag bruteforce" v-for="s in compareResult.bruteforce.selected_stocks" :key="s">{{ s }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </template>
+          <el-empty v-else-if="!compareLoading" description="请设置参数并运行对比分析"></el-empty>
+        </el-tab-pane>
+
+      </el-tabs>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      量子组合投资优化云平台 | Quantum Portfolio Optimization Platform
+    </footer>
+  </div>
+
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script src="https://unpkg.com/element-plus"></script>
+  <script src="https://unpkg.com/echarts@5/dist/echarts.min.js"></script>
+  <script src="https://unpkg.com/@element-plus/icons-vue"></script>
+  <script src="/static/app.js"></script>
+</body>
+</html>

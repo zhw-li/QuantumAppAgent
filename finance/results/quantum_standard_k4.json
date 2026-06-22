@@ -1,0 +1,120 @@
+{
+  "symbols": [
+    "AAPL",
+    "MSFT",
+    "JPM",
+    "JNJ",
+    "HD",
+    "KO",
+    "CAT",
+    "IBM"
+  ],
+  "tier": "standard",
+  "k": 4,
+  "q": 0.5,
+  "solution": [
+    1,
+    1,
+    0,
+    1,
+    0,
+    1,
+    0,
+    0
+  ],
+  "selected_indices": [
+    0,
+    1,
+    3,
+    5
+  ],
+  "selected_stocks": [
+    "AAPL",
+    "MSFT",
+    "JNJ",
+    "KO"
+  ],
+  "weights": {
+    "AAPL": 0.25,
+    "MSFT": 0.25,
+    "JNJ": 0.25,
+    "KO": 0.25,
+    "JPM": 0.0,
+    "HD": 0.0,
+    "CAT": 0.0,
+    "IBM": 0.0
+  },
+  "portfolio_return": 0.7715820238102293,
+  "portfolio_risk": 0.8679796074535037,
+  "portfolio_sharpe": 0.8889402667810509,
+  "sharpe_ratio": 0.8889402667810509,
+  "cost_gap": 0.0,
+  "optimal_energy": -1.7065238032899952,
+  "penalty_weight": 4.5993811041311075,
+  "norm_factor": 33.195667728917755,
+  "n_qubits": 8,
+  "depth": 3,
+  "top_bitstrings": [
+    {
+      "bitstring": "11100100",
+      "probability": 0.012401283402667763,
+      "is_selected": false
+    },
+    {
+      "bitstring": "00011011",
+      "probability": 0.012381758379495724,
+      "is_selected": false
+    },
+    {
+      "bitstring": "00010111",
+      "probability": 0.012300406150904173,
+      "is_selected": false
+    },
+    {
+      "bitstring": "10010011",
+      "probability": 0.012290767436270568,
+      "is_selected": false
+    },
+    {
+      "bitstring": "00110011",
+      "probability": 0.01227416283901088,
+      "is_selected": false
+    },
+    {
+      "bitstring": "11001100",
+      "probability": 0.012239895550075434,
+      "is_selected": false
+    },
+    {
+      "bitstring": "11010100",
+      "probability": 0.012237845964298931,
+      "is_selected": true
+    },
+    {
+      "bitstring": "01010011",
+      "probability": 0.012230192641844499,
+      "is_selected": false
+    },
+    {
+      "bitstring": "01000111",
+      "probability": 0.012166565384334757,
+      "is_selected": false
+    },
+    {
+      "bitstring": "01101100",
+      "probability": 0.012087907962458176,
+      "is_selected": false
+    }
+  ],
+  "brute_force": {
+    "selected_stocks": [
+      "AAPL",
+      "MSFT",
+      "JNJ",
+      "KO"
+    ],
+    "portfolio_return": 0.7715820238102293,
+    "portfolio_risk": 0.8679796074535037,
+    "portfolio_sharpe": 0.8889402667810509
+  }
+}

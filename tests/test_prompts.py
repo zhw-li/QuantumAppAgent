@@ -1,5 +1,7 @@
 """Tests for EvoScientist/prompts.py."""
 
+from pathlib import Path
+
 from EvoScientist.prompts import (
     DELEGATION_STRATEGY,
     EVOSCIENTIST_IDENTITY,
@@ -41,6 +43,35 @@ class TestGetSystemPrompt:
     def test_contains_delegation(self):
         result = get_system_prompt()
         assert "Sub-Agent Delegation" in result
+
+    def test_quantum_application_workflow_replaces_research_addendum(self):
+        result = get_system_prompt()
+        assert "Research Lifecycle" not in result
+        assert "Quantum Application Delivery (when applicable)" not in result
+        assert "Quantum Application Lifecycle" in result
+        for term in (
+            "quantum application",
+            "cloud showcase",
+            "experiment-pipeline",
+            "success signals",
+            "verification_report.md",
+            "cqlib-sdk",
+            "qccp-frontend",
+            "qccp-service",
+        ):
+            assert term in result
+
+    def test_quantum_application_workflow_avoids_top_level_release_gates(self):
+        result = get_system_prompt()
+        for term in (
+            "G0-G5",
+            "G0_REQUIREMENT_STRUCTURED",
+            "release_gate.json",
+            "quantum-app-validation",
+            "release gates",
+            "release-gate",
+        ):
+            assert term not in result
 
     def test_no_numeric_limits(self):
         result = get_system_prompt()
@@ -203,3 +234,37 @@ class TestDangerousShellGuidelines:
     def test_dangerous_without_cwd_falls_back(self):
         result = get_system_prompt(dangerous=True)
         assert "DANGEROUS MODE" in result
+
+
+class TestQuantumApplicationSubagentHints:
+    def test_subagent_prompts_replace_native_workflow_with_application_routes(self):
+        config_dir = Path(__file__).resolve().parents[1] / "EvoScientist" / "subagents"
+        text = "\n".join(path.read_text(encoding="utf-8") for path in config_dir.glob("*.yaml"))
+
+        for term in (
+            "experiment-pipeline",
+            "cqlib-sdk",
+            "cqlib-qaoa",
+            "ui-design-spec",
+            "qccp-frontend",
+            "qccp-service",
+            "README.md",
+            "INTEGRATE.md",
+            "verification_report.md",
+            "slides",
+        ):
+            assert term in text
+
+    def test_subagent_prompts_avoid_top_level_release_gates(self):
+        config_dir = Path(__file__).resolve().parents[1] / "EvoScientist" / "subagents"
+        text = "\n".join(path.read_text(encoding="utf-8") for path in config_dir.glob("*.yaml"))
+
+        for term in (
+            "G0-G5",
+            "G0_REQUIREMENT_STRUCTURED",
+            "release_gate.json",
+            "quantum-app-validation",
+            "release gates",
+            "release-gate",
+        ):
+            assert term not in text
