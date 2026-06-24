@@ -1,7 +1,7 @@
 [project]
 name = "EvoScientist"
 version = "0.1.6"
-description = "EvoScientist: Towards Self-Evolving AI Scientists for End-to-End Scientific Discovery"
+description = "TYQA (TianYan Quantum Agent): end-to-end quantum application framework for the TianYan quantum computing cloud platform, built on EvoScientist and cqlib"
 readme = "README.md"
 requires-python = ">=3.11"
 license = "Apache-2.0"
@@ -11,7 +11,7 @@ authors = [
 maintainers = [
     { name = "Xi Zhang" },
 ]
-keywords = ["ai-scientific", "scientific-discovery", "self-evolving", "ai-scientists", "end-to-end"]
+keywords = ["quantum-computing", "quantum-applications", "qaoa", "vqe", "quantum-machine-learning", "cqlib", "tianyan", "ai-agent", "self-evolving"]
 classifiers = [
     "Programming Language :: Python :: 3",
 ]
@@ -90,9 +90,9 @@ all-channels = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/EvoScientist/EvoScientist"
-"Bug Tracker" = "https://github.com/EvoScientist/EvoScientist/issues"
-"Documentation" = "https://github.com/EvoScientist/EvoScientist#readme"
+"Homepage" = "https://github.com/zhw-li/TYQA"
+"Bug Tracker" = "https://github.com/zhw-li/TYQA/issues"
+"Documentation" = "https://github.com/zhw-li/TYQA#readme"
 
 [project.scripts]
 evoscientist = "EvoScientist.cli:main"

@@ -1,4 +1,9 @@
-"""EvoScientist Agent - AI-powered research and code execution.
+"""TYQA (TianYan Quantum Agent) — quantum application agent built on EvoScientist.
+
+The runtime package that takes a research question from idea to a validated
+quantum application and cloud showcase, end to end. It is powered by the cqlib
+quantum SDK and the EvoScientist multi-agent harness; see the top-level README
+for the six-phase quantum-application workflow and the skills under ``skills/``.
 
 This package exposes a convenience API at the package root while keeping
 imports lazy, so lightweight modules (for example config helpers) can be used

@@ -1,10 +1,11 @@
 <h1 align="center">🍪 Examples & Recipes</h1>
 
-<h3 align="center">Customize your EvoScientist — harness it, make it yours.</h3>
+<h3 align="center">Customize your TYQA — harness it, make it yours.</h3>
 
 | Example                                                     | Description                                                                     |
 |------------------------------------------------------------|---------------------------------------------------------------------------------|
-| [Survey literature](https://github.com/EvoScientist/EvoScientist/tree/main/docs/examples/survey-literature#literature-survey)   | Run EvoScientist with the `paper-navigator` skill to produce a bilingual, conference-grade literature survey |
+| [Quantum applications](https://github.com/EvoScientist/EvoScientist/tree/main/quantum_app_example) | Five end-to-end QAOA / VQE / QRC showcases for the TianYan quantum cloud (Finance_QAOA, MaxCut_QAOA, UC_QAOA, H2_VQE, Finance_QRC), each with classical baseline, quantum method, verification report, and SFC showcase page |
+| [Survey literature](https://github.com/EvoScientist/EvoScientist/tree/main/docs/examples/survey-literature#literature-survey)   | Run with the `paper-navigator` skill to produce a bilingual, conference-grade literature survey |
 
 
 | Recipe                                                     | Description                                                                     |

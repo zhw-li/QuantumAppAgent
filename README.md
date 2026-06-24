@@ -2,24 +2,12 @@
     <picture>
       <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/logo-dark.svg">
       <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/logo-light.svg">
-      <img alt="EvoScientist Logo" src="https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/logo-dark.svg" width="80%">
+      <img alt="TYQA Logo" src="https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/logo-dark.svg" width="80%">
     </picture>
 </div>
 
 <div align="center">
-<a href="https://pypi.org/project/EvoScientist/"><picture>
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/badge-pypi-light.svg">
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/badge-pypi-dark.svg">
-  <img alt="PyPI v0.1.6" src="https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/badge-pypi-light.svg" height="28">
-</picture></a><a href="https://EvoScientist.github.io/"><picture>
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/badge-website-light.svg">
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/badge-website-dark.svg">
-  <img alt="Website" src="https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/badge-website-light.svg" height="28">
-</picture></a><a href="https://github.com/langchain-ai/deepagents"><picture>
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/badge-framework-light.svg">
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/badge-framework-dark.svg">
-  <img alt="Framework DeepAgents" src="https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/badge-framework-light.svg" height="28">
-</picture></a><a href="https://github.com/EvoScientist/EvoScientist/blob/main/LICENSE"><picture>
+<a href="https://github.com/EvoScientist/EvoScientist/blob/main/LICENSE"><picture>
   <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/badge-license-light.svg">
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/badge-license-dark.svg">
   <img alt="License Apache 2.0" src="https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/badge-license-light.svg" height="28">
@@ -29,7 +17,7 @@
 ---
 
 <div align="center">
-<a href="https://github.com/EvoScientist/EvoScientist"><img src="https://readme-typing-svg.demolab.com?font=Sans-Serif&pause=1000&color=64B5F6&center=true&vCenter=true&width=435&lines=Towards+Self-Evolving+AI+Scientists;Harness+Vibe+Research" alt="Typing SVG" /></a>
+<a href="https://github.com/zhw-li/TYQA"><img src="https://readme-typing-svg.demolab.com?font=Sans-Serif&pause=1000&color=64B5F6&center=true&vCenter=true&width=435&lines=TianYan+Quantum+Agent;Quantum+Applications%2C+End+to+End" alt="Typing SVG" /></a>
 </div>
 
 <div align="center">
@@ -38,135 +26,59 @@
 
 </div>
 
-**EvoScientist aims to harness vibe research by enabling self-evolving AI scientists that autonomously explore, generate insights, and iteratively improve.
-It is designed to be opinionated and ready to use out of the box, offering a living research system that grows alongside evolving agent skills, toolsets, and memory bases.
-Moving beyond traditional human-in-the-loop systems, EvoScientist adopts a human-on-the-loop paradigm, where AI acts as a research buddy that co-evolves with human researchers and internalizes scholarly taste and scientific judgment.**
+**TYQA (TianYan Quantum Agent, 天衍量智) is a self-evolving agent framework that moves a research question from idea to a validated quantum application and cloud showcase — end to end.
+Built on the [EvoScientist](https://github.com/EvoScientist/EvoScientist) agent harness and the [cqlib](https://github.com/cqlib-quantum/cqlib) quantum SDK, it orchestrates specialized sub-agents to survey methods, establish classical baselines, build the quantum algorithm, package a runnable application, generate the TianYan (天衍) quantum-cloud showcase UI, and verify the evidence — growing its skills and memory across cycles.**
 
-<h3>🏆 Awards & Recognition</h3>
-
-<table>
-  <tr>
-      <td align="center" valign="top" width="33%">
-      <img src="https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/ICAIS_awards.JPG" height="180" alt="ICAIS 2025 Awards"/>
-      <br />
-      <sub><b>Best Paper & Appraisal Award</b></sub>
-    </td>
-    <td align="center" valign="top" width="33%">
-      <img src="https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/ICAIS_best_paper.png" height="180" alt="Best Paper"/>
-      <br />
-      <sub><b>AI-Generated Best Paper</b></sub>
-    </td>
-    <td align="center" valign="top" width="33%">
-      <img src="https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/deepresearch_bench_2.png" height="180" alt="DeepResearch Bench II #1"/>
-      <br />
-      <sub><b>#1 on DeepResearch Bench II</b></sub>
-    </td>
-  </tr>
-</table>
-
-<br />
-
-<table>
-  <tr>
-    <td align="center" valign="top" width="33%">
-      <img src="https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/DeepResearch_Bench.png" height="180" alt="DeepResearch Bench #1"/>
-      <br />
-      <sub><b>#1 on DeepResearch Bench</b></sub>
-    </td>
-    <td align="center" valign="top" width="33%">
-      <img src="https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/asta_bench_code.png" height="180" alt="AstaBench Code & Execution #1"/>
-      <br />
-      <sub><b>#1 on AstaBench Code & Execution</b></sub>
-    </td>
-    <td align="center" valign="top" width="33%">
-      <img src="https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/asta_bench_data.png" height="180" alt="AstaBench Data Analysis #1"/>
-      <br />
-      <sub><b>#1 on AstaBench Data Analysis</b></sub>
-    </td>
-  </tr>
-</table>
-
-<h3>⚡ Unified Control, Different Surfaces</h3>
-
-<table>
-  <tr>
-    <th><p align="center">🌐 Desktop WebUI</p></th>
-  </tr>
-  <tr>
-    <td align="center">
-      <video src="https://github.com/user-attachments/assets/b977f2d5-488a-428d-9c02-b6b27c1521f8" autoplay loop muted playsinline width="100%">
-        <a href="https://github.com/user-attachments/assets/b977f2d5-488a-428d-9c02-b6b27c1521f8">View WebUI demo</a>
-      </video>
-    </td>
-  </tr>
-</table>
-
-<table>
-  <tr>
-    <th width="75%"><p align="center">🖥️ CLI / TUI</p></th>
-    <th width="25%"><p align="center">📱 Mobile</p></th>
-  </tr>
-  <tr>
-    <td align="center">
-      <video src="https://github.com/user-attachments/assets/a40ba429-bb07-4663-b5b1-77aed1a833b9" autoplay loop muted playsinline width="100%">
-        <a href="https://github.com/user-attachments/assets/a40ba429-bb07-4663-b5b1-77aed1a833b9">View demo video</a>
-      </video>
-    </td>
-    <td align="center">
-      <video src="https://github.com/user-attachments/assets/4919e6f4-e434-46c9-98c7-35d7482868a6" width="100%" autoplay loop muted playsinline>
-        <a href="https://github.com/user-attachments/assets/4919e6f4-e434-46c9-98c7-35d7482868a6">View mobile demo</a>
-      </video>
-    </td>
-  </tr>
-</table>
+> [!NOTE]
+> The project is rebranding to **tyqa**. For now the Python package name, the `EvoSci` / `evosci` CLI commands, and the `~/.config/evoscientist/` config path still use the upstream `EvoScientist` identifiers and remain fully functional. The full stack rename (package, CLI, config directory, env vars) is tracked as a follow-up.
 
 ## ✨ Features
 - **🤖 Multi-Agent Team** — 6 sub-agents (plan, research, code, debug, analyze, write) working in concert.
+- **⚛️ Quantum Algorithm Stack** — `cqlib-sdk` routes to QAOA, VQE, quantum ML, and hybrid quantum-classical pipelines.
+- **☁️ TianYan Cloud Integration** — generate `qccp-web` SFC showcase pages, backend APIs, and deployment artifacts in one pass.
+- **🔬 Six-Phase Quantum Workflow** — Intake → baseline → quantum method → app packaging → verification → write-up.
 - **🧠 Self-Evolving Memory** — User profile and observations auto-distilled each turn, growing across sessions.
 - **🌐 Multi-Provider** — Anthropic, OpenAI, Google, MiniMax, NVIDIA — one config to switch.
 - **📱 Multi-Channel** — CLI as the hub; Telegram, Slack, Feishu, WeChat, and more — one agent session.
 - **🖥️ Desktop WebUI** — Workspace-panel web app, one terminal via `--ui webui`.
-- **🔬 Scientific Workflow** — Intake → plan → execute → evaluate → write → verify.
 - **🔄 Code Generation Modes** — More Effort (iterative refinement), continuously improving code quality.
-- **⚡ Adaptive Tools** — Per-turn tool selection keeps only relevant tools visible, reducing noise.
-- **✂️ Context Editing** — Dynamic system prompt rewriting based on conversation state.
+- **⚡ Adaptive Tools & Context** — Per-turn tool selection and dynamic system-prompt rewriting keep only what's relevant.
 - **🔌 MCP & Skills** — Plug in MCP servers or install skills from GitHub on the fly.
 
-> [!TIP]
-> Looking for ready-to-use research skills? Check out [**EvoSkills**](https://github.com/EvoScientist/EvoSkills) — powered by [**EvoScientist**](https://github.com/EvoScientist/EvoScientist)'s engine and installable skills, the entire end-to-end research lifecycle is covered out of the box. [**EvoSkills**](https://github.com/EvoScientist/EvoSkills) are also compatible with other CLI coding agents.
+## 🧪 Quantum Application Examples
 
-## 🔥 News
-- **[03 Jun 2026]** 🥈 Ranked #2 overall — and 🥇 #1 among `GPT-5.4`-based agents — on [ResearchClawBench](https://github.com/InternScience/ResearchClawBench) (Agent Mode)! [**Leaderboard**](https://internscience.github.io/ResearchClawBench-Home/) 👈
-- **[18 Apr 2026]** 🥇 Ranked #1 on [DeepResearch Bench](https://deepresearch-bench.github.io/) at submission time! [**Leaderboard**](https://huggingface.co/spaces/muset-ai/DeepResearch-Bench-Leaderboard) 👈
-- **[13 Apr 2026]** 🥇 Reclaimed #1 on [DeepResearch Bench II](https://agentresearchlab.com/benchmarks/deepresearch-bench-ii/index.html#leaderboard) at submission time! [**Leaderboard**](https://agentresearchlab.com/benchmarks/deepresearch-bench-ii/index.html#leaderboard) 👈
-- **[26 Mar 2026]** 🥇 Ranked #1 on [AstaBench Data Analysis](https://allenai-asta-bench-leaderboard.hf.space/home) at submission time! [**Leaderboard**](https://allenai-asta-bench-leaderboard.hf.space/data-analysis) 👈
-- **[25 Mar 2026]** 🥇 Ranked #1 on [AstaBench Code & Execution](https://allenai-asta-bench-leaderboard.hf.space/home) at submission time! [**Leaderboard**](https://allenai-asta-bench-leaderboard.hf.space/code-execution) 👈
-- **[13 Mar 2026]** 🚀 [**EvoScientist**](https://github.com/EvoScientist/EvoScientist) officially debuts!
-- **[11 Mar 2026]** ⛳ Technical Report is live! [**Check it out**](https://arxiv.org/abs/2603.08127) 👈
-- **[06 Mar 2026]** 🥇 Ranked #1 on [DeepResearch Bench II](https://agentresearchlab.com/benchmarks/deepresearch-bench-ii/index.html#leaderboard) at submission time! [**Leaderboard**](https://agentresearchlab.com/benchmarks/deepresearch-bench-ii/index.html#leaderboard) 👈
-- **[24 Nov 2025]** 🏆 6/6 accepted at [ICAIS 2025](https://icais.ai/) AI Scientist Track — Best Paper & AI Reviewer's Appraisal Award! [**Details**](https://airaxiv.com/papers/?q=zacharyzhang2022%40gmail.com) 👈
+Ready-to-run quantum applications live under [`quantum_app_example/`](./quantum_app_example). Each ships with a classical baseline, a quantum method, a verification report, and a TianYan-cloud SFC showcase page.
 
-<details>
-<summary>📦 Release Highlights — version changelog</summary>
+| Example | Quantum method | Classical baseline | Primary metric |
+| --- | --- | --- | --- |
+| [`Finance_QAOA`](./quantum_app_example/Finance_QAOA) | QAOA portfolio selection | Markowitz mean-variance + brute force | `cost_gap_percent` |
+| [`MaxCut_QAOA`](./quantum_app_example/MaxCut_QAOA) | QAOA graph partitioning | brute-force enumeration | `cost_gap_percent` |
+| [`UC_QAOA`](./quantum_app_example/UC_QAOA) | QAOA unit commitment (power systems) | brute-force search | `optimality_gap_percent` |
+| [`H2_VQE`](./quantum_app_example/H2_VQE) | VQE H₂ ground-state energy | exact diagonalization | energy error vs chemical accuracy (1.6 mHa) |
+| [`Finance_QRC`](./quantum_app_example/Finance_QRC) | Quantum reservoir computing (stock prediction) | Echo State Network | RMSE |
 
-- **[11 Jun 2026]** **[v0.1.6](https://github.com/EvoScientist/EvoScientist/releases/tag/v0.1.6)** — Session persistence fix: WebUI / `langgraph dev` threads survive restarts (SQLite checkpointer + scoped thread restore), memory-worker checkpoint cleanup (delete-on-completion + startup purge), short thread IDs in `/threads` and resume hints.
-- **[11 Jun 2026]** **[v0.1.5](https://github.com/EvoScientist/EvoScientist/releases/tag/v0.1.5)** — Dangerous mode (real-filesystem access with safety checks), LangGraph streaming v3 pipeline, opt-in Anthropic prompt caching via OpenRouter, claude-fable-5, free-scrolling TUI, Windows CI support, public Cloudflare tunnel for `EvoSci deploy` (`--tunnel`).
-- **[07 Jun 2026]** **[v0.1.4](https://github.com/EvoScientist/EvoScientist/releases/tag/v0.1.4)** — Auxiliary model for background tasks & tool selection, observation-memory lifecycle, Qwen3.7-Max/Plus (DashScope), UI-backend selection, plus an OpenRouter multi-turn reasoning fix.
-- **[03 Jun 2026]** **[v0.1.3](https://github.com/EvoScientist/EvoScientist/releases/tag/v0.1.3)** — Multimodal handling (image + PDF/doc flatten/hoisting, text-only model fallback), runtime-context middleware, memory middleware → profile files with stream timeline narration, textual CJK-input fix.
-- **[02 Jun 2026]** **[v0.1.2](https://github.com/EvoScientist/EvoScientist/releases/tag/v0.1.2)** — Browser WebUI mode, `EvoSci deploy` standalone LangGraph server, default model → claude-sonnet-4-6, MiniMax M3, plus sandbox-timeout and async-notifier channel-routing fixes.
-- **[19 May 2026]** **[v0.1.1](https://github.com/EvoScientist/EvoScientist/releases/tag/v0.1.1)** — deepagents 0.6.2 DeltaChannel upgrade, tier-aware skill mounts, status & elapsed-time bar, QQ inline buttons.
-- **[08 May 2026]** **[v0.1.0](https://github.com/EvoScientist/EvoScientist/releases/tag/v0.1.0)** — Async sub-agents (langgraph dev), official Docker image, personal WeChat, sessions-DB compaction.
-- **[26 Apr 2026]** **[v0.0.9](https://github.com/EvoScientist/EvoScientist/releases/tag/v0.0.9)** — Faster startup, in-session model switching, unified slash commands, DeepSeek V4 thinking fix.
-- **[21 Apr 2026]** **[v0.0.8](https://github.com/EvoScientist/EvoScientist/releases/tag/v0.0.8)** — Unified data directory, status bar, enhanced ask-user & auto-mode.
-- **[10 Apr 2026]** **[v0.0.7](https://github.com/EvoScientist/EvoScientist/releases/tag/v0.0.7)** — Global skills directory, Moonshot/Kimi providers, ccproxy fixes, channel improvements.
-- **[03 Apr 2026]** **[v0.0.6](https://github.com/EvoScientist/EvoScientist/releases/tag/v0.0.6)** — Dynamic context management, OpenRouter reasoning, More Effort mode, GLM-5.1.
-- **[27 Mar 2026]** **[v0.0.5](https://github.com/EvoScientist/EvoScientist/releases/tag/v0.0.5)** — Context-retry middleware, OpenAI relay config, Feishu event-loop fix, `/compact`.
-- **[24 Mar 2026]** **[v0.0.4](https://github.com/EvoScientist/EvoScientist/releases/tag/v0.0.4)** — `@file` mentions, resume history, Feishu WebSocket, LaTeX setup.
-- **[20 Mar 2026]** **[v0.0.3](https://github.com/EvoScientist/EvoScientist/releases/tag/v0.0.3)** — Voice input (STT), MiniMax/DeepSeek providers, MCP & skill browsers.
-- **[17 Mar 2026]** **[v0.0.2](https://github.com/EvoScientist/EvoScientist/releases/tag/v0.0.2)** — OAuth sign-in, human-in-the-loop & `ask_user`, headless serve mode.
-- **[13 Mar 2026]** **[v0.0.1](https://github.com/EvoScientist/EvoScientist/releases/tag/v0.0.1)** — First public release of the self-evolving AI Scientist.
+## 🏗️ Framework Architecture
 
-</details>
+TYQA drives every project through a staged quantum-application lifecycle, composing the right skills at each phase:
+
+```
+research-survey / paper-navigator   ←  methods, datasets, baselines, prior results
+        │
+research-ideation / paper-planning  ←  application framing, validation & artifact plan
+        │
+   experiment-pipeline               ←  stage-gated execution (baseline → quantum → app → verify)
+        │
+cqlib-sdk → cqlib-qaoa / cqlib-vqe   ←  quantum algorithm + quantum_report.json
+          / cqlib-qml / cqlib-hybrid
+        │
+ui-design-spec → qccp-frontend /     ←  cloud showcase UI + API/service + deploy evidence
+                 qccp-service
+        │
+paper-writing / paper-review /       ←  report, README, INTEGRATE notes, slides
+academic-slides
+```
+
+Not every project needs every phase — the starting point matches what you already have. The stage gates and skill-routing rules live in [`skills/experiment-pipeline/SKILL.md`](./skills/experiment-pipeline/SKILL.md); the quantum-algorithm skills are documented under [`skills/`](./skills).
 
 ## 📖 Table of Contents
 
@@ -176,11 +88,9 @@ Moving beyond traditional human-in-the-loop systems, EvoScientist adopts a human
 - [🍪 Examples & Recipes](#-examples--recipes)
 - [🔌 MCP Integration](#-mcp-integration)
 - [📱 Channels](#-channels)
-- [📚 Acknowledgments](#-acknowledgments)
 - [🎯 Roadmap](#-ᯓ-roadmap)
-- [🌍 Project Roles](#-project-roles)
 - [🤝 Contributing](#-contributing)
-- [📝 Citation](#-citation)
+- [📚 Acknowledgments](#-acknowledgments)
 
 ## 📦 Installation
 
@@ -290,9 +200,9 @@ A pre-built image is published to [GitHub Container Registry](https://github.com
 - **`uv`** — used by the MCP registry to install Python MCP servers on demand
 - **Node.js 24 LTS + `npx`** — required by the majority of MCP servers
 
-The **iMessage** channel isn't usable from the container — it requires the `imsg` CLI talking to macOS's Messages.app, which is host-OS-specific. Run EvoScientist directly on macOS if you need iMessage.
+The **iMessage** channel isn't usable from the container — it requires the `imsg` CLI talking to macOS's Messages.app, which is host-OS-specific. Run the agent directly on macOS if you need iMessage.
 
-Running EvoScientist in a container also **sandboxes the agent's shell access** — file edits and shell commands stay confined to volumes you explicitly mount.
+Running the agent in a container also **sandboxes the agent's shell access** — file edits and shell commands stay confined to volumes you explicitly mount.
 
 ```bash
 docker run -it --rm \
@@ -534,9 +444,8 @@ for state in EvoScientist_agent.stream(
 
 ## 🍪 Examples & Recipes
 
-A curated collection of official examples, advanced usage patterns, and community-contributed recipes to help you get the most out of EvoScientist.
-
-👉 **[Browse all examples & recipes](https://github.com/EvoScientist/EvoScientist/tree/main/docs#-examples--recipes)**
+- **Quantum applications** — see [`quantum_app_example/`](./quantum_app_example) for the five end-to-end QAOA / VQE / QRC showcases above.
+- **Other examples & recipes** — a curated collection of usage patterns and deployment recipes: 👉 [browse all](https://github.com/EvoScientist/EvoScientist/tree/main/docs#-examples--recipes)
 
 <p align="right"><a href="#top">🔝Back to top</a></p>
 
@@ -582,151 +491,42 @@ The channel can also be started interactively with `/channel` in the CLI session
 
 <p align="right"><a href="#top">🔝Back to top</a></p>
 
-## 📚 Acknowledgments
-
-This project builds upon the following outstanding open-source works:
-
-- [**LangChain**](https://github.com/langchain-ai/langchain) — A framework for building agents and LLM-powered applications.
-- [**DeepAgents**](https://github.com/langchain-ai/deepagents) — The batteries-included agent harness.
-
-We thank the authors for their valuable contributions to the open-source community.
-
-<p align="right"><a href="#top">🔝Back to top</a></p>
-
 ## 🎯 ᯓ➤ Roadmap
 
-Coming soon:
+Done:
 - [x] 🖥️ Full-screen TUI and classic CLI interfaces
-- [x] 📻 EvoMemory v1.0 shipped
-- [x] ⚒️ 200+ predefined skills built in
-- [x] 🧩 Built-in research-lifecycle skills shipped
-- [x] 👋 Human-in-the-loop action approval
-- [x] 🦾 Agent-initiated human clarification
-- [x] 📑 Technical report on the way
-- [x] 🔐 OAuth sign-in (CLI coding agent subscribers)
-- [x] 📺 Web app with workspace UI
-- [ ] 📹 Demo and tutorial in the works
-- [ ] 📊 Benchmark suite to be released
-- [ ] ⏰ Scheduled tasks for the core system planned
+- [x] ⚛️ cqlib quantum-algorithm skill stack (QAOA / VQE / QML / hybrid)
+- [x] ☁️ TianYan cloud showcase generation (qccp-web SFC + backend service)
+- [x] 🔬 Six-phase quantum-application pipeline with stage gates
+- [x] 🧪 Five end-to-end quantum application examples
+- [x] 🧠 Self-evolving memory across sessions
+- [x] 👋 Human-on-the-loop action approval & agent-initiated clarification
+- [x] 📺 Desktop WebUI with workspace panels
 
-Stay tuned — more features are on the way!
-
-<p align="right"><a href="#top">🔝Back to top</a></p>
-
-## 🌍 Project Roles
-
-#### Core Contributors
-
-<table>
-  <tbody>
-    <tr>
-      <td align="center">
-        <a href="https://x-izhang.github.io/">
-          <img src="https://x-izhang.github.io/author/xi-zhang/avatar_hu13660783057866068725.jpg"
-               width="100" height="100"
-               style="object-fit: cover; border-radius: 20%;" alt="Xi Zhang"/>
-          <br />
-          <sub><b>Xi Zhang</b></sub>
-        </a>
-      </td>
-      <td align="center">
-        <a href="https://youganglyu.github.io/">
-          <img src="https://youganglyu.github.io/images/profile.png"
-               width="100" height="100"
-               style="object-fit: cover; border-radius: 20%;" alt="Yougang Lyu"/>
-          <br />
-          <sub><b>Yougang Lyu</b></sub>
-        </a>
-      </td>
-      <td align="center">
-        <a href="https://din0s.me/">
-          <img src="https://din0s.me/images/pk.jpg"
-               width="100" height="100"
-               style="object-fit: cover; border-radius: 20%;" alt="Dinos Papakostas"/>
-          <br />
-          <sub><b>Dinos Papakostas</b></sub>
-        </a>
-      </td>
-      <td align="center">
-        <a href="https://go0day.github.io/">
-          <img src="https://go0day.github.io/authors/admin/avatar_hu_ee1051aceae96124.png"
-               width="100" height="100"
-               style="object-fit: cover; border-radius: 20%;" alt="Yuyue Zhao"/>
-          <br />
-          <sub><b>Yuyue Zhao</b></sub>
-        </a>
-      </td>
-      <td align="center">
-        <a href="https://muxincg2004.github.io/">
-          <img src="https://muxincg2004.github.io/resume_avatar.jpg"
-               width="100" height="100"
-               style="object-fit: cover; border-radius: 20%;" alt="Ziheng Zhang"/>
-          <br />
-          <sub><b>Ziheng Zhang</b></sub>
-        </a>
-      </td>
-      <td align="center">
-        <a href="https://xiaohuiyan.github.io/">
-          <img src="https://xiaohuiyan.github.io/img/me.jpg"
-               width="100" height="100"
-               style="object-fit: cover; border-radius: 20%;" alt="Xiaohui Yan"/>
-          <br />
-          <sub><b>Xiaohui Yan</b></sub>
-        </a>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-#### Contributors
-
-Jan Piotrowski, Wiktor Cupiał, Jakub Kaliski, Jakub Filipiuk, Xinhao Yi, Shuyu Guo, Andreas Sauter, Wenxiang Hu, Jacopo Urbani, Zaiqiao Meng, Jun Luo, Lun Zhou
-
-> <a href="https://xiaoyi.huawei.com/chat/research"><img src="https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/xiaoyi-deepresearch.webp" height="16" alt="Xiaoyi DeepResearch" align="center" /></a> [*Xiaoyi DeepResearch*](https://xiaoyi.huawei.com/chat/research) *Team* and the wider open-source community contribute to this project.
-
-For any inquiries or collaboration opportunities, please contact: [**EvoScientist.ai@gmail.com**](mailto:evoscientist.ai@gmail.com)
+Coming next:
+- [ ] 🏷️ Full-stack rename to `tyqa` (package, CLI, config directory, env vars)
+- [ ] ⚙️ Real quantum-hardware backends (beyond the cqlib simulator)
+- [ ] 🧩 More quantum application examples across domains
+- [ ] 📊 Benchmark suite for quantum-application workflows
+- [ ] 📹 Demo and tutorial
 
 <p align="right"><a href="#top">🔝Back to top</a></p>
 
 ## 🤝 Contributing
 
-<img align="right" alt="EvoScientist Team" src="https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/EvoScientist_team.png" width="20%" />
-
-We welcome contributions from developers, researchers, and AI coding agents at all levels. Our [Contributing Guidelines](./CONTRIBUTING.md) are designed for both humans and AI agents — covering architecture, patterns, extension guides, and code standards to help you contribute safely and effectively.
-
-### 👥 Community Contributors
-
-⚗️ Join the EvoScientist community to discuss AI-driven research, share experiment results, and help shape the future of automated scientific discovery.
-
-- [Discord](https://discord.gg/AZ9ZMXkunY) — Ask questions, share findings, and collaborate with researchers and developers in real-time.
-- [WeChat](https://github.com/EvoScientist/EvoScientist/blob/main/.github/assets/cn_info.md) — Connect with our Chinese-speaking research community.
-
-  <img src="https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/wechat_group.jpeg" alt="WeChat QR Code" width="200"/>
-
-Every contribution brings us one step closer to a future where AI accelerates scientific breakthroughs for all of humanity.
-
-<a href="https://github.com/EvoScientist/EvoScientist/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=EvoScientist/EvoScientist" />
-</a>
-
-<!-- ### 📈 Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=EvoScientist/EvoScientist&type=date&legend=bottom-right)](https://www.star-history.com/?repos=EvoScientist%2FEvoScientist&type=date&legend=bottom-right) -->
+We welcome contributions from developers, researchers, and AI coding agents. Our [Contributing Guidelines](./CONTRIBUTING.md) cover architecture, patterns, extension guides, and code standards to help you contribute safely and effectively.
 
 <p align="right"><a href="#top">🔝Back to top</a></p>
 
-## 📝 Citation
+## 📚 Acknowledgments
 
-If you find our paper and code useful in your research and applications, please cite using this BibTeX:
+TYQA is built on outstanding open-source works:
 
-```bibtex
-@article{evoscientist2026, 
-  title={EvoScientist: Towards Multi-Agent Evolving AI Scientists for End-to-End Scientific Discovery}, 
-  author={Yougang Lyu and Xi Zhang and Xinhao Yi and Yuyue Zhao and Shuyu Guo and Wenxiang Hu and Jan Piotrowski and Jakub Kaliski and Jacopo Urbani and Zaiqiao Meng and Lun Zhou and Xiaohui Yan}, 
-  journal={arXiv preprint arXiv:2603.08127}, 
-  year={2026} 
-}
-```
+- [**EvoScientist**](https://github.com/EvoScientist/EvoScientist) — The self-evolving multi-agent harness this project extends.
+- [**cqlib**](https://github.com/cqlib-quantum/cqlib) — The quantum SDK powering the algorithm layer (circuits, simulators, QCIS).
+- [**LangChain**](https://github.com/langchain-ai/langchain) / [**DeepAgents**](https://github.com/langchain-ai/deepagents) / [**LangGraph**](https://github.com/langchain-ai/langgraph) — The agent framework stack.
+
+We thank the authors for their valuable contributions to the open-source community.
 
 <p align="right"><a href="#top">🔝Back to top</a></p>
 
