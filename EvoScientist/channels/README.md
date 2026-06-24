@@ -1,6 +1,6 @@
 # Channels
 
-EvoScientist provides unified integration with 10 messaging platforms. This document covers the architecture overview, message processing pipeline, capability matrix, security model, deployment guides, and troubleshooting.
+TYQA provides unified integration with 10 messaging platforms. This document covers the architecture overview, message processing pipeline, capability matrix, security model, deployment guides, and troubleshooting.
 
 Configuration file: `~/.config/evoscientist/config.yaml` (or use environment variables with the `EVOSCIENTIST_` prefix).
 

@@ -1,6 +1,9 @@
-# Contributing to EvoScientist
+# Contributing to TYQA
 
-We appreciate your interest and the time you spend helping improve EvoScientist. Please read the following guidelines before contributing.
+We appreciate your interest and the time you spend helping improve TYQA (TianYan Quantum Agent). Please read the following guidelines before contributing.
+
+> [!NOTE]
+> The project is rebranding to **tyqa**. For now the Python package name, the `EvoSci` / `evosci` CLI commands, and the `~/.config/evoscientist/` config path still use the upstream `EvoScientist` identifiers and remain fully functional.
 
 ## How you can contribute
 
@@ -10,7 +13,7 @@ We appreciate your interest and the time you spend helping improve EvoScientist.
 
 ## What we are looking for in PRs
 
-We aim to keep EvoScientist focused on core functionality that benefits the majority of users. PRs should only include:
+We aim to keep TYQA focused on core functionality that benefits the majority of users. PRs should only include:
 
 - Bug fixes / improvements to existing features
 - New features that were proposed in an issue and agreed upon with maintainers
@@ -23,8 +26,8 @@ If you want to add a niche or specialized workflow, consider packaging it as a s
 
 1. **Fork and clone** the repository:
    ```bash
-   git clone https://github.com/<your-username>/EvoScientist.git
-   cd EvoScientist
+   git clone https://github.com/<your-username>/TYQA.git
+   cd TYQA
    ```
 
 2. **Install dependencies** (requires [uv](https://docs.astral.sh/uv/)):

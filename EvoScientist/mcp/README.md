@@ -1,6 +1,6 @@
 # Model Context Protocol Integration
 
-> Connects external systems to [EvoScientist](https://github.com/EvoScientist/EvoScientist) via [Model Context Protocol (MCP)](https://modelcontextprotocol.io/).
+> Connects external systems to TYQA via [Model Context Protocol (MCP)](https://modelcontextprotocol.io/).
 
 > [!TIP]
 > Explore more servers: [MCP Server Directory](https://github.com/modelcontextprotocol/servers)

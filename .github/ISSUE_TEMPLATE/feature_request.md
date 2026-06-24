@@ -1,6 +1,6 @@
 ---
 name: Feature request
-about: Suggest an idea for EvoScientist core functionality
+about: Suggest an idea for TYQA core functionality
 title: ''
 labels: enhancement
 assignees: ''
