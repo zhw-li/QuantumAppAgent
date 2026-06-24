@@ -1,0 +1,25 @@
+{
+  "task": "stock_price_prediction",
+  "task_type": "time_series_regression",
+  "description": "Compare Quantum Reservoir Computing (QRC) vs Classic Reservoir Computing (Echo State Network) for stock price prediction on DOW 10 stocks",
+  "inputs": {
+    "data_source": "yfinance DOW 10 (AAPL, MSFT, JPM, JNJ, V, PG, UNH, HD, CVX, KO)",
+    "date_range": "2023-01-01 to 2025-01-01",
+    "features": ["Close price"],
+    "window_size": 5,
+    "train_test_split": "80/20 chronological"
+  },
+  "outputs": {
+    "predictions": "next-day closing price",
+    "metrics": ["RMSE", "MAE", "MAPE", "training_time", "parameter_count"]
+  },
+  "primary_metric": "RMSE",
+  "higher_is_better": false,
+  "quantum_method": "Quantum Reservoir Computing with cqlib StatevectorSimulator",
+  "classical_baseline": "Echo State Network (Classic Reservoir Computing)",
+  "success_signals": [
+    "QRC parameter efficiency > 90% vs Classic RC",
+    "QRC RMSE within 2x of Classic RC on average",
+    "QRC outperforms Classic RC on at least 1 stock"
+  ]
+}

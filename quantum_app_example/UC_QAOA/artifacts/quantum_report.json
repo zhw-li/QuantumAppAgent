@@ -1,0 +1,26 @@
+{
+  "task": "unit_commitment_optimization",
+  "data": "6 generators (A-F), load options 400/600/700 MW; 3 scales: 2x2 (4q), 3x2 (6q), 4x2 (8q); same as baseline",
+  "primary_metric": "optimality_gap_percent",
+  "primary_metric_definition": "|QAOA_cost - classical_optimal| / classical_optimal * 100",
+  "higher_is_better": false,
+  "method": "QAOA (p=2 layers, 5 restarts, COBYLA optimizer) with cqlib StatevectorSimulator",
+  "value": {
+    "2gens_2periods_4qubit": {"n_qubits": 4, "qaoa_cost": 19724.44, "classical_optimal": 19724.44, "optimality_gap_percent": 0.0, "solve_time_s": 6.57, "constraint_satisfied": true},
+    "3gens_2periods_6qubit": {"n_qubits": 6, "qaoa_cost": 28067.22, "classical_optimal": 28067.22, "optimality_gap_percent": 0.0, "solve_time_s": 4.75, "constraint_satisfied": true},
+    "4gens_2periods_8qubit": {"n_qubits": 8, "qaoa_cost": 28674.86, "classical_optimal": 28067.22, "optimality_gap_percent": 2.16, "solve_time_s": 11.65, "constraint_satisfied": true}
+  },
+  "feasibility_rate": "3/3 (100%) all scales returned feasible solutions",
+  "optimal_rate": "2/3 (67%) exact optimum at 4q and 6q; 2.16% gap at 8q",
+  "avg_gap_percent": 0.72,
+  "command": "curl -X POST http://127.0.0.1:8001/api/solve -H 'Content-Type: application/json' -d '{\"generator_ids\":[\"A\",\"B\"],\"loads\":[400,600],\"qaoa_layers\":2,\"restarts\":5}'  (per scale)",
+  "artifact_paths": ["artifacts/uc_experiment_multiscale.json"],
+  "seed": null,
+  "backend": "cqlib StatevectorSimulator (local)",
+  "qubits": [4, 6, 8],
+  "qaoa_layers": 2,
+  "restarts": 5,
+  "optimizer": "COBYLA (scipy), maxiter 500",
+  "qubo_modeling": "H = sum x[i,t]*C_i + lambda*(D_t - sum x[i,t]*P_i)^2, QUBO normalized to [-1,1]",
+  "limitations": "Simulator-only results (cqlib StatevectorSimulator), NOT real quantum hardware. QAOA is heuristic: finds exact optimum at small scales (4-6 qubits) but shows a 2.16% optimality gap at 8 qubits — this gap reflects QAOA's known limitation on larger combinatorial problems and would benefit from more layers/restarts. Optimality measured against brute-force (exact for n<=8). All solutions are feasible (load-balance satisfied)."
+}

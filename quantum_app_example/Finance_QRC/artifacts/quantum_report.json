@@ -1,0 +1,28 @@
+{
+  "task": "stock_price_prediction",
+  "data": "DOW 10 demo tier (AAPL, MSFT, JPM, JNJ, V), 2023-01-01 to 2025-01-01, yfinance Close price, window=5, 80/20 chronological split",
+  "primary_metric": "RMSE",
+  "higher_is_better": false,
+  "method": "Quantum Reservoir Computing (cqlib StatevectorSimulator)",
+  "value": {
+    "AAPL": {"RMSE": 7.530643, "RMSE_std": 1.154177, "MAE": 6.732591, "MAE_std": 1.095961, "MAPE": 2.894655, "MAPE_std": 0.468654},
+    "MSFT": {"RMSE": 7.598022, "RMSE_std": 0.457159, "MAE": 6.343761, "MAE_std": 0.417057, "MAPE": 1.510935, "MAPE_std": 0.097745},
+    "JPM":  {"RMSE": 5.970843, "RMSE_std": 0.918438, "MAE": 4.800301, "MAE_std": 0.961034, "MAPE": 2.177062, "MAPE_std": 0.424851},
+    "JNJ":  {"RMSE": 1.73667,  "RMSE_std": 0.161388, "MAE": 1.386861, "MAE_std": 0.131331, "MAPE": 0.919686, "MAPE_std": 0.086526},
+    "V":    {"RMSE": 6.290709, "RMSE_std": 0.78331,  "MAE": 5.242916, "MAE_std": 0.726454, "MAPE": 1.798063, "MAPE_std": 0.240354}
+  },
+  "avg_RMSE": 5.825418,
+  "avg_RMSE_std": 0.694894,
+  "command": "python run_experiment.py --tier demo --n_qubits 4 --depth 2 --window_size 5 --seeds 42 123 456",
+  "artifact_paths": ["artifacts/qrc_experiment_20260623_174937.json"],
+  "seed": [42, 123, 456],
+  "backend": "cqlib StatevectorSimulator (local)",
+  "qubits": 4,
+  "circuit_depth": 7,
+  "n_parameters": 46,
+  "reservoir_depth": 2,
+  "window_size": 5,
+  "param_efficiency_vs_classic": "99.53%",
+  "quantum_wins_on": ["JPM", "V"],
+  "limitations": "Simulator-only results (cqlib StatevectorSimulator), NOT real quantum hardware. QRC uses 4 qubits which limits reservoir state dimension. Nonlinear feature augmentation (squares + input mean) is essential for competitive performance. Per-sample statevector simulation is slower than classic RC (~14x). QRC advantage is stock-dependent: significant on JPM/V, absent on AAPL/MSFT/JNJ; results carry seed-to-seed variance (RMSE_std) reported per stock."
+}

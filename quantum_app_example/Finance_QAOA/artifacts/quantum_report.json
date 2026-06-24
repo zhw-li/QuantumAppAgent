@@ -1,0 +1,25 @@
+{
+  "task": "quantum_portfolio_optimization",
+  "data": "DOW stocks 2018-2022, 3 tiers: demo(5), standard(8), full(12); same as baseline; q=0.5",
+  "primary_metric": "cost_gap_percent",
+  "primary_metric_definition": "|QAOA_objective - brute_force_objective| / |brute_force_objective| * 100",
+  "higher_is_better": false,
+  "method": "QAOA (p=2 layers, 5 restarts, COBYLA) with cqlib StatevectorSimulator; portfolio QUBO = minimize q·risk − (1−q)·return + selection penalty",
+  "value": {
+    "demo_5stocks_k3": {"n_qubits": 5, "return": 0.6493, "risk": 0.7292, "sharpe": 0.8904, "selected": ["AAPL", "MSFT", "JNJ"], "cost_gap_percent": 0.0, "solve_time_s": 15.9},
+    "standard_8stocks_k4": {"n_qubits": 8, "return": 0.7716, "risk": 0.8680, "sharpe": 0.8889, "selected": ["AAPL", "MSFT", "JNJ", "KO"], "cost_gap_percent": 0.0, "solve_time_s": 26.0},
+    "full_12stocks_k4": {"n_qubits": 12, "return": 0.3921, "risk": 0.9977, "sharpe": 0.3931, "selected": ["AAPL", "BA", "MMM", "WMT"], "cost_gap_percent": 125.3755, "solve_time_s": 229.3}
+  },
+  "optimal_rate": "2/3 (67%) exact optimum at demo(5q) and standard(8q); 125.4% gap at full(12q)",
+  "avg_gap_small_medium_percent": 0.0,
+  "command": "curl -X POST http://127.0.0.1:8106/api/optimize/quantum -H 'Content-Type: application/json' -d '{\"tier\":\"demo\",\"k\":3,\"q\":0.5,\"depth\":2,\"restarts\":5,\"force\":true}'  (per tier)",
+  "artifact_paths": ["artifacts/portfolio_experiment_3tiers.json"],
+  "seed": null,
+  "backend": "cqlib StatevectorSimulator (local)",
+  "qubits": [5, 8, 12],
+  "qaoa_layers": 2,
+  "restarts": 5,
+  "optimizer": "COBYLA (scipy)",
+  "qubo_modeling": "H = q·(w^T Σ w) − (1−q)·(μ^T w) + penalty·(Σx_i − k)^2; QUBO normalized",
+  "limitations": "Simulator-only results (cqlib StatevectorSimulator), NOT real quantum hardware. QAOA finds exact optimum at small-medium scale (5-8 qubits, gap 0%) but shows a LARGE 125.4% gap at 12 qubits (full tier) — this reflects QAOA's known heuristic limitation: with only p=2 layers and 5 restarts, the 2^12-dimensional search landscape is under-explored, and the top-probability bitstring deviates from optimal. Larger p / more restarts would improve but increase cost. Solve time grows sharply (16s→26s→229s). Markowitz (continuous) and QAOA (binary) optimize different formulations, so their returns/risks are not directly comparable; cost_gap is measured against brute-force binary optimum."
+}

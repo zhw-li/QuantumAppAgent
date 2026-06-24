@@ -1,0 +1,27 @@
+{
+  "task": "molecular_ground_state_energy",
+  "task_type": "variational_quantum_eigensolver",
+  "description": "Compute the H2 molecule ground-state energy using VQE (Variational Quantum Eigensolver) with cqlib, compared against exact classical diagonalization across bond lengths.",
+  "inputs": {
+    "molecule": "H2 (hydrogen molecule)",
+    "basis": "STO-3G",
+    "mapping": "Parity + 2-qubit reduction",
+    "n_qubits": 2,
+    "hamiltonian_source": "Qiskit Nature / PySCF standard output (g_II, g_IZ, g_ZI, g_ZZ, g_XX coefficients)",
+    "bond_lengths_A": [0.50, 0.60, 0.70, 0.74, 0.75, 0.80, 0.90, 1.00, 1.25, 1.50, 2.00, 2.50, 3.00]
+  },
+  "outputs": {
+    "energies": "ground-state total energy (Hartree) = electronic + nuclear repulsion V_nn",
+    "metrics": ["energy_error_mhartree", "convergence_curve", "solve_time", "n_parameters"]
+  },
+  "primary_metric": "energy_error_mhartree",
+  "primary_metric_definition": "|VQE_total - classical_exact_total| in mHartree; chemical accuracy threshold = 1.6 mHa",
+  "higher_is_better": false,
+  "quantum_method": "VQE with hardware-efficient ansatz (RY-RZ + CNOT), COBYLA optimizer, cqlib StatevectorSimulator",
+  "classical_baseline": "Exact diagonalization of the 4x4 Pauli Hamiltonian (numpy.linalg.eigvalsh)",
+  "success_signals": [
+    "VQE achieves chemical accuracy (< 1.6 mHartree error) at equilibrium bond length 0.74 Å",
+    "VQE energy tracks the exact potential energy curve across bond lengths",
+    "VQE converges within iterative layer budget (≤3 ansatz layers)"
+  ]
+}

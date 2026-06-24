@@ -1,0 +1,25 @@
+{
+  "task": "unit_commitment_optimization",
+  "task_type": "combinatorial_optimization",
+  "description": "Solve the Unit Commitment (UC) problem — minimizing total generation fuel cost by deciding which generators are ON/OFF across time periods under load-balance constraints — using QAOA, compared with classical brute-force search.",
+  "inputs": {
+    "generators": "6 units (A-F), p_max 300-1000 MW, quadratic fuel cost F = a + b*P + c*P^2",
+    "time_periods": "1-6 load periods, load options 400/600/700 MW",
+    "qubit_encoding": "x[i,t] = unit i ON at period t; qubit index = i*T + t",
+    "scale_tested": "2-4 generators x 2 periods = 4-8 qubits"
+  },
+  "outputs": {
+    "solution": "ON/OFF schedule per generator per period",
+    "metrics": ["total_fuel_cost", "optimality_gap_percent", "constraint_satisfied", "solve_time", "qubit_count"]
+  },
+  "primary_metric": "optimality_gap_percent",
+  "primary_metric_definition": "|QAOA_cost - classical_optimal_cost| / classical_optimal_cost * 100; lower is better (0% = optimal)",
+  "higher_is_better": false,
+  "quantum_method": "QAOA (Quantum Approximate Optimization Algorithm) with cqlib StatevectorSimulator, COBYLA optimizer, 2 layers, 5 restarts",
+  "classical_baseline": "Brute-force enumeration of all 2^n bitstrings (feasible for n<=8)",
+  "success_signals": [
+    "QAOA finds feasible solutions (load balance satisfied) across all tested scales",
+    "QAOA optimality gap <= 5% on small-to-medium scales (4-6 qubits)",
+    "QAOA scales to 8 qubits while remaining feasible and near-optimal"
+  ]
+}

@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QRC Finance Platform - Quantum Reservoir Computing</title>
+
+  <!-- Element Plus CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css">
+
+  <!-- Custom CSS (MUST use /static/ prefix for FastAPI StaticFiles) -->
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- ===== Section 1: Banner ===== -->
+    <div class="banner">
+      <div class="banner-title">量子储备池计算金融预测平台</div>
+      <div class="banner-subtitle">Quantum Reservoir Computing Finance Platform &mdash; QRC vs Classic RC</div>
+    </div>
+
+    <!-- ===== Main Container ===== -->
+    <div class="main-container">
+
+      <!-- ===== Section 2: Stock Selection & Parameters ===== -->
+      <div class="section-card">
+        <div class="section-title">参数配置 / Configuration</div>
+
+        <!-- Stock selector -->
+        <div class="stock-selector-row">
+          <span class="stock-selector-label">股票选择 / Stock:</span>
+          <el-select v-model="selectedStock" placeholder="Select Stock" style="width: 200px">
+            <el-option
+              v-for="t in DOW10_TICKERS"
+              :key="t"
+              :label="t"
+              :value="t"
+            ></el-option>
+          </el-select>
+        </div>
+
+        <!-- Parameter grid -->
+        <div class="param-grid">
+          <div class="param-item">
+            <span class="param-label">量子比特数 n_qubits:</span>
+            <div class="param-control">
+              <el-radio-group v-model="nQubits" size="small">
+                <el-radio-button :value="4">4</el-radio-button>
+                <el-radio-button :value="6">6</el-radio-button>
+                <el-radio-button :value="8">8</el-radio-button>
+              </el-radio-group>
+            </div>
+          </div>
+
+          <div class="param-item">
+            <span class="param-label">储备池深度 depth:</span>
+            <div class="param-control">
+              <el-radio-group v-model="depth" size="small">
+                <el-radio-button :value="2">2</el-radio-button>
+                <el-radio-button :value="3">3</el-radio-button>
+              </el-radio-group>
+            </div>
+          </div>
+
+          <div class="param-item">
+            <span class="param-label">时间窗口 window_size:</span>
+            <div class="param-control">
+              <el-radio-group v-model="windowSize" size="small">
+                <el-radio-button :value="5">5</el-radio-button>
+                <el-radio-button :value="10">10</el-radio-button>
+                <el-radio-button :value="20">20</el-radio-button>
+              </el-radio-group>
+            </div>
+          </div>
+
+          <div class="param-item">
+            <span class="param-label">经典储备池节点 n_reservoir:</span>
+            <div class="param-control">
+              <el-slider v-model="nReservoir" :min="50" :max="500" :step="10" show-input size="small"></el-slider>
+            </div>
+          </div>
+
+          <div class="param-item">
+            <span class="param-label">谱半径 spectral_radius:</span>
+            <div class="param-control">
+              <el-slider v-model="spectralRadius" :min="0.1" :max="0.99" :step="0.01" :show-input="true" size="small"></el-slider>
+            </div>
+          </div>
+
+          <div class="param-item">
+            <span class="param-label">正则化 ridge_alpha:</span>
+            <div class="param-control">
+              <el-slider v-model="ridgeAlpha" :min="0.01" :max="100" :step="0.01" :show-input="true" size="small"></el-slider>
+            </div>
+          </div>
+        </div>
+
+        <!-- Start button -->
+        <div class="start-btn-row">
+          <el-button type="primary" size="large" :loading="loading" @click="startPrediction">
+            {{ loading ? '预测中...' : '开始预测 / Start Prediction' }}
+          </el-button>
+        </div>
+      </div>
+
+      <!-- ===== Section 3: Metrics Comparison ===== -->
+      <div v-if="hasResult" class="section-card">
+        <div class="section-title">指标对比 / Metrics Comparison</div>
+        <div class="metrics-row">
+          <!-- RMSE -->
+          <div class="metric-card">
+            <div class="metric-card-title">RMSE</div>
+            <div class="metric-values">
+              <div>
+                <div class="metric-sub-label">Classic</div>
+                <div class="metric-value classic">{{ fmt(classicRMSE) }}</div>
+              </div>
+              <div class="metric-arrow" :class="rmseImprovement > 0 ? 'up' : 'down'">
+                {{ fmtArrow(rmseImprovement) }}
+              </div>
+              <div>
+                <div class="metric-sub-label">QRC</div>
+                <div class="metric-value quantum">{{ fmt(quantumRMSE) }}</div>
+              </div>
+            </div>
+            <div class="metric-improvement" :class="rmseImprovement > 0 ? 'positive' : 'negative'">
+              {{ fmtPct(rmseImprovement) }}
+            </div>
+          </div>
+
+          <!-- MAE -->
+          <div class="metric-card">
+            <div class="metric-card-title">MAE</div>
+            <div class="metric-values">
+              <div>
+                <div class="metric-sub-label">Classic</div>
+                <div class="metric-value classic">{{ fmt(classicMAE) }}</div>
+              </div>
+              <div class="metric-arrow" :class="maeImprovement > 0 ? 'up' : 'down'">
+                {{ fmtArrow(maeImprovement) }}
+              </div>
+              <div>
+                <div class="metric-sub-label">QRC</div>
+                <div class="metric-value quantum">{{ fmt(quantumMAE) }}</div>
+              </div>
+            </div>
+            <div class="metric-improvement" :class="maeImprovement > 0 ? 'positive' : 'negative'">
+              {{ fmtPct(maeImprovement) }}
+            </div>
+          </div>
+
+          <!-- MAPE -->
+          <div class="metric-card">
+            <div class="metric-card-title">MAPE (%)</div>
+            <div class="metric-values">
+              <div>
+                <div class="metric-sub-label">Classic</div>
+                <div class="metric-value classic">{{ fmt(classicMAPE) }}</div>
+              </div>
+              <div class="metric-arrow" :class="mapeImprovement > 0 ? 'up' : 'down'">
+                {{ fmtArrow(mapeImprovement) }}
+              </div>
+              <div>
+                <div class="metric-sub-label">QRC</div>
+                <div class="metric-value quantum">{{ fmt(quantumMAPE) }}</div>
+              </div>
+            </div>
+            <div class="metric-improvement" :class="mapeImprovement > 0 ? 'positive' : 'negative'">
+              {{ fmtPct(mapeImprovement) }}
+            </div>
+          </div>
+
+          <!-- Parameter Efficiency -->
+          <div class="metric-card">
+            <div class="metric-card-title">Parameter Efficiency</div>
+            <div class="metric-values">
+              <div>
+                <div class="metric-sub-label">Classic</div>
+                <div class="metric-value classic">{{ fmtParams(classicParams) }}</div>
+              </div>
+              <div class="metric-arrow" style="color: #1664FF;">→</div>
+              <div>
+                <div class="metric-sub-label">QRC</div>
+                <div class="metric-value quantum">{{ fmtParams(quantumParams) }}</div>
+              </div>
+            </div>
+            <div class="metric-improvement positive">
+              {{ paramEfficiency != null ? paramEfficiency.toFixed(2) + '% reduction' : '-' }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Section 4: Tabs ===== -->
+      <div v-if="hasResult" class="section-card">
+        <el-tabs v-model="activeTab" @tab-change="onTabChange">
+          <!-- Tab 1: Prediction Comparison -->
+          <el-tab-pane label="预测对比 / Prediction" name="prediction">
+            <div id="predictionChart" class="chart-container"></div>
+          </el-tab-pane>
+
+          <!-- Tab 2: Reservoir States -->
+          <el-tab-pane label="储备池状态 / Reservoir States" name="reservoir">
+            <div class="charts-row">
+              <div>
+                <div class="chart-sub-title">Quantum Reservoir States (PCA)</div>
+                <div id="quantumReservoirChart" class="chart-container-half"></div>
+              </div>
+              <div>
+                <div class="chart-sub-title">Classic Reservoir States (PCA)</div>
+                <div id="classicReservoirChart" class="chart-container-half"></div>
+              </div>
+            </div>
+          </el-tab-pane>
+
+          <!-- Tab 3: Quantum Circuit -->
+          <el-tab-pane label="量子电路 / Quantum Circuit" name="circuit">
+            <div class="circuit-info-grid">
+              <div class="circuit-info-item" v-for="item in circuitInfoItems" :key="item.label">
+                <div class="circuit-info-label">{{ item.label }}</div>
+                <div class="circuit-info-value">{{ item.value }}</div>
+              </div>
+            </div>
+
+            <!-- Gate counts -->
+            <div v-if="gateCountEntries.length > 0" style="margin-top: 16px; margin-bottom: 16px;">
+              <div style="font-size: 14px; color: #41464F; margin-bottom: 8px;">Gate Counts:</div>
+              <div class="gate-count-grid">
+                <span class="gate-count-chip" v-for="g in gateCountEntries" :key="g.gate">
+                  <span class="gate-name">{{ g.gate }}</span>
+                  <span class="gate-num">{{ g.count }}</span>
+                </span>
+              </div>
+            </div>
+
+            <div style="margin-top: 16px;">
+              <div style="font-size: 14px; color: #41464F; margin-bottom: 8px;">QCIS Code:</div>
+              <el-input
+                type="textarea"
+                :rows="12"
+                :model-value="circuitData.qcis || 'QCIS code will appear here after prediction...'"
+                readonly
+                style="font-family: 'Courier New', monospace;"
+              ></el-input>
+            </div>
+          </el-tab-pane>
+
+          <!-- Tab 4: Multi-Stock Comparison -->
+          <el-tab-pane label="多股对比 / Multi-Stock" name="multistock">
+            <div id="multiStockBarChart" class="multi-stock-bar-chart"></div>
+
+            <!-- Summary -->
+            <div v-if="compareData.summary" style="margin-bottom: 16px;">
+              <el-descriptions :column="4" border size="small">
+                <el-descriptions-item label="Total Stocks">{{ compareData.summary.total_stocks }}</el-descriptions-item>
+                <el-descriptions-item label="QRC Wins">{{ compareData.summary.quantum_wins }}</el-descriptions-item>
+                <el-descriptions-item label="Avg Classic RMSE">{{ compareData.summary.avg_classic_rmse }}</el-descriptions-item>
+                <el-descriptions-item label="Avg QRC RMSE">{{ compareData.summary.avg_quantum_rmse }}</el-descriptions-item>
+              </el-descriptions>
+            </div>
+
+            <el-table :data="multiStockTableData" stripe style="width: 100%" size="small">
+              <el-table-column prop="ticker" label="Stock" width="80"></el-table-column>
+              <el-table-column label="Classic RC RMSE" width="160">
+                <template #default="{ row }">{{ typeof row.classicRMSE === 'number' ? row.classicRMSE.toFixed(4) : row.classicRMSE }}</template>
+              </el-table-column>
+              <el-table-column label="QRC RMSE" width="160">
+                <template #default="{ row }">{{ typeof row.quantumRMSE === 'number' ? row.quantumRMSE.toFixed(4) : row.quantumRMSE }}</template>
+              </el-table-column>
+              <el-table-column label="RMSE Improvement" width="160">
+                <template #default="{ row }">
+                  <span :style="{ color: row.improvement > 0 ? '#52C41A' : '#F5222D' }">
+                    {{ typeof row.improvement === 'number' ? (row.improvement > 0 ? '+' : '') + row.improvement.toFixed(2) + '%' : row.improvement }}
+                  </span>
+                </template>
+              </el-table-column>
+              <el-table-column label="QRC Better" width="100">
+                <template #default="{ row }">
+                  <el-tag :type="row.quantumWins ? 'success' : 'danger'" size="small">
+                    {{ row.quantumWins ? 'Yes' : 'No' }}
+                  </el-tag>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-tab-pane>
+        </el-tabs>
+      </div>
+
+      <!-- Loading state -->
+      <div v-if="loading" class="section-card">
+        <div class="loading-overlay">
+          <el-icon class="is-loading" :size="40" color="#1664FF"><Loading /></el-icon>
+          <div class="loading-text">QRC & Classic RC prediction in progress...</div>
+        </div>
+      </div>
+
+      <!-- Empty state -->
+      <div v-if="!hasResult && !loading" class="section-card">
+        <div class="empty-state">
+          Select a stock and configure parameters, then click "Start Prediction" to run QRC vs Classic RC comparison.
+        </div>
+      </div>
+
+      <!-- ===== Section 5: Algorithm Description ===== -->
+      <div class="section-card">
+        <div class="section-title">算法说明 / Algorithm Description</div>
+        <div class="algo-desc-content">
+          <h4>Quantum Reservoir Computing (QRC)</h4>
+          <p>
+            Quantum Reservoir Computing uses a fixed random quantum circuit as the "reservoir" to project
+            classical input data into a high-dimensional quantum Hilbert space. The quantum reservoir's
+            intrinsic nonlinearity (from quantum gate operations and entanglement) replaces the classical
+            random weight matrix of traditional Echo State Networks.
+          </p>
+
+          <h4>Key Differences from Classic Reservoir Computing</h4>
+          <ul>
+            <li><strong>Reservoir:</strong> QRC uses a fixed quantum circuit (RY/RZ rotations + CNOT entanglement); Classic RC uses a random sparse recurrent weight matrix.</li>
+            <li><strong>State extraction:</strong> QRC measures Pauli-Z expectation values on each qubit (n_qubits-dimensional feature); Classic RC reads the full hidden state vector (n_reservoir-dimensional).</li>
+            <li><strong>Readout:</strong> Both use Ridge regression from reservoir states to target output.</li>
+            <li><strong>Training:</strong> Only the readout weights are trained; the reservoir (quantum or classical) is frozen after initialization.</li>
+          </ul>
+
+          <h4>Parameter Efficiency Advantage</h4>
+          <p>
+            QRC achieves comparable or better prediction accuracy with orders of magnitude fewer parameters.
+            A 4-qubit QRC circuit uses only ~46 total parameters (20 circuit + 26 readout), while a
+            Classic RC with 100 nodes requires ~9,700 parameters. This makes QRC especially promising
+            for edge deployment and resource-constrained scenarios.
+          </p>
+
+          <div class="algo-arch-diagram">Input x(t)
+  |
+  v
+[W_in] -- Random projection --> RY angle encoding
+  |
+  v
++-----------------------------------+
+|  QUANTUM RESERVOIR (frozen)       |
+|                                   |
+|  Q0 -- RY -- RZ ---+             |
+|  Q1 -- RY -- RZ ---+-- CNOT ring |
+|  Q2 -- RY -- RZ ---+             |
+|  Q3 -- RY -- RZ ---+             |
+|       ...depth layers...          |
++-----------------------------------+
+  |
+  v
+Measure &lt;Z_q&gt; on each qubit
+  |
+  v
+[quantum state features: n_qubits dims]
+  + [nonlinear features: h^2, mean(x)]
+  |
+  v
+[Ridge Regression Readout]
+  |
+  v
+Output y_pred(t)
+
+====================================
+Classic RC (Echo State Network):
+Input x(t) --> W_in --> [W_res (sparse, N x N)] --> tanh --> Ridge --> y_pred(t)</div>
+        </div>
+      </div>
+
+    </div><!-- end main-container -->
+  </div><!-- end #app -->
+
+  <!-- ===== CDN Scripts ===== -->
+  <!-- Vue 3 -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <!-- Element Plus -->
+  <script src="https://unpkg.com/element-plus"></script>
+  <!-- Element Plus Icons -->
+  <script src="https://unpkg.com/@element-plus/icons-vue"></script>
+  <!-- ECharts -->
+  <script src="https://unpkg.com/echarts@5/dist/echarts.min.js"></script>
+
+  <!-- App JS (MUST use /static/ prefix for FastAPI StaticFiles) -->
+  <script src="/static/app.js"></script>
+</body>
+</html>

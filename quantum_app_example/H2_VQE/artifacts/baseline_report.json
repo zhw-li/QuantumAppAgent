@@ -1,0 +1,29 @@
+{
+  "task": "molecular_ground_state_energy",
+  "data": "H2 molecule, STO-3G, Parity + 2-qubit reduction, 2 qubits; 13 bond lengths (0.50-3.00 Å); Hamiltonian coefficients from Qiskit Nature/PySCF",
+  "primary_metric": "energy_error_mhartree",
+  "higher_is_better": false,
+  "method": "Exact diagonalization of the 4x4 Pauli Hamiltonian (numpy.linalg.eigvalsh)",
+  "value": {
+    "0.50": {"total_energy": -0.496278, "electronic": -1.560572, "V_nn": 1.064294},
+    "0.60": {"total_energy": -0.707423, "electronic": -1.455377, "V_nn": 0.747944},
+    "0.70": {"total_energy": -0.988927, "electronic": -1.738292, "V_nn": 0.749365},
+    "0.74": {"total_energy": -1.142098, "electronic": -1.857202, "V_nn": 0.715104},
+    "0.75": {"total_energy": -1.151632, "electronic": -1.866736, "V_nn": 0.715104},
+    "0.80": {"total_energy": -0.931737, "electronic": -1.594837, "V_nn": 0.663100},
+    "0.90": {"total_energy": -0.968984, "electronic": -1.497584, "V_nn": 0.528606},
+    "1.00": {"total_energy": -0.933499, "electronic": -1.335282, "V_nn": 0.401783},
+    "1.25": {"total_energy": -0.907846, "electronic": -1.172944, "V_nn": 0.265098},
+    "1.50": {"total_energy": -0.881752, "electronic": -1.011797, "V_nn": 0.130045},
+    "2.00": {"total_energy": -0.800665, "electronic": -0.807465, "V_nn": 0.006800},
+    "2.50": {"total_energy": -0.788007, "electronic": -0.766307, "V_nn": 0.021700},
+    "3.00": {"total_energy": -0.785746, "electronic": -0.745546, "V_nn": 0.010300}
+  },
+  "equilibrium_bond_length_A": 0.75,
+  "equilibrium_energy_hartree": -1.151632,
+  "command": "curl -X POST http://127.0.0.1:8002/api/solve -H 'Content-Type: application/json' -d '{\"bond_lengths\":[0.50,0.60,0.70,0.74,0.75,0.80,0.90,1.00,1.25,1.50,2.00,2.50,3.00],\"max_iterations\":3}'",
+  "artifact_paths": ["artifacts/vqe_experiment_all_bondlengths.json"],
+  "backend": "numpy.linalg.eigvalsh (classical exact, deterministic)",
+  "seed": null,
+  "limitations": "Exact diagonalization is the analytical ground truth for the given 2-qubit Hamiltonian; deterministic (no seed needed). Energy = electronic ground state + nuclear repulsion V_nn=1/(R*1.8897259886). Results are exact within floating-point precision, NOT a quantum simulation."
+}

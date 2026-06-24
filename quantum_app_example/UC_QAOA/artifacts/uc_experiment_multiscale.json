@@ -1,0 +1,55 @@
+{
+  "experiment_config": {
+    "generator_options": "A-F",
+    "load_options": [
+      400,
+      600,
+      700
+    ],
+    "qaoa_layers": 2,
+    "restarts": 5,
+    "scales_tested": [
+      "2x2",
+      "3x2",
+      "4x2"
+    ]
+  },
+  "results": [
+    {
+      "config": "2gens_2periods_4qubit",
+      "qubit_count": 4,
+      "qaoa_cost": 19724.44,
+      "classical_optimal_cost": 19724.44,
+      "optimality_gap_percent": 0.0,
+      "solve_time_s": 6.57,
+      "constraint_satisfied": true,
+      "probability": 5e-06,
+      "qaoa_layers": 2,
+      "status": "success"
+    },
+    {
+      "config": "3gens_2periods_6qubit",
+      "qubit_count": 6,
+      "qaoa_cost": 28067.22,
+      "classical_optimal_cost": 28067.22,
+      "optimality_gap_percent": 0.0,
+      "solve_time_s": 4.75,
+      "constraint_satisfied": true,
+      "probability": 0.002963,
+      "qaoa_layers": 2,
+      "status": "success"
+    },
+    {
+      "config": "4gens_2periods_8qubit",
+      "qubit_count": 8,
+      "qaoa_cost": 28674.86,
+      "classical_optimal_cost": 28067.22,
+      "optimality_gap_percent": 2.16,
+      "solve_time_s": 11.65,
+      "constraint_satisfied": true,
+      "probability": 0.005567,
+      "qaoa_layers": 2,
+      "status": "success"
+    }
+  ]
+}

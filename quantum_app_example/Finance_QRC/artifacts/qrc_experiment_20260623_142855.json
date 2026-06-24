@@ -1,0 +1,54 @@
+{
+  "experiment_config": {
+    "tickers": [
+      "AAPL"
+    ],
+    "n_qubits": 4,
+    "reservoir_depth": 2,
+    "window_size": 5,
+    "n_reservoir": 100,
+    "seeds": [
+      42
+    ],
+    "data_range": "2023-01-01 ~ 2025-01-01"
+  },
+  "results": [
+    {
+      "ticker": "AAPL",
+      "n_qubits": 4,
+      "reservoir_depth": 2,
+      "window_size": 5,
+      "n_reservoir_classic": 100,
+      "seed": 42,
+      "train_samples": 397,
+      "test_samples": 100,
+      "classic_rc": {
+        "RMSE": 5.953457,
+        "MAE": 4.960843,
+        "MAPE": 2.109716,
+        "training_time": 0.0227,
+        "prediction_time": 0.0004,
+        "n_params": 9702,
+        "n_reservoir": 100
+      },
+      "quantum_rc": {
+        "RMSE": 16.144304,
+        "MAE": 15.647977,
+        "MAPE": 6.755651,
+        "training_time": 0.0934,
+        "prediction_time": 0.0212,
+        "n_params": 41,
+        "n_qubits": 4,
+        "reservoir_depth": 2,
+        "circuit_params": 20
+      },
+      "comparison": {
+        "rmse_improvement_pct": -171.1753,
+        "qrc_better": false,
+        "param_ratio": 0.0042,
+        "speed_ratio": 4.1145
+      }
+    }
+  ],
+  "timestamp": "20260623_142855"
+}

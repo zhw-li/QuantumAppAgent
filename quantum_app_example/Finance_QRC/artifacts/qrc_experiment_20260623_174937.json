@@ -1,0 +1,189 @@
+{
+  "experiment_config": {
+    "tickers": [
+      "AAPL",
+      "MSFT",
+      "JPM",
+      "JNJ",
+      "V"
+    ],
+    "n_qubits": 4,
+    "reservoir_depth": 2,
+    "window_size": 5,
+    "n_reservoir": 100,
+    "seeds": [
+      42,
+      123,
+      456
+    ],
+    "data_range": "2023-01-01 ~ 2025-01-01"
+  },
+  "results": [
+    {
+      "ticker": "AAPL",
+      "seeds": [
+        42,
+        123,
+        456
+      ],
+      "n_seeds": 3,
+      "classic_rc": {
+        "RMSE_mean": 4.602789,
+        "RMSE_std": 0.205412,
+        "MAE_mean": 3.716666,
+        "MAE_std": 0.152526,
+        "MAPE_mean": 1.580652,
+        "MAPE_std": 0.062797,
+        "training_time_mean": 0.016667,
+        "training_time_std": 0.014732
+      },
+      "quantum_rc": {
+        "RMSE_mean": 7.530643,
+        "RMSE_std": 1.154177,
+        "MAE_mean": 6.732591,
+        "MAE_std": 1.095961,
+        "MAPE_mean": 2.894655,
+        "MAPE_std": 0.468654,
+        "training_time_mean": 0.128533,
+        "training_time_std": 0.04003
+      },
+      "comparison": {
+        "rmse_improvement_mean": -64.8092,
+        "rmse_improvement_std": 31.4382
+      }
+    },
+    {
+      "ticker": "MSFT",
+      "seeds": [
+        42,
+        123,
+        456
+      ],
+      "n_seeds": 3,
+      "classic_rc": {
+        "RMSE_mean": 5.229244,
+        "RMSE_std": 0.037383,
+        "MAE_mean": 3.876757,
+        "MAE_std": 0.047776,
+        "MAPE_mean": 0.92651,
+        "MAPE_std": 0.011112,
+        "training_time_mean": 0.0064,
+        "training_time_std": 0.000852
+      },
+      "quantum_rc": {
+        "RMSE_mean": 7.598022,
+        "RMSE_std": 0.457159,
+        "MAE_mean": 6.343761,
+        "MAE_std": 0.417057,
+        "MAPE_mean": 1.510935,
+        "MAPE_std": 0.097745,
+        "training_time_mean": 0.093267,
+        "training_time_std": 0.004152
+      },
+      "comparison": {
+        "rmse_improvement_mean": -45.3587,
+        "rmse_improvement_std": 9.6564
+      }
+    },
+    {
+      "ticker": "JPM",
+      "seeds": [
+        42,
+        123,
+        456
+      ],
+      "n_seeds": 3,
+      "classic_rc": {
+        "RMSE_mean": 8.61431,
+        "RMSE_std": 0.401573,
+        "MAE_mean": 6.900538,
+        "MAE_std": 0.340264,
+        "MAPE_mean": 3.039545,
+        "MAPE_std": 0.148175,
+        "training_time_mean": 0.005967,
+        "training_time_std": 0.00034
+      },
+      "quantum_rc": {
+        "RMSE_mean": 5.970843,
+        "RMSE_std": 0.918438,
+        "MAE_mean": 4.800301,
+        "MAE_std": 0.961034,
+        "MAPE_mean": 2.177062,
+        "MAPE_std": 0.424851,
+        "training_time_mean": 0.088267,
+        "training_time_std": 0.00045
+      },
+      "comparison": {
+        "rmse_improvement_mean": 30.086,
+        "rmse_improvement_std": 13.8909
+      }
+    },
+    {
+      "ticker": "JNJ",
+      "seeds": [
+        42,
+        123,
+        456
+      ],
+      "n_seeds": 3,
+      "classic_rc": {
+        "RMSE_mean": 1.229251,
+        "RMSE_std": 0.004802,
+        "MAE_mean": 0.981307,
+        "MAE_std": 0.004114,
+        "MAPE_mean": 0.652429,
+        "MAPE_std": 0.00264,
+        "training_time_mean": 0.005967,
+        "training_time_std": 0.000368
+      },
+      "quantum_rc": {
+        "RMSE_mean": 1.73667,
+        "RMSE_std": 0.161388,
+        "MAE_mean": 1.386861,
+        "MAE_std": 0.131331,
+        "MAPE_mean": 0.919686,
+        "MAPE_std": 0.086526,
+        "training_time_mean": 0.088533,
+        "training_time_std": 0.001087
+      },
+      "comparison": {
+        "rmse_improvement_mean": -41.3301,
+        "rmse_improvement_std": 13.673
+      }
+    },
+    {
+      "ticker": "V",
+      "seeds": [
+        42,
+        123,
+        456
+      ],
+      "n_seeds": 3,
+      "classic_rc": {
+        "RMSE_mean": 7.561207,
+        "RMSE_std": 0.360604,
+        "MAE_mean": 5.712157,
+        "MAE_std": 0.255652,
+        "MAPE_mean": 1.89986,
+        "MAPE_std": 0.082814,
+        "training_time_mean": 0.005867,
+        "training_time_std": 0.000287
+      },
+      "quantum_rc": {
+        "RMSE_mean": 6.290709,
+        "RMSE_std": 0.78331,
+        "MAE_mean": 5.242916,
+        "MAE_std": 0.726454,
+        "MAPE_mean": 1.798063,
+        "MAPE_std": 0.240354,
+        "training_time_mean": 0.089733,
+        "training_time_std": 0.002812
+      },
+      "comparison": {
+        "rmse_improvement_mean": 16.2157,
+        "rmse_improvement_std": 14.0483
+      }
+    }
+  ],
+  "timestamp": "20260623_174937"
+}

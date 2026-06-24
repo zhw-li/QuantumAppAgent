@@ -1,0 +1,56 @@
+{
+  "experiment_config": {
+    "graphs": [
+      "simple_4",
+      "medium_6",
+      "large_8"
+    ],
+    "qaoa_layers": 2,
+    "restarts": 5,
+    "maxiter": 300
+  },
+  "results": [
+    {
+      "graph": "simple_4",
+      "n_qubits": 4,
+      "n_nodes": 4,
+      "n_edges": 4,
+      "qaoa_cut": 3.0,
+      "optimal_cut": 3.0,
+      "cost_gap_percent": 0.0,
+      "best_probability": 0.3995712951807256,
+      "solve_time_s": 13.092,
+      "brute_evaluated": 16,
+      "qaoa_layers": 2,
+      "restarts": 5
+    },
+    {
+      "graph": "medium_6",
+      "n_qubits": 6,
+      "n_nodes": 6,
+      "n_edges": 8,
+      "qaoa_cut": 8.0,
+      "optimal_cut": 8.0,
+      "cost_gap_percent": 0.0,
+      "best_probability": 0.23271301981453202,
+      "solve_time_s": 6.718,
+      "brute_evaluated": 64,
+      "qaoa_layers": 2,
+      "restarts": 5
+    },
+    {
+      "graph": "large_8",
+      "n_qubits": 8,
+      "n_nodes": 8,
+      "n_edges": 16,
+      "qaoa_cut": 11.0,
+      "optimal_cut": 11.0,
+      "cost_gap_percent": 0.0,
+      "best_probability": 0.029936595551901198,
+      "solve_time_s": 17.709,
+      "brute_evaluated": 256,
+      "qaoa_layers": 2,
+      "restarts": 5
+    }
+  ]
+}

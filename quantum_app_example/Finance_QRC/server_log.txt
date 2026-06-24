@@ -1,0 +1,18 @@
+INFO:     Started server process [97009]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 48] error while attempting to bind on address ('0.0.0.0', 8009): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+============================================================
+Finance QRC API Server
+项目根目录: /Users/lizhaowei/code/EvoScientist/finance-qrc
+数据缓存: /Users/lizhaowei/code/EvoScientist/finance-qrc/data/cache
+结果目录: /Users/lizhaowei/code/EvoScientist/finance-qrc/artifacts/results
+可用股票: ['AAPL', 'MSFT', 'JPM', 'JNJ', 'V', 'PG', 'UNH', 'HD', 'CVX', 'KO']
+============================================================
+[Finance-QRC] 服务启动, 预加载 AAPL 数据...
+[数据] 从缓存加载: /Users/lizhaowei/code/EvoScientist/finance-qrc/data/cache/stock_data_2023-01-01_2025-01-01.json
+[数据集] 窗口=5, 训练=397, 测试=100, 总计=497
+[Finance-QRC] AAPL 数据预加载成功
+[Finance-QRC] 服务关闭

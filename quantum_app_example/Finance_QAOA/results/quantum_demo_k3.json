@@ -1,0 +1,108 @@
+{
+  "symbols": [
+    "AAPL",
+    "MSFT",
+    "JPM",
+    "JNJ",
+    "HD"
+  ],
+  "tier": "demo",
+  "k": 3,
+  "q": 1.0,
+  "solution": [
+    1,
+    1,
+    0,
+    1,
+    0
+  ],
+  "selected_indices": [
+    0,
+    1,
+    3
+  ],
+  "selected_stocks": [
+    "AAPL",
+    "MSFT",
+    "JNJ"
+  ],
+  "weights": {
+    "AAPL": 0.3333,
+    "MSFT": 0.3333,
+    "JNJ": 0.3333,
+    "JPM": 0.0,
+    "HD": 0.0
+  },
+  "portfolio_return": 0.6493123863656605,
+  "portfolio_risk": 0.7292355330562018,
+  "portfolio_sharpe": 0.8904014641804602,
+  "sharpe_ratio": 0.8904014641804602,
+  "cost_gap": 0.0,
+  "optimal_energy": -0.6702993478153285,
+  "penalty_weight": 2.8746131900819423,
+  "norm_factor": 15.37306595040971,
+  "n_qubits": 5,
+  "depth": 2,
+  "top_bitstrings": [
+    {
+      "bitstring": "10011",
+      "probability": 0.09403534081899036,
+      "is_selected": false
+    },
+    {
+      "bitstring": "01011",
+      "probability": 0.09175649114610998,
+      "is_selected": false
+    },
+    {
+      "bitstring": "00111",
+      "probability": 0.09058852289216632,
+      "is_selected": false
+    },
+    {
+      "bitstring": "11010",
+      "probability": 0.0869151604509762,
+      "is_selected": true
+    },
+    {
+      "bitstring": "11001",
+      "probability": 0.08689293379030007,
+      "is_selected": false
+    },
+    {
+      "bitstring": "10101",
+      "probability": 0.08638940951827231,
+      "is_selected": false
+    },
+    {
+      "bitstring": "10110",
+      "probability": 0.08618896841013382,
+      "is_selected": false
+    },
+    {
+      "bitstring": "01101",
+      "probability": 0.08536261237038464,
+      "is_selected": false
+    },
+    {
+      "bitstring": "01110",
+      "probability": 0.08511337927890818,
+      "is_selected": false
+    },
+    {
+      "bitstring": "11100",
+      "probability": 0.08385893102922413,
+      "is_selected": false
+    }
+  ],
+  "brute_force": {
+    "selected_stocks": [
+      "AAPL",
+      "MSFT",
+      "JNJ"
+    ],
+    "portfolio_return": 0.6493123863656605,
+    "portfolio_risk": 0.7292355330562018,
+    "portfolio_sharpe": 0.8904014641804602
+  }
+}

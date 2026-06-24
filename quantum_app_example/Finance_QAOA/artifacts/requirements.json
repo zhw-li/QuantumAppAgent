@@ -1,0 +1,25 @@
+{
+  "task": "quantum_portfolio_optimization",
+  "task_type": "combinatorial_optimization",
+  "description": "Select an optimal k-stock portfolio from DOW components to balance return and risk, comparing QAOA-based quantum selection against classical Markowitz mean-variance optimization and brute-force enumeration.",
+  "inputs": {
+    "data_source": "DOW component stocks (AAPL, BA, CAT, CSCO, HD, IBM, JNJ, JPM, KO, MMM, MSFT, WMT), 2018-2022 OHLCV CSV",
+    "tiers": {"demo": 5 stocks, "standard": 8 stocks, "full": 12 stocks},
+    "objective": "minimize q·risk − (1−q)·return (risk aversion q=0.5)",
+    "qubit_encoding": "1 qubit per stock; x_i = stock i selected"
+  },
+  "outputs": {
+    "solution": "selected k stocks + weights",
+    "metrics": ["portfolio_return", "portfolio_risk", "sharpe_ratio", "cost_gap_percent", "n_qubits"]
+  },
+  "primary_metric": "cost_gap_percent",
+  "primary_metric_definition": "|QAOA_objective - brute_force_objective| / |brute_force_objective| * 100; lower is better (0% = optimal)",
+  "higher_is_better": false,
+  "quantum_method": "QAOA (p=2 layers, 5 restarts, COBYLA) with cqlib StatevectorSimulator; portfolio selection as QUBO",
+  "classical_baseline": "Markowitz mean-variance optimization (continuous weights) + brute-force binary enumeration (exact for small n)",
+  "success_signals": [
+    "QAOA finds optimal selection (gap 0%) on small-to-medium tiers (5-8 stocks)",
+    "QAOA scales to 12 stocks (full tier) producing a feasible portfolio",
+    "QAOA Sharpe ratio comparable to classical on small tiers"
+  ]
+}

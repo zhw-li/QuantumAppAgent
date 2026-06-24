@@ -1,0 +1,17 @@
+{
+  "task": "quantum_portfolio_optimization",
+  "data": "DOW stocks 2018-2022, 3 tiers: demo(5), standard(8), full(12); risk aversion q=0.5",
+  "primary_metric": "cost_gap_percent",
+  "higher_is_better": false,
+  "method": "Markowitz mean-variance optimization (continuous weights via quadratic programming) + brute-force binary enumeration (exact for comparison)",
+  "value": {
+    "demo_5stocks_k3": {"n_stocks": 5, "return": 0.2652, "risk": 0.2909, "sharpe": 0.9115, "selected": ["MSFT", "AAPL", "JNJ"]},
+    "standard_8stocks_k4": {"n_stocks": 8, "return": 0.2401, "risk": 0.2597, "sharpe": 0.9244, "selected": ["AAPL", "MSFT", "KO", "CAT"]},
+    "full_12stocks_k4": {"n_stocks": 12, "return": 0.2284, "risk": 0.2459, "sharpe": 0.9292, "selected": ["AAPL", "MSFT", "KO", "WMT"]}
+  },
+  "command": "curl -X POST http://127.0.0.1:8106/api/optimize/classical -H 'Content-Type: application/json' -d '{\"tier\":\"demo\",\"k\":3,\"q\":0.5}'  (per tier)",
+  "artifact_paths": ["artifacts/portfolio_experiment_3tiers.json"],
+  "seed": null,
+  "backend": "numpy + scipy (Markowitz QP, deterministic)",
+  "limitations": "Markowitz gives continuous-weight optimal (reference frontier); brute-force binary enumeration is the exact ground truth for QUBO comparison (exponential, feasible n<=~15). 2018-2022 historical data, not forward-looking."
+}

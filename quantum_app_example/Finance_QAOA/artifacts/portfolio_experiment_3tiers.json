@@ -1,0 +1,103 @@
+{
+  "experiment_config": {
+    "tiers": [
+      "demo",
+      "standard",
+      "full"
+    ],
+    "q": 0.5,
+    "depth": 2,
+    "restarts": 5,
+    "data": "DOW stocks 2018-2022"
+  },
+  "results": [
+    {
+      "tier": "demo",
+      "k": 3,
+      "n_qubits": 5,
+      "n_stocks": 5,
+      "classical": {
+        "return": 0.2651739939514881,
+        "risk": 0.2909202969422153,
+        "sharpe": 0.9115004925357921,
+        "selected": [
+          "MSFT",
+          "AAPL",
+          "JNJ"
+        ]
+      },
+      "quantum": {
+        "return": 0.6493123863656605,
+        "risk": 0.7292355330562018,
+        "sharpe": 0.8904014641804602,
+        "selected": [
+          "AAPL",
+          "MSFT",
+          "JNJ"
+        ]
+      },
+      "cost_gap_percent": 0.0,
+      "solve_time_s": 15.9
+    },
+    {
+      "tier": "standard",
+      "k": 4,
+      "n_qubits": 8,
+      "n_stocks": 8,
+      "classical": {
+        "return": 0.24010698148557263,
+        "risk": 0.25974409111159547,
+        "sharpe": 0.9243982431246683,
+        "selected": [
+          "AAPL",
+          "MSFT",
+          "KO",
+          "CAT"
+        ]
+      },
+      "quantum": {
+        "return": 0.7715820238102293,
+        "risk": 0.8679796074535037,
+        "sharpe": 0.8889402667810509,
+        "selected": [
+          "AAPL",
+          "MSFT",
+          "JNJ",
+          "KO"
+        ]
+      },
+      "cost_gap_percent": 0.0,
+      "solve_time_s": 26.0
+    },
+    {
+      "tier": "full",
+      "k": 4,
+      "n_qubits": 12,
+      "n_stocks": 12,
+      "classical": {
+        "return": 0.2284448185542238,
+        "risk": 0.2458604279444478,
+        "sharpe": 0.9291646503024917,
+        "selected": [
+          "AAPL",
+          "MSFT",
+          "KO",
+          "WMT"
+        ]
+      },
+      "quantum": {
+        "return": 0.3921413648764702,
+        "risk": 0.9976777620691153,
+        "sharpe": 0.3930541300862474,
+        "selected": [
+          "AAPL",
+          "BA",
+          "MMM",
+          "WMT"
+        ]
+      },
+      "cost_gap_percent": 125.3755,
+      "solve_time_s": 229.3
+    }
+  ]
+}

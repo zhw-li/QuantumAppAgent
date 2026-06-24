@@ -1,0 +1,24 @@
+{
+  "task": "stock_price_prediction",
+  "data": "DOW 10 demo tier (AAPL, MSFT, JPM, JNJ, V), 2023-01-01 to 2025-01-01, yfinance Close price, window=5, 80/20 chronological split",
+  "primary_metric": "RMSE",
+  "higher_is_better": false,
+  "method": "Classic Reservoir Computing (Echo State Network)",
+  "value": {
+    "AAPL": {"RMSE": 4.602789, "RMSE_std": 0.205412, "MAE": 3.716666, "MAE_std": 0.152526, "MAPE": 1.580652, "MAPE_std": 0.062797},
+    "MSFT": {"RMSE": 5.229244, "RMSE_std": 0.037383, "MAE": 3.876757, "MAE_std": 0.047776, "MAPE": 0.92651,  "MAPE_std": 0.011112},
+    "JPM":  {"RMSE": 8.61431,  "RMSE_std": 0.401573, "MAE": 6.900538, "MAE_std": 0.340264, "MAPE": 3.039545, "MAPE_std": 0.148175},
+    "JNJ":  {"RMSE": 1.229251, "RMSE_std": 0.004802, "MAE": 0.981307, "MAE_std": 0.004114, "MAPE": 0.652429, "MAPE_std": 0.00264},
+    "V":    {"RMSE": 7.561207, "RMSE_std": 0.360604, "MAE": 5.712157, "MAE_std": 0.255652, "MAPE": 1.89986,  "MAPE_std": 0.082814}
+  },
+  "avg_RMSE": 5.44736,
+  "avg_RMSE_std": 0.201957,
+  "command": "python run_experiment.py --tier demo --n_reservoir 100 --depth 2 --window_size 5 --seeds 42 123 456",
+  "artifact_paths": ["artifacts/qrc_experiment_20260623_174937.json"],
+  "seed": [42, 123, 456],
+  "backend": "numpy + sklearn Ridge",
+  "n_reservoir": 100,
+  "spectral_radius": 0.9,
+  "n_parameters": 9702,
+  "limitations": "Classic RC uses a random reservoir matrix with spectral radius < 1; performance depends on reservoir size and spectral radius tuning. Train/test split is chronological 80/20 (no shuffle) to respect temporal order. Results are averages over 3 seeds (42/123/456) with per-stock std reported."
+}

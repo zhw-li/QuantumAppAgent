@@ -1,0 +1,25 @@
+{
+  "task": "maxcut_optimization",
+  "data": "3 preset weighted graphs: simple_4 (4 nodes/4 edges), medium_6 (6 nodes), large_8 (8 nodes); same as baseline",
+  "primary_metric": "cost_gap_percent",
+  "primary_metric_definition": "(optimal_cut - qaoa_cut) / optimal_cut * 100",
+  "higher_is_better": false,
+  "method": "QAOA (p=2 layers, 5 restarts, COBYLA optimizer) with cqlib StatevectorSimulator",
+  "value": {
+    "simple_4": {"n_qubits": 4, "qaoa_cut": 3.0, "optimal_cut": 3.0, "cost_gap_percent": 0.0, "best_probability": 0.3996, "solve_time_s": 13.09},
+    "medium_6": {"n_qubits": 6, "qaoa_cut": 8.0, "optimal_cut": 8.0, "cost_gap_percent": 0.0, "best_probability": null, "solve_time_s": 6.72},
+    "large_8": {"n_qubits": 8, "qaoa_cut": 11.0, "optimal_cut": 11.0, "cost_gap_percent": 0.0, "best_probability": null, "solve_time_s": 17.71}
+  },
+  "optimal_rate": "3/3 (100%) QAOA found exact optimum on all graphs",
+  "avg_gap_percent": 0.0,
+  "command": "curl -X POST http://127.0.0.1:8006/api/solve -H 'Content-Type: application/json' -d '{\"graph_name\":\"simple_4\",\"depth\":2,\"restarts\":5,\"maxiter\":300}'  (per graph)",
+  "artifact_paths": ["artifacts/maxcut_experiment_3graphs.json"],
+  "seed": null,
+  "backend": "cqlib StatevectorSimulator (local)",
+  "qubits": [4, 6, 8],
+  "qaoa_layers": 2,
+  "restarts": 5,
+  "optimizer": "COBYLA (scipy), maxiter 300",
+  "qubo_modeling": "MaxCut as QUBO: maximize sum of crossing-edge weights; normalized to [-1,1]",
+  "limitations": "Simulator-only results (cqlib StatevectorSimulator), NOT real quantum hardware. All 3 preset graphs solved to optimum (gap 0%) — MaxCut on these small graphs is favorable for QAOA; performance on denser/larger graphs may differ. No shot noise (statevector, not sampling)."
+}

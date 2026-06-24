@@ -1,0 +1,17 @@
+{
+  "task": "unit_commitment_optimization",
+  "data": "6 generators (A-F), load options 400/600/700 MW; 3 scales tested: 2x2 (4q), 3x2 (6q), 4x2 (8q)",
+  "primary_metric": "optimality_gap_percent",
+  "higher_is_better": false,
+  "method": "Brute-force enumeration of all 2^n bitstrings with feasibility check (load balance)",
+  "value": {
+    "2gens_2periods_4qubit": {"n_qubits": 4, "optimal_cost": 19724.44, "enumerated": 16, "feasible": true},
+    "3gens_2periods_6qubit": {"n_qubits": 6, "optimal_cost": 28067.22, "enumerated": 64, "feasible": true},
+    "4gens_2periods_8qubit": {"n_qubits": 8, "optimal_cost": 28067.22, "enumerated": 256, "feasible": true}
+  },
+  "command": "curl -X POST http://127.0.0.1:8001/api/solve-classical -H 'Content-Type: application/json' -d '{\"generator_ids\":[\"A\",\"B\"],\"loads\":[400,600]}'  (per scale)",
+  "artifact_paths": ["artifacts/uc_experiment_multiscale.json"],
+  "seed": null,
+  "backend": "numpy enumeration (classical exact, deterministic)",
+  "limitations": "Brute-force is the exact ground truth for the given QUBO; deterministic (no seed needed). Exponential cost 2^n limits this baseline to n<=20 qubits in practice (here n<=8). Fuel cost computed as F=a+b*P+c*P^2 with economic dispatch (proportional load split among ON units)."
+}

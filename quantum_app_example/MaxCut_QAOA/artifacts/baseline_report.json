@@ -1,0 +1,17 @@
+{
+  "task": "maxcut_optimization",
+  "data": "3 preset weighted graphs: simple_4 (4 nodes/4 edges), medium_6 (6 nodes), large_8 (8 nodes)",
+  "primary_metric": "cost_gap_percent",
+  "higher_is_better": false,
+  "method": "Brute-force enumeration of all 2^n node partitions",
+  "value": {
+    "simple_4": {"n_qubits": 4, "optimal_cut": 3.0, "enumerated": 16},
+    "medium_6": {"n_qubits": 6, "optimal_cut": 8.0, "enumerated": 64},
+    "large_8": {"n_qubits": 8, "optimal_cut": 11.0, "enumerated": 256}
+  },
+  "command": "curl -X POST http://127.0.0.1:8006/api/brute-force -H 'Content-Type: application/json' -d '{\"graph_name\":\"simple_4\"}'  (per graph)",
+  "artifact_paths": ["artifacts/maxcut_experiment_3graphs.json"],
+  "seed": null,
+  "backend": "numpy enumeration (classical exact, deterministic)",
+  "limitations": "Brute-force is the exact ground truth; deterministic. Exponential cost 2^n limits to n<=20 in practice (here n<=8)."
+}

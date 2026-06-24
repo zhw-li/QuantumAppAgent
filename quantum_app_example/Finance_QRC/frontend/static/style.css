@@ -1,0 +1,417 @@
+/* ========================================
+   Finance QRC - Vue 3 CDN Preview Styles
+   Design tokens from ui-design-spec
+   ======================================== */
+
+:root {
+  --primary: #1664FF;
+  --primary-light: #4F9DF7;
+  --primary-bg: rgba(22, 100, 255, 0.06);
+  --page-bg: #F4F7FC;
+  --card-bg: #FFFFFF;
+  --text-title: #020814;
+  --text-sub: #41464F;
+  --text-body: #939AAB;
+  --border: #DCE0EB;
+  --radius-btn: 4px;
+  --radius-tag: 6px;
+  --radius-card: 8px;
+  --success: #52C41A;
+  --danger: #F5222D;
+  --warning: #FAAD14;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  background-color: var(--page-bg);
+  color: var(--text-title);
+  line-height: 1.6;
+}
+
+#app {
+  min-height: 100vh;
+}
+
+/* ===== Banner ===== */
+.banner {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  padding: 48px 40px;
+  text-align: center;
+}
+
+.banner-title {
+  font-size: 36px;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+
+.banner-subtitle {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 400;
+}
+
+/* ===== Main Container ===== */
+.main-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 20px;
+}
+
+/* ===== Section Card ===== */
+.section-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-card);
+  padding: 24px;
+  margin-bottom: 24px;
+  border: 1px solid var(--border);
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-title);
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--primary);
+  display: inline-block;
+}
+
+/* ===== Parameter Panel ===== */
+.param-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px 40px;
+}
+
+.param-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.param-label {
+  font-size: 14px;
+  color: var(--text-sub);
+  min-width: 140px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.param-control {
+  flex: 1;
+}
+
+.stock-selector-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.stock-selector-label {
+  font-size: 14px;
+  color: var(--text-sub);
+  white-space: nowrap;
+}
+
+.start-btn-row {
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* ===== Metric Cards ===== */
+.metrics-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.metric-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-card);
+  padding: 20px;
+  text-align: center;
+  border: 1px solid var(--border);
+  transition: box-shadow 0.3s;
+}
+
+.metric-card:hover {
+  box-shadow: 0 4px 12px rgba(22, 100, 255, 0.12);
+}
+
+.metric-card-title {
+  font-size: 14px;
+  color: var(--text-body);
+  margin-bottom: 12px;
+}
+
+.metric-values {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.metric-value {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.metric-value.classic {
+  color: var(--text-sub);
+}
+
+.metric-value.quantum {
+  color: var(--primary);
+}
+
+.metric-arrow {
+  font-size: 18px;
+}
+
+.metric-arrow.up {
+  color: var(--success);
+}
+
+.metric-arrow.down {
+  color: var(--danger);
+}
+
+.metric-improvement {
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.metric-improvement.positive {
+  color: var(--success);
+}
+
+.metric-improvement.negative {
+  color: var(--danger);
+}
+
+.metric-sub-label {
+  font-size: 12px;
+  color: var(--text-body);
+  margin-top: 4px;
+}
+
+/* ===== Chart Containers ===== */
+.chart-container {
+  width: 100%;
+  height: 400px;
+  min-height: 400px;
+}
+
+.chart-container-half {
+  width: 100%;
+  height: 350px;
+  min-height: 350px;
+}
+
+.charts-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.chart-sub-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-sub);
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+/* ===== Circuit Info ===== */
+.circuit-info-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.circuit-info-item {
+  text-align: center;
+  padding: 12px;
+  background: var(--primary-bg);
+  border-radius: var(--radius-tag);
+}
+
+.circuit-info-label {
+  font-size: 12px;
+  color: var(--text-body);
+  margin-bottom: 4px;
+}
+
+.circuit-info-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+/* Gate count row */
+.gate-count-grid {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.gate-count-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: #F8F9FC;
+  border-radius: 20px;
+  font-size: 13px;
+  color: var(--text-sub);
+}
+
+.gate-count-chip .gate-name {
+  font-weight: 600;
+  color: var(--primary);
+  font-family: 'Courier New', monospace;
+}
+
+.gate-count-chip .gate-num {
+  font-weight: 700;
+  color: var(--text-title);
+}
+
+/* ===== Multi-Stock ===== */
+.multi-stock-bar-chart {
+  width: 100%;
+  height: 350px;
+  min-height: 350px;
+  margin-bottom: 20px;
+}
+
+/* ===== Algorithm Description ===== */
+.algo-desc-content {
+  font-size: 14px;
+  color: var(--text-sub);
+  line-height: 1.8;
+}
+
+.algo-desc-content h4 {
+  color: var(--text-title);
+  margin: 16px 0 8px;
+  font-size: 15px;
+}
+
+.algo-desc-content ul {
+  padding-left: 20px;
+}
+
+.algo-desc-content li {
+  margin-bottom: 6px;
+}
+
+.algo-arch-diagram {
+  background: #F8F9FC;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-tag);
+  padding: 20px;
+  margin-top: 16px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre;
+  overflow-x: auto;
+  color: var(--text-sub);
+}
+
+/* ===== Loading Overlay ===== */
+.loading-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 0;
+  color: var(--text-body);
+}
+
+.loading-text {
+  margin-top: 16px;
+  font-size: 14px;
+}
+
+/* ===== Empty State ===== */
+.empty-state {
+  text-align: center;
+  padding: 60px 0;
+  color: var(--text-body);
+  font-size: 14px;
+}
+
+/* ===== Element Plus Overrides ===== */
+.el-card {
+  border-radius: var(--radius-card) !important;
+}
+
+.el-tabs__item.is-active {
+  color: var(--primary) !important;
+}
+
+.el-tabs__active-bar {
+  background-color: var(--primary) !important;
+}
+
+.el-radio-button__inner:hover {
+  color: var(--primary) !important;
+}
+
+.el-radio-button__original-radio:checked + .el-radio-button__inner {
+  background-color: var(--primary) !important;
+  border-color: var(--primary) !important;
+}
+
+.el-button--primary {
+  background-color: var(--primary) !important;
+  border-color: var(--primary) !important;
+}
+
+.el-button--primary:hover {
+  background-color: var(--primary-light) !important;
+  border-color: var(--primary-light) !important;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .metrics-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .param-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .charts-row {
+    grid-template-columns: 1fr;
+  }
+
+  .circuit-info-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .banner-title {
+    font-size: 24px;
+  }
+
+  .banner-subtitle {
+    font-size: 14px;
+  }
+}

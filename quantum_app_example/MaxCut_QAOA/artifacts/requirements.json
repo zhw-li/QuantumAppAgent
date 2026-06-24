@@ -1,0 +1,24 @@
+{
+  "task": "maxcut_optimization",
+  "task_type": "combinatorial_optimization",
+  "description": "Solve the MaxCut problem — partitioning graph nodes into two sets to maximize the total weight of edges crossing the cut — using QAOA, compared with classical brute-force search.",
+  "inputs": {
+    "graphs": "3 preset weighted graphs: simple_4 (4 nodes/4 edges), medium_6 (6 nodes), large_8 (8 nodes)",
+    "qubit_encoding": "1 qubit per node; x_i = which side of the cut node i belongs to",
+    "scale_tested": "4-8 qubits"
+  },
+  "outputs": {
+    "solution": "node partition (best_partition)",
+    "metrics": ["cut_value", "cost_gap_percent", "solve_time", "qubit_count", "best_probability"]
+  },
+  "primary_metric": "cost_gap_percent",
+  "primary_metric_definition": "(optimal_cut - qaoa_cut) / optimal_cut * 100; lower is better (0% = optimal)",
+  "higher_is_better": false,
+  "quantum_method": "QAOA (p=2 layers, 5 restarts, COBYLA) with cqlib StatevectorSimulator",
+  "classical_baseline": "Brute-force enumeration of all 2^n partitions",
+  "success_signals": [
+    "QAOA finds the optimal MaxCut (gap 0%) on all 3 preset graphs (4-8 qubits)",
+    "QAOA cut value matches brute-force optimal",
+    "QAOA converges within restart/iteration budget"
+  ]
+}
