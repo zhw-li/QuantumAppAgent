@@ -58,6 +58,8 @@ class TestGetSystemPrompt:
             "cqlib-sdk",
             "qccp-frontend",
             "qccp-service",
+            "FastAPI",
+            "Java",
         ):
             assert term in result
 
@@ -248,6 +250,8 @@ class TestQuantumApplicationSubagentHints:
             "qccp-ui",
             "qccp-frontend",
             "qccp-service",
+            "FastAPI",
+            "Java",
             "README.md",
             "INTEGRATE.md",
             "verification_report.md",

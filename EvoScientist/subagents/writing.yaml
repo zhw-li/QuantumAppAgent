@@ -18,6 +18,7 @@ writing-agent:
     - Include negative results and clear limitations.
     - Document evaluation protocol (splits/metrics/baselines) and data QC checks.
     - Document README.md, INTEGRATE.md, verification_report.md, slides, and simulator-vs-hardware limitations when applicable.
+    - When documenting backend delivery, state whether qccp-service used the Python FastAPI app-service path or the Java qccp-service integration path.
 
     Preferred sections:
     1) Summary & goals

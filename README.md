@@ -72,13 +72,13 @@ cqlib-sdk → cqlib-qaoa / cqlib-vqe   ←  quantum algorithm + quantum_report.j
           / cqlib-qml / cqlib-hybrid
         │
 qccp-ui → qccp-frontend /     ←  cloud showcase UI + API/service + deploy evidence
-                 qccp-service
+                 qccp-service  ←  FastAPI app service by default; Java qccp-service integration when explicit
         │
 paper-writing / paper-review /       ←  report, README, INTEGRATE notes, slides
 academic-slides
 ```
 
-Not every project needs every phase — the starting point matches what you already have. The stage gates and skill-routing rules live in [`skills/experiment-pipeline/SKILL.md`](./skills/experiment-pipeline/SKILL.md); the quantum-algorithm skills are documented under [`skills/`](./skills).
+Not every project needs every phase — the starting point matches what you already have. The stage gates and skill-routing rules live in [`EvoScientist/skills/experiment-pipeline/SKILL.md`](./EvoScientist/skills/experiment-pipeline/SKILL.md); the built-in quantum-algorithm skills are documented under [`EvoScientist/skills/`](./EvoScientist/skills).
 
 ## 📖 Table of Contents
 

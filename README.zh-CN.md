@@ -78,13 +78,13 @@ cqlib-sdk → cqlib-qaoa / cqlib-vqe   ←  量子算法 + quantum_report.json
           / cqlib-qml / cqlib-hybrid
         │
 qccp-ui → qccp-frontend /     ←  云展示 UI + API/服务 + 部署证据
-                 qccp-service
+                 qccp-service  ←  默认 FastAPI 应用服务；明确 Java 集成时走 qccp-service Java 路径
         │
 paper-writing / paper-review /       ←  报告、README、INTEGRATE 说明、幻灯片
 academic-slides
 ```
 
-并非每个项目都需要走完全部阶段——起点取决于你已有的内容。阶段门禁与技能路由规则详见 [`skills/experiment-pipeline/SKILL.md`](./skills/experiment-pipeline/SKILL.md)；量子算法技能文档位于 [`skills/`](./skills)。
+并非每个项目都需要走完全部阶段——起点取决于你已有的内容。阶段门禁与技能路由规则详见 [`EvoScientist/skills/experiment-pipeline/SKILL.md`](./EvoScientist/skills/experiment-pipeline/SKILL.md)；内置量子算法技能文档位于 [`EvoScientist/skills/`](./EvoScientist/skills)。
 
 ## 📖 目录
 

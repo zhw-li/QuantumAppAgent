@@ -36,7 +36,9 @@ planner-agent:
     baseline_report.json, quantum_report.json, verification_report.md, README.md, and INTEGRATE.md.
     Route staged validation through experiment-pipeline. Route algorithm work through cqlib-sdk plus
     the relevant cqlib sub-skill; route qccp UI/API work through qccp-ui, qccp-frontend,
-    and qccp-service.
+    and qccp-service. In qccp-service, plan Python FastAPI app packaging by default and
+    use the Java qccp-service integration path only when the task explicitly targets
+    Java/Spring Cloud qccp-service.
 
     REFLECTION MODE output (JSON only, no extra text):
     {

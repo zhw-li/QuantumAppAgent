@@ -1,10 +1,9 @@
-"""Text checks for EvoScientist skills (built-in and workspace).
+"""Text checks for EvoScientist built-in skills.
 
-Skills can live in two tiers: the built-in layer shipped in the wheel
-(`EvoScientist/skills/`) and the optional workspace layer (`./skills/`). These
-tests look up each skill across both tiers. In a clean checkout where the
-optional workspace skills are absent, the tests that only need workspace skills
-skip instead of failing.
+The workspace layer (`./skills/`) is intentionally gitignored and may override
+or extend skills at runtime, but it is not a release baseline. Required skills
+must live in `EvoScientist/skills/` so clean checkouts and packaged wheels do
+not depend on local ignored files.
 """
 
 from __future__ import annotations
@@ -18,8 +17,6 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 # Built-in layer: ships inside the package (EvoScientist/skills/).
 BUILTIN_SKILLS_DIR = ROOT / "EvoScientist" / "skills"
-# Workspace layer: optional, gitignored local skills (./skills/).
-SKILLS_DIR = ROOT / "skills"
 
 NATIVE_QUANTUM_SKILLS = [
     "academic-slides",
@@ -66,28 +63,24 @@ OLD_GATE_TERMS = (
 )
 
 
-def _require_workspace_skills() -> None:
-    if not SKILLS_DIR.exists():
-        pytest.skip("workspace skills directory is not present")
-
-
-def _require_any_skills_layer() -> None:
-    """Skip unless at least one skills tier is present."""
-    if not (BUILTIN_SKILLS_DIR.exists() or SKILLS_DIR.exists()):
-        pytest.skip("no skills directory is present")
-
-
 def _skill_path(name: str) -> Path:
-    """Resolve a skill directory across built-in then workspace tiers."""
-    for base in (BUILTIN_SKILLS_DIR, SKILLS_DIR):
-        candidate = base / name
-        if (candidate / "SKILL.md").is_file():
-            return candidate
+    """Resolve a required built-in skill directory."""
+    candidate = BUILTIN_SKILLS_DIR / name
+    if (candidate / "SKILL.md").is_file():
+        return candidate
     raise AssertionError(f"missing skill: {name}")
 
 
 def _read_skill(name: str) -> str:
     return (_skill_path(name) / "SKILL.md").read_text(encoding="utf-8")
+
+
+def _builtin_skill_names() -> set[str]:
+    return {
+        path.parent.name
+        for path in BUILTIN_SKILLS_DIR.glob("*/SKILL.md")
+        if path.is_file()
+    }
 
 
 def _frontmatter(text: str) -> str:
@@ -153,7 +146,6 @@ def test_experiment_pipeline_logs_actual_skill_usage():
 
 
 def test_skills_do_not_reintroduce_release_gate_system():
-    _require_any_skills_layer()
     checked_paths = [
         _skill_path(name) / "SKILL.md"
         for name in NATIVE_QUANTUM_SKILLS + CQ_QCCP_SKILLS
@@ -169,3 +161,21 @@ def test_skills_do_not_reintroduce_release_gate_system():
 
     for term in OLD_GATE_TERMS:
         assert term not in text
+
+
+def test_required_skills_are_packaged_as_builtins():
+    required = set(NATIVE_QUANTUM_SKILLS + CQ_QCCP_SKILLS)
+    assert required <= _builtin_skill_names()
+
+
+def test_prompt_referenced_core_skills_exist_in_builtin_layer():
+    from EvoScientist.prompts import get_system_prompt
+
+    text = get_system_prompt()
+    referenced = set(re.findall(r"`([a-z][a-z0-9-]+)`", text))
+    skill_like = {
+        name
+        for name in referenced
+        if name in set(NATIVE_QUANTUM_SKILLS + CQ_QCCP_SKILLS)
+    }
+    assert skill_like <= _builtin_skill_names()
