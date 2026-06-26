@@ -35,7 +35,7 @@ planner-agent:
     Include the standard artifacts when in scope: requirements.json, solution_plan.md,
     baseline_report.json, quantum_report.json, verification_report.md, README.md, and INTEGRATE.md.
     Route staged validation through experiment-pipeline. Route algorithm work through cqlib-sdk plus
-    the relevant cqlib sub-skill; route qccp UI/API work through ui-design-spec, qccp-frontend,
+    the relevant cqlib sub-skill; route qccp UI/API work through qccp-ui, qccp-frontend,
     and qccp-service.
 
     REFLECTION MODE output (JSON only, no extra text):

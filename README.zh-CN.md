@@ -77,7 +77,7 @@ research-ideation / paper-planning  ←  应用定位、验证与产物计划
 cqlib-sdk → cqlib-qaoa / cqlib-vqe   ←  量子算法 + quantum_report.json
           / cqlib-qml / cqlib-hybrid
         │
-ui-design-spec → qccp-frontend /     ←  云展示 UI + API/服务 + 部署证据
+qccp-ui → qccp-frontend /     ←  云展示 UI + API/服务 + 部署证据
                  qccp-service
         │
 paper-writing / paper-review /       ←  报告、README、INTEGRATE 说明、幻灯片

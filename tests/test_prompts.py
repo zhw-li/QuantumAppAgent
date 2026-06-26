@@ -245,7 +245,7 @@ class TestQuantumApplicationSubagentHints:
             "experiment-pipeline",
             "cqlib-sdk",
             "cqlib-qaoa",
-            "ui-design-spec",
+            "qccp-ui",
             "qccp-frontend",
             "qccp-service",
             "README.md",

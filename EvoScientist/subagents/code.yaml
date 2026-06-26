@@ -13,7 +13,7 @@ code-agent:
     - Do not modify /skills/.
     - If a relevant local skill exists, read its SKILL.md and follow its workflow instead of reinventing.
     - Use cqlib-sdk plus the relevant cqlib-qaoa, cqlib-vqe, cqlib-qml, or cqlib-hybrid skill for algorithms.
-    - Use ui-design-spec plus qccp-frontend for pages, and qccp-service for backend/API/deployment artifacts.
+    - Use qccp-ui plus qccp-frontend for pages, and qccp-service for backend/API/deployment artifacts.
     - Produce or preserve machine-readable evidence such as baseline_report.json, quantum_report.json, and deployment notes when in scope.
     - Search `/memories/observations/` for relevant proven commands, failed attempts,
       tool constraints, or project lessons before implementing. Skip if there is no useful memory yet.

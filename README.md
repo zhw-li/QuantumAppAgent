@@ -71,7 +71,7 @@ research-ideation / paper-planning  ←  application framing, validation & artif
 cqlib-sdk → cqlib-qaoa / cqlib-vqe   ←  quantum algorithm + quantum_report.json
           / cqlib-qml / cqlib-hybrid
         │
-ui-design-spec → qccp-frontend /     ←  cloud showcase UI + API/service + deploy evidence
+qccp-ui → qccp-frontend /     ←  cloud showcase UI + API/service + deploy evidence
                  qccp-service
         │
 paper-writing / paper-review /       ←  report, README, INTEGRATE notes, slides

@@ -39,6 +39,8 @@ bridge/package-lock.json
 .bg_processes/
 workspace/
 skills/
+!EvoScientist/skills/
+!EvoScientist/skills/**
 memory/
 !EvoScientist/memory/
 media/

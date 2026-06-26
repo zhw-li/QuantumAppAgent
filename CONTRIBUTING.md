@@ -74,7 +74,7 @@ TYQA (TianYan Quantum Agent) is a multi-agent AI framework that takes a research
 | Default model | `claude-sonnet-4-6` (Anthropic) |
 | Tests | ~890 across 36 files, no API keys needed |
 | Config file | `~/.config/evoscientist/config.yaml` |
-| Workspace skills | `./skills/` (cqlib-*, qccp-*, ui-design-spec override built-ins) |
+| Workspace skills | `./skills/` (cqlib-*, qccp-*, qccp-ui override built-ins) |
 | Examples | `./quantum_app_example/` (Finance_QAOA, MaxCut_QAOA, UC_QAOA, H2_VQE, Finance_QRC) |
 
 ### Sub-Agents (defined in `EvoScientist/subagents/*.yaml`)
@@ -107,7 +107,7 @@ Main Agent (EvoScientist.py) -- create_deep_agent()
     |
 task tool --> Delegates to Sub-Agents
     |        +-- quantum skills: cqlib-sdk → cqlib-qaoa / -vqe / -qml / -hybrid
-    |        +-- showcase skills: ui-design-spec → qccp-frontend / qccp-service
+    |        +-- showcase skills: qccp-ui → qccp-frontend / qccp-service
     |        +-- lifecycle skill: experiment-pipeline (stage-gated, 4 stages)
     |
 Stream Events --> Emitter --> Tracker --> State --> Rich Display / TUI

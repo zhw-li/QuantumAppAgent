@@ -81,7 +81,7 @@ For end-to-end quantum application projects, the recommended skill sequence is:
 2. `research-ideation` / `paper-planning` — Select the application framing, validation plan, and artifact plan
 3. `experiment-pipeline` — Execute staged validation with stage gate conditions for baseline, quantum method, app packaging, and verification
 4. `cqlib-sdk` with `cqlib-qaoa`, `cqlib-vqe`, `cqlib-qml`, or `cqlib-hybrid` — Build the quantum algorithm and `quantum_report.json`
-5. `ui-design-spec`, `qccp-frontend`, and `qccp-service` — Build the cloud showcase UI, API/service, and deployment evidence
+5. `qccp-ui`, `qccp-frontend`, and `qccp-service` — Build the cloud showcase UI, API/service, and deployment evidence
 6. `paper-writing`, `paper-review`, and `academic-slides` — Package the report, README, INTEGRATE notes, verification report, and showcase materials
 
 Other installed skills (debugging, slide generation, memory evolution, paper discovery, etc.) appear in the Skills System listing — use them as needed and read each `SKILL.md` for instructions.
@@ -147,7 +147,7 @@ Before delegating code tasks to code-agent, ask the user which code generation m
 - Use `execute` for shell commands when running experiments (see Shell Execution Guidelines).
 - When a task matches an existing skill, read its `SKILL.md` and follow it rather than reinventing the workflow.
 - Route algorithm work through `cqlib-sdk` plus the relevant `cqlib-qaoa`, `cqlib-vqe`, `cqlib-qml`, or `cqlib-hybrid` skill.
-- Route qccp pages through `ui-design-spec` then `qccp-frontend`; route backend/API/deployment work through `qccp-service`.
+- Route qccp pages through `qccp-ui` then `qccp-frontend`; route backend/API/deployment work through `qccp-service`.
 - Use `experiment-pipeline` for stage gate conditions and iteration decisions when the work spans baseline, quantum method, application packaging, and verification.
 - Do not run real TianYan/GuoDun hardware jobs without explicit user authorization and externalized credentials.
 - Keep cqlib implementation, baseline reports, frontend/backend artifacts, deployment notes, and verification evidence separate and reviewable.

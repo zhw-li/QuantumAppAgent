@@ -1,8 +1,10 @@
-"""Text checks for workspace EvoScientist skills.
+"""Text checks for EvoScientist skills (built-in and workspace).
 
-These tests intentionally inspect the local workspace `skills/` layer. In a
-clean checkout where the optional workspace skills are absent, they skip instead
-of making the package test suite depend on ignored local files.
+Skills can live in two tiers: the built-in layer shipped in the wheel
+(`EvoScientist/skills/`) and the optional workspace layer (`./skills/`). These
+tests look up each skill across both tiers. In a clean checkout where the
+optional workspace skills are absent, the tests that only need workspace skills
+skip instead of failing.
 """
 
 from __future__ import annotations
@@ -14,6 +16,9 @@ import pytest
 
 
 ROOT = Path(__file__).resolve().parents[1]
+# Built-in layer: ships inside the package (EvoScientist/skills/).
+BUILTIN_SKILLS_DIR = ROOT / "EvoScientist" / "skills"
+# Workspace layer: optional, gitignored local skills (./skills/).
 SKILLS_DIR = ROOT / "skills"
 
 NATIVE_QUANTUM_SKILLS = [
@@ -40,7 +45,7 @@ CQ_QCCP_SKILLS = [
     "cqlib-vqe",
     "qccp-frontend",
     "qccp-service",
-    "ui-design-spec",
+    "qccp-ui",
 ]
 
 QUANTUM_TRIGGER_TERMS = (
@@ -66,11 +71,23 @@ def _require_workspace_skills() -> None:
         pytest.skip("workspace skills directory is not present")
 
 
+def _require_any_skills_layer() -> None:
+    """Skip unless at least one skills tier is present."""
+    if not (BUILTIN_SKILLS_DIR.exists() or SKILLS_DIR.exists()):
+        pytest.skip("no skills directory is present")
+
+
+def _skill_path(name: str) -> Path:
+    """Resolve a skill directory across built-in then workspace tiers."""
+    for base in (BUILTIN_SKILLS_DIR, SKILLS_DIR):
+        candidate = base / name
+        if (candidate / "SKILL.md").is_file():
+            return candidate
+    raise AssertionError(f"missing skill: {name}")
+
+
 def _read_skill(name: str) -> str:
-    _require_workspace_skills()
-    path = SKILLS_DIR / name / "SKILL.md"
-    assert path.exists(), f"missing skill: {name}"
-    return path.read_text(encoding="utf-8")
+    return (_skill_path(name) / "SKILL.md").read_text(encoding="utf-8")
 
 
 def _frontmatter(text: str) -> str:
@@ -122,28 +139,30 @@ def test_cqlib_qccp_skills_contribute_evidence_not_final_readiness(name: str):
 
 def test_experiment_pipeline_logs_actual_skill_usage():
     text = _read_skill("experiment-pipeline")
-    stage_log = (SKILLS_DIR / "experiment-pipeline" / "assets" / "stage-log-template.md").read_text(
+    ep_dir = _skill_path("experiment-pipeline")
+    stage_log = (ep_dir / "assets" / "stage-log-template.md").read_text(
         encoding="utf-8"
     )
-    tracker = (
-        SKILLS_DIR / "experiment-pipeline" / "assets" / "pipeline-tracker-template.md"
-    ).read_text(encoding="utf-8")
+    tracker = (ep_dir / "assets" / "pipeline-tracker-template.md").read_text(
+        encoding="utf-8"
+    )
 
     assert "Skill Used" in text
     assert "Skill Used" in stage_log
     assert "Skill Used" in tracker
 
 
-def test_workspace_skills_do_not_reintroduce_release_gate_system():
-    _require_workspace_skills()
+def test_skills_do_not_reintroduce_release_gate_system():
+    _require_any_skills_layer()
     checked_paths = [
-        SKILLS_DIR / name / "SKILL.md"
+        _skill_path(name) / "SKILL.md"
         for name in NATIVE_QUANTUM_SKILLS + CQ_QCCP_SKILLS
     ]
+    ep_dir = _skill_path("experiment-pipeline")
     checked_paths.extend(
         [
-            SKILLS_DIR / "experiment-pipeline" / "assets" / "stage-log-template.md",
-            SKILLS_DIR / "experiment-pipeline" / "assets" / "pipeline-tracker-template.md",
+            ep_dir / "assets" / "stage-log-template.md",
+            ep_dir / "assets" / "pipeline-tracker-template.md",
         ]
     )
     text = "\n".join(path.read_text(encoding="utf-8") for path in checked_paths)
