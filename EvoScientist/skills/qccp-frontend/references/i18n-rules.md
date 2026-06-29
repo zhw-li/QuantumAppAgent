@@ -11,6 +11,7 @@ qccp-web must keep Chinese/English switching for every generated page.
 - Do not maintain two large local text objects inside the page.
 - Do not hardcode one language in button labels, charts, empty states, form rules, messages, table columns, tabs, tags, or alt text.
 - The route guard already manages `?lang=zh` and `?lang=en`; do not rewrite language query parameters in the page.
+- QCIS circuit source text is technical data and must not be translated. Only surrounding titles, tabs, labels, helper text, and error or empty messages need i18n keys.
 
 ## Page usage
 
@@ -71,4 +72,5 @@ English object to append to `src/utils/lang/en.js`:
 - [ ] No visible Chinese or English text remains hardcoded in the Vue template.
 - [ ] Element Plus form rules and message text use `t(...)`.
 - [ ] Chart labels, legends, tooltips, and empty states are translated.
+- [ ] QCIS section labels are translated, while QCIS source strings remain unchanged.
 - [ ] Button widths and layouts tolerate longer English text.

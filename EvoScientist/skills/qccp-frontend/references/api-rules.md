@@ -80,11 +80,22 @@ const loadData = async () => {
 };
 ```
 
+## QCIS circuit fields
+
+When an API returns a QCIS circuit string, preserve it as response data and pass the string to the optional circuit display component. Do not parse, reformat, translate, or split the QCIS text unless the API contract explicitly requires it.
+
+- Use the exact field name from the API response, such as `qcis`, `qcisCode`, or `circuitQcis`.
+- If the API contract does not name a QCIS field, do not invent one for the real API. In `INTEGRATE.md`, list the required response field that backend integration must provide.
+- Use a computed value to normalize only the empty/non-empty state for rendering.
+- Hide the circuit section completely when the QCIS value is missing, not a string, or blank.
+- Record the QCIS field name and hidden-when-empty behavior in `INTEGRATE.md`.
+
 ## No real API
 
 If URL, method, parameters, response example, and apiCode are not provided:
 
 - Do not create `src/api/<pageKey>/index.js`.
 - Put demo data in `src/views/<module>/<pageKey>/data.js`.
+- If the requested page includes circuit display, demo data may include a local QCIS string for preview, but mark it as mock data in `INTEGRATE.md`.
 - Keep the page previewable with local data.
 - In `INTEGRATE.md`, list the exact functions and fields that should be replaced when the real API is available.

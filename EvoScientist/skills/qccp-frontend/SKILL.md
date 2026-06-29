@@ -1,6 +1,6 @@
 ---
 name: qccp-frontend
-description: "Guides self-contained Vue 3 page artifacts for the qccp-web TianYan Quantum Computing Cloud Platform frontend and quantum application cloud showcases. Use when creating qccp pages, solution/product/news/about pages, Element Plus Vue SFC pages, bilingual Chinese/English pages, route and i18n integration snippets, or frontend evidence for experiment-pipeline application packaging. Trigger after qccp-ui for visual constraints. Do NOT use for backend/API implementation, cqlib algorithm work, standalone design-only review, or final delivery readiness decisions."
+description: "Guides self-contained Vue 3 page artifacts for the qccp-web TianYan Quantum Computing Cloud Platform frontend and quantum application cloud showcases. Use when creating qccp pages, solution/product/news/about pages, Element Plus Vue SFC pages, bilingual Chinese/English pages, optional QCIS circuit display sections, route and i18n integration snippets, or frontend evidence for experiment-pipeline application packaging. Trigger after qccp-ui for visual constraints. Do NOT use for backend/API implementation, cqlib algorithm work, standalone design-only review, or final delivery readiness decisions."
 allowed-tools: "write_file edit_file read_file think_tool execute"
 metadata:
   author: EvoScientist
@@ -15,7 +15,7 @@ Generate qccp-web Vue SFC artifacts for the `qccp_web_page` delivery profile. Th
 ## When to Use
 
 - User needs a qccp-web compatible Vue 3 SFC page for a quantum application or cloud showcase.
-- User needs route snippets, i18n entries, page-local data/API boundary, component structure, or build/integration evidence.
+- User needs route snippets, i18n entries, page-local data/API boundary, optional QCIS circuit display, component structure, or build/integration evidence.
 - `experiment-pipeline` Stage 3 needs qccp-web frontend packaging evidence.
 
 ## When NOT to Use
@@ -34,7 +34,7 @@ Generate qccp-web Vue SFC artifacts for the `qccp_web_page` delivery profile. Th
 5. Do not generate React, TypeScript, JSX/TSX, Nuxt, Tailwind CSS, standalone HTML, CDN Vue/ECharts, or a new Vite project.
 6. Do not create or replace app-level files such as `package.json`, `main.js`, `App.vue`, router file, language files, Header, or Footer.
 7. Keep Chinese/English switching fully supported. Every visible string must use i18n keys and `INTEGRATE.md` must include complete zh/en entries.
-8. Use a vertical top-to-bottom page structure by default: banner/header section, content sections, data/process sections, action/footer section. Avoid left-right split hero layouts unless the request explicitly requires them.
+8. Use a vertical top-to-bottom page structure by default: algorithm introduction box, banner/header section, content sections, data/process sections, action/footer section. Avoid left-right split hero layouts unless the request explicitly requires them.
 9. qccp frontend artifacts must not invent endpoint prefixes such as `/api/<pageKey>/...`; consume the backend contract exactly, or state that a proxy/alias is required.
 
 ## Output location
@@ -106,10 +106,13 @@ Allowed confirmed project-level imports:
 import Footer from '@/components/Footer.vue';
 import { useMainStore } from '@/store/index.js';
 import PagePanel from '@/views/solution/<pageKey>/components/PagePanel.vue';
+import QcisGraph from '@/views/solution/components/graph.vue';
 import { getPageData } from '@/api/<pageKey>/index.js';
 ```
 
 Do not import unknown shared components. Header is already rendered globally and must not be imported.
+
+Use `QcisGraph` only when the page requirement or API/local data includes a QCIS circuit string. Treat it as optional and render nothing when no QCIS value exists. Do not copy the component source from this skill's `assets/` folder into `project-files`; qccp-web already owns the component source.
 
 ## API and chart reliability
 
@@ -126,6 +129,7 @@ Load these only when needed:
 - `references/layout-and-style.md`: qccp layout, SCSS, vertical structure, responsive constraints.
 - `references/i18n-rules.md`: Chinese/English switching and required i18n snippets.
 - `references/api-rules.md`: axios instance and no-fake-interface rules.
+- `references/qcis-circuit.md`: optional QCIS circuit graph import, rendering guard, preview-only asset handling.
 
 ## Required states
 
@@ -152,9 +156,10 @@ Include task-specific, copy-pastable content:
 5. Complete English i18n object to append.
 6. Existing npm dependencies used.
 7. API URL/method/request/response/apiCode, or state clearly that mock `data.js` is used.
-8. Whether `Footer` is used.
-9. Whether login permission or nav entry is needed.
-10. Verification command: `npm run build`.
+8. Whether the optional QCIS circuit display is used, the QCIS field name, and the hidden-when-empty behavior.
+9. Whether `Footer` is used.
+10. Whether login permission or nav entry is needed.
+11. Verification command: `npm run build`.
 
 Never claim the page has already been integrated into qccp-web.
 
@@ -172,8 +177,10 @@ Do not decide delivery readiness from this skill. Provide reviewable frontend ev
 - [ ] Vue 3 `<script setup>` uses JavaScript, not TypeScript.
 - [ ] All visible text uses i18n keys.
 - [ ] zh/en snippets are complete and preserve language switching.
+- [ ] The first visible page content is the required 1440px algorithm introduction box with i18n text.
 - [ ] No new dependencies.
 - [ ] No unknown shared component imports.
+- [ ] If a QCIS circuit is used, `QcisGraph` is imported from qccp-web and is guarded by a non-empty QCIS string.
 - [ ] Styles are scoped SCSS.
 - [ ] Layout is mainly top-to-bottom and works at 1366/1440/1920 desktop widths.
 - [ ] No generated replacement for existing app-level files.
