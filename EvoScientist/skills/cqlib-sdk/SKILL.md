@@ -59,6 +59,8 @@ If an import fails in the active repo, inspect its installed cqlib version befor
 
 When cqlib work is part of application delivery, produce artifacts that `experiment-pipeline` can compare against the classical baseline during later stages.
 
+This skill owns the `algorithm` layer and comparable algorithm evidence only. It does not own local demo, backend contracts, qccp UI evidence, or delivery readiness. Update `application_manifest.json` only with the actual paths to algorithm artifacts and relevant execution metadata when that manifest exists.
+
 `baseline_report.json` and `quantum_report.json` should include:
 
 - `task`
@@ -75,7 +77,7 @@ When cqlib work is part of application delivery, produce artifacts that `experim
 - `circuit_depth` when available
 - `limitations`
 
-Do not decide delivery readiness from this skill. Produce comparable evidence and let `experiment-pipeline` advance or block the next stage.
+Do not decide delivery readiness from this skill. Produce comparable evidence and let `experiment-pipeline` and `validate_quantum_application` advance or block the next stage.
 
 ## Circuit contract
 

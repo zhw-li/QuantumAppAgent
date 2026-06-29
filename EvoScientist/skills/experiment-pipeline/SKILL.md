@@ -59,6 +59,7 @@ Each stage follows a **generate -> execute -> record -> diagnose -> revise** loo
 Recommended artifacts:
 
 ```text
+application_manifest.json
 requirements.json
 solution_plan.md
 baseline_report.json
@@ -68,7 +69,16 @@ README.md
 INTEGRATE.md
 ```
 
-Each stage saves artifacts to `/experiments/stageN_name/` or the project-specific artifact directory selected by the caller.
+Each stage saves artifacts in the user-specified or current project artifact location selected by the caller. Do not assume a default directory; record the actual paths used.
+
+`application_manifest.json` is the application-level contract. It records `delivery_profile`, actual artifact paths, `algorithm`, `local_demo`, `qccp_web`, `docs`, verification commands, and limitations. Create it in planning and update it after each stage.
+
+Allowed `delivery_profile` values:
+
+- `algorithm_only`: algorithm evidence only.
+- `local_fastapi_demo`: algorithm evidence plus a local FastAPI demo.
+- `qccp_web_page`: algorithm evidence plus a qccp-web Vue SFC page.
+- `full_delivery`: algorithm evidence, local demo, qccp-web page, and docs.
 
 ### The Stage Loop
 
@@ -93,12 +103,13 @@ Within every stage, repeat this cycle for each attempt:
 **Process**:
 
 1. Write or update `requirements.json`.
-2. Write `solution_plan.md` with stages, success signals, commands, and expected artifacts.
-3. Implement or locate the classical baseline.
-4. Produce `baseline_report.json` with metric value, command, data reference, seed when relevant, and limitations.
-5. Record anomalies, leakage risks, missing data, or unresolved assumptions.
+2. Write or update `application_manifest.json` with `delivery_profile`, task, primary metric, artifact paths, profile-specific contracts, verification commands, and limitations.
+3. Write `solution_plan.md` with stages, success signals, commands, and expected artifacts.
+4. Implement or locate the classical baseline.
+5. Produce `baseline_report.json` with metric value, command, data reference, seed when relevant, and limitations.
+6. Record anomalies, leakage risks, missing data, or unresolved assumptions.
 
-**Output**: `/experiments/stage1_scope_baseline/` containing requirements, baseline code/results, and baseline report.
+**Output**: Requirements, baseline code/results, and baseline report saved in the selected artifact location.
 
 ## Stage 2: Quantum Method Implementation
 
@@ -123,9 +134,10 @@ Within every stage, repeat this cycle for each attempt:
 2. Keep encoding, ansatz, objective/observable, optimizer, backend execution, and result analysis separate.
 3. Run local simulator or authorized backend only.
 4. Produce `quantum_report.json` using the cqlib artifact contract.
-5. Compare against `baseline_report.json`; if the method underperforms or is not comparable, diagnose before changing multiple variables.
+5. Update `application_manifest.json` with the actual `quantum_report.json` path and relevant quantum evidence paths.
+6. Compare against `baseline_report.json`; if the method underperforms or is not comparable, diagnose before changing multiple variables.
 
-**Output**: `/experiments/stage2_quantum_method/` containing quantum code, command logs, raw results, and `quantum_report.json`.
+**Output**: Quantum code, command logs, raw results, and `quantum_report.json` saved in the selected artifact location.
 
 ## Stage 3: Application Packaging
 
@@ -145,17 +157,18 @@ Within every stage, repeat this cycle for each attempt:
 
 **Process**:
 
-1. Define the user-facing workflow and input/output contract.
-2. Build or draft frontend page artifacts with route, i18n, mock/API boundary, and build command.
-3. Build or draft backend/API artifacts with endpoint paths, schema, error cases, env requirements, and health checks.
-4. Keep simulator, cloud, and real-hardware execution assumptions explicit.
-5. Update `INTEGRATE.md` with copy destinations and verification commands.
+1. Read `application_manifest.json` and define the selected profile workflow.
+2. For `local_fastapi_demo`, use `qccp-service` to build the FastAPI backend, local HTML demo, endpoint contract, and static asset contract.
+3. For `qccp_web_page`, use `qccp-ui` and `qccp-frontend` to build Vue SFC, scoped SCSS, Element Plus, i18n, route snippet, and API paths consumed from the manifest contract.
+4. Keep local FastAPI demo frontend separate from qccp-web SFC artifacts.
+5. Keep simulator, cloud, and real-hardware execution assumptions explicit.
+6. Update `INTEGRATE.md` with copy destinations, route, endpoint contract, profile-specific verification status, and commands.
 
-**Output**: `/experiments/stage3_app_packaging/` or qccp output folders containing frontend/backend/deployment evidence.
+**Output**: Frontend/backend/deployment evidence saved in the selected artifact location or the caller-provided qccp output location.
 
 ## Stage 4: Verification & Handoff
 
-**Goal**: Verify artifact consistency and prepare delivery materials.
+**Goal**: Verify artifact consistency with `validate_quantum_application` and prepare delivery materials.
 
 **Why this matters**: Delivery language must match computed artifacts. Simulator evidence cannot become real-hardware claims.
 
@@ -165,14 +178,15 @@ Within every stage, repeat this cycle for each attempt:
 
 **Process**:
 
-1. Re-read `requirements.json`, `baseline_report.json`, `quantum_report.json`, and app evidence.
-2. Cross-check metric values, commands, dataset/split, backend, and limitations.
-3. Write `verification_report.md` with comparison, missing evidence, failures, and limitations.
-4. Write or update `README.md` and `INTEGRATE.md`.
-5. Prepare slide/showcase text through `academic-slides` when needed.
-6. Mark unresolved evidence as blockers instead of writing customer-facing readiness claims.
+1. Re-read `application_manifest.json`, `requirements.json`, `baseline_report.json`, `quantum_report.json`, and app evidence.
+2. Cross-check metric values, commands, dataset/split, backend, API/frontend contracts, qccp route, and limitations.
+3. Run `validate_quantum_application(app_dir)` on the application artifact directory.
+4. Write `verification_report.md` with comparison, missing evidence, validation blockers, failures, and limitations.
+5. Write or update `README.md` and `INTEGRATE.md`.
+6. Prepare slide/showcase text through `academic-slides` when needed.
+7. Mark unresolved evidence as blockers instead of writing customer-facing readiness claims.
 
-**Output**: `/experiments/stage4_verification_handoff/` containing verification report, docs, and presentation notes.
+**Output**: Verification report, docs, and presentation notes saved in the selected artifact location.
 
 ## Integrating experiment-craft for Diagnosis
 
@@ -209,9 +223,26 @@ See [references/code-trajectory-logging.md](references/code-trajectory-logging.m
 1. **Baseline is part of the application**: It defines what the quantum method must be compared against.
 2. **Comparability beats optimism**: Same data, metric, direction, and task definition matter more than a better-looking number.
 3. **Packaging is evidence**: A cloud showcase needs route/API/deployment proof, not only screenshots or prose.
-4. **Verification can block handoff**: Missing artifacts or overclaimed hardware behavior should stop delivery language.
+4. **Verification can block handoff**: Missing artifacts, validator blockers, or overclaimed hardware behavior should stop delivery language.
 5. **Failed attempts are data**: Log failures carefully so `evo-memory` can improve future cycles.
 6. **Early termination is a feature**: Stop when the stage gate is clearly unreachable under current assumptions.
+
+## Deterministic Validation Tool
+
+Before final handoff, call `validate_quantum_application(app_dir)` on the artifact directory. The tool reads `delivery_profile` and runs only that profile's layers: `algorithm`, `local_demo`, `qccp_web`, and `docs`. Blockers must be fixed or reported by layer.
+
+The v1 report schema follows the `cqlib-sdk` contract:
+
+- `task`
+- `data`
+- `primary_metric`
+- `higher_is_better`
+- `value`
+- `command`
+- `artifact_paths`
+- optional `seed`, `backend`, `shots`, `qubits`, `circuit_depth`, and `limitations`
+
+If the user only asks for a feasibility demo, set `require_quantum_improvement` or `require_packaging` to `false` in `requirements.json`; otherwise unresolved tool blockers must remain visible in `verification_report.md`.
 
 ## Handoff to Writing and Slides
 

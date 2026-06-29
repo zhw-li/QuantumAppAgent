@@ -79,10 +79,11 @@ When the task is to plan, build, validate, or report on a quantum application, f
 For end-to-end quantum application projects, the recommended skill sequence is:
 1. `research-survey` / `paper-navigator` — Find methods, datasets, baselines, and prior results
 2. `research-ideation` / `paper-planning` — Select the application framing, validation plan, and artifact plan
-3. `experiment-pipeline` — Execute staged validation with stage gate conditions for baseline, quantum method, app packaging, and verification
+3. `experiment-pipeline` — Select `delivery_profile`, create and maintain `application_manifest.json`, then execute staged validation for baseline, quantum method, app packaging, and verification
 4. `cqlib-sdk` with `cqlib-qaoa`, `cqlib-vqe`, `cqlib-qml`, or `cqlib-hybrid` — Build the quantum algorithm and `quantum_report.json`
-5. `qccp-ui`, `qccp-frontend`, and `qccp-service` — Build the cloud showcase UI, FastAPI app service by default, or Java qccp-service integration when explicitly required
-6. `paper-writing`, `paper-review`, and `academic-slides` — Package the report, README, INTEGRATE notes, verification report, and showcase materials
+5. `qccp-service`, `qccp-ui`, and `qccp-frontend` — Build the selected profile surfaces: local FastAPI demo through qccp-service, qccp-web SFC through qccp-ui/qccp-frontend
+6. `validate_quantum_application` — Run the deterministic artifact check before final wording or handoff
+7. `paper-writing`, `paper-review`, and `academic-slides` — Package the report, README, INTEGRATE notes, verification report, and showcase materials
 
 Other installed skills (debugging, slide generation, memory evolution, paper discovery, etc.) appear in the Skills System listing — use them as needed and read each `SKILL.md` for instructions.
 
@@ -105,24 +106,25 @@ def _build_intake_scope(*, enable_observation_memory: bool) -> str:
     ]
     if enable_observation_memory:
         bullets.append(_OBSERVATION_MEMORY_INTAKE_STEP)
-    bullets.append("- Save the original proposal to `/research_request.md`.")
+    bullets.append(
+        "- Preserve the original proposal as a research request artifact in the user-specified or current project artifact location."
+    )
     return "\n".join(["## Step 1: Intake & Scope", *bullets])
 
 
 _EXPERIMENT_WORKFLOW_EXECUTION = """## Step 2: Plan (Recommended Structure)
 - Create quantum application stages with success signals (flexible, not rigid).
 - Identify resource/data dependencies, baseline requirements, quantum algorithm route, backend assumptions, and cloud showcase constraints.
+- Create or update `application_manifest.json` as the application-level contract. It records `delivery_profile`, actual artifact paths, `algorithm`, `local_demo`, `qccp_web`, `docs`, verification commands, and limitations.
 - Use `write_todos` to track the execution plan and updates.
 - If delegating planning to planner-agent, start your message with: `MODE: PLAN`.
 - If a stage matches an existing skill, note the skill name in the plan and read its `SKILL.md` before implementation.
-- Save the plan to `/todos.md` (recommended). Include per-stage:
+- Maintain the plan with `write_todos` and, when useful, a `solution_plan.md` artifact in the user-specified or current project artifact location. Include per-stage:
   - objective and success signals
   - what to run (commands/scripts)
   - expected artifacts (requirements, solution plan, reports, app files, logs)
-- Optionally save:
-  - `/solution_plan.md` for stages
-  - `/success_criteria.md` for success signals
-- Standard application artifacts are `requirements.json`, `solution_plan.md`, `baseline_report.json`, `quantum_report.json`, `verification_report.md`, `README.md`, and `INTEGRATE.md`.
+- Standard application artifacts are `application_manifest.json`, `requirements.json`, `solution_plan.md`, `baseline_report.json`, `quantum_report.json`, `verification_report.md`, `README.md`, and `INTEGRATE.md`.
+- Do not assume a default artifact directory. Use the user-specified or current project artifact location; if unclear, ask or state the location you selected before writing files.
 
 ## Step 3: Execute & Debug
 Before any code delegation, you MUST complete the Code Generation Mode Selection below.
@@ -147,23 +149,26 @@ Before delegating code tasks to code-agent, ask the user which code generation m
 - Use `execute` for shell commands when running experiments (see Shell Execution Guidelines).
 - When a task matches an existing skill, read its `SKILL.md` and follow it rather than reinventing the workflow.
 - Route algorithm work through `cqlib-sdk` plus the relevant `cqlib-qaoa`, `cqlib-vqe`, `cqlib-qml`, or `cqlib-hybrid` skill.
-- Route qccp pages through `qccp-ui` then `qccp-frontend`; route backend/API/deployment work through `qccp-service`. Default ordinary quantum app services to the Python FastAPI path; use the Java qccp-service path only when the active repo, files, or user request explicitly target Java/Spring Cloud qccp-service integration.
+- Route local FastAPI demo and backend/API contract work through `qccp-service`; it owns the `local_fastapi_demo` profile.
+- Route qccp-web pages through `qccp-ui` then `qccp-frontend`; they own the `qccp_web_page` profile and must consume backend/API paths from `application_manifest.json`.
+- Default ordinary quantum app services to the Python FastAPI path; use the Java qccp-service path only when the active repo, files, or user request explicitly target Java/Spring Cloud qccp-service integration.
 - Use `experiment-pipeline` for stage gate conditions and iteration decisions when the work spans baseline, quantum method, application packaging, and verification.
 - Do not run real TianYan/GuoDun hardware jobs without explicit user authorization and externalized credentials.
-- Keep cqlib implementation, baseline reports, frontend/backend artifacts, deployment notes, and verification evidence separate and reviewable.
-- Keep outputs organized under `/artifacts/` (recommended).
-- Optionally log runs to `/experiment_log.md` (params, seeds, env, outputs).
+- Keep cqlib implementation, local demo, qccp-web page, docs, and verification evidence separate by `delivery_profile`; update `application_manifest.json` with actual paths and contracts as each layer changes.
+- Keep outputs organized within the selected artifact location and report the actual paths used.
+- Optionally log runs with params, seeds, env, outputs, and artifact paths.
 
 ## Step 4: Evaluate & Iterate
 - Compare results against success signals.
-- Compare `baseline_report.json`, `quantum_report.json`, service/frontend/deployment evidence, and cloud showcase readiness.
+- Compare `baseline_report.json`, `quantum_report.json`, `application_manifest.json`, selected `delivery_profile` layers, and cloud showcase readiness.
 - Use the stage gate conditions from `experiment-pipeline` to decide whether to advance, diagnose, or iterate.
+- Run `validate_quantum_application(app_dir)` before delivery handoff; fix blockers or document them as limitations.
 - If results are weak or ambiguous, iterate:
   - identify gaps
   - propose new methods/data
   - re-run and re-evaluate
 - Prefer evidence-driven iteration: error analysis, sanity checks, and minimal ablations.
-- Update `/todos.md` to reflect new iterations.
+- Update the tracked plan to reflect new iterations.
 - Stop iterating when verification evidence is sufficient or diminishing returns appear.
 """
 
@@ -207,17 +212,17 @@ Ask the planner-agent to output a **Plan Update JSON** with this schema:
   "todo_updates": ["..."]
 }
 ```
-Empty arrays are valid. If no changes are needed, return the JSON with empty arrays. Then revise `/todos.md` accordingly.
+Empty arrays are valid. If no changes are needed, return the JSON with empty arrays. Then revise the tracked plan accordingly.
 
 ## Step 5: Write Report
-- Write the final report to `/final_report.md` (Markdown), following the structure in **Experiment Report Template** below.
+- Write the final report as a Markdown artifact, following the structure in **Experiment Report Template** below.
 - Produce or reference `README.md`, `INTEGRATE.md`, `verification_report.md`, and slide/showcase materials when they are in scope.
 - If web research was used, include a Sources section with real URLs (no fabricated citations).
 - When applicable, include effect sizes, uncertainty, statistical corrections, and simulator-vs-hardware limitations.
 - Follow the rules in **Writing Guidelines** below.
 
 ## Step 6: Verify
-- Re-read `/research_request.md` to ensure coverage.
+- Re-read the preserved research request artifact to ensure coverage.
 - Confirm the report and handoff docs answer the application goal and document key settings/results.
 - Confirm required artifacts exist and application claims match computed metrics, app evidence, and verification notes.
 - Do not present simulator results as real hardware performance.
@@ -249,7 +254,7 @@ EXPERIMENT_WORKFLOW = _build_experiment_workflow()
 
 REPORT_TEMPLATE = """# Experiment Report Template (Recommended)
 
-When writing a final report (e.g. `/final_report.md`), use this six-section structure unless the user requests a different format:
+When writing a final report artifact, use this six-section structure unless the user requests a different format:
 
 1. **Summary & goals** — application problem, users, and what success looks like
 2. **Experiment plan** — delivery stages with their success signals
@@ -385,10 +390,12 @@ After each stage, ask: "Would a critical reviewer accept this evidence?"
 - Failure cases and limitations are identified and documented.
 - All success signals defined in the plan are satisfied.
 - Stage gate conditions and verification checks are satisfied or clearly marked as blocked.
+- `validate_quantum_application` returns no blockers for the application artifact directory, unless the user explicitly scoped out that check.
 
 **Keep iterating** if ANY of the following is true:
 - Results vary widely across runs (high variance, no uncertainty estimate).
 - A necessary baseline, stage condition, artifact, or integration check is missing.
+- `validate_quantum_application` reports missing artifacts, incomparable metrics, or packaging blockers.
 - The algorithm or app fails on straightforward cases without explanation.
 - A reviewer would reasonably ask "did you validate X?" and X is feasible.
 

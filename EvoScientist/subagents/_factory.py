@@ -46,7 +46,12 @@ def build_async_subagent_graph(name: str) -> Any:
         _get_default_middleware,
         _inject_subagent_middleware,
     )
-    from EvoScientist.tools import tavily_search, think_tool
+    from EvoScientist.tools import (
+        skill_manager,
+        tavily_search,
+        think_tool,
+        validate_quantum_application,
+    )
     from EvoScientist.utils import load_subagents
 
     # Surface API keys as env vars so downstream SDKs (openai, anthropic, …)
@@ -55,7 +60,11 @@ def build_async_subagent_graph(name: str) -> Any:
     apply_config_to_env(cfg)
 
     # Mirror the tool registry constructed in EvoScientist._build_base_kwargs.
-    tool_registry = {"think_tool": think_tool}
+    tool_registry = {
+        "think_tool": think_tool,
+        "skill_manager": skill_manager,
+        "validate_quantum_application": validate_quantum_application,
+    }
     if os.environ.get("TAVILY_API_KEY"):
         tool_registry["tavily_search"] = tavily_search
 

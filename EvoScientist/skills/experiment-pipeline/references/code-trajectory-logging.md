@@ -92,20 +92,11 @@ When writing analysis, think about which M_E category the insight falls into. Th
 
 ### Per-Stage Logs
 
-Each stage maintains its own trajectory log:
-```
-/experiments/stage1_baseline/trajectory.md
-/experiments/stage2_tuning/trajectory.md
-/experiments/stage3_method/trajectory.md
-/experiments/stage4_ablation/trajectory.md
-```
+Each stage maintains its own trajectory log in the selected artifact location. Do not assume a default directory; record the actual path for each stage log.
 
 ### Cross-Stage Summary
 
-After completing all stages (or when the pipeline terminates), create a summary:
-```
-/experiments/trajectory-summary.md
-```
+After completing all stages (or when the pipeline terminates), create a trajectory summary in the selected artifact location and record its actual path.
 
 The summary should highlight:
 - Total attempts per stage (actual vs budget)

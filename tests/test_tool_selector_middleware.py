@@ -54,6 +54,15 @@ def test_create_tool_selector_returns_list():
         assert len(result) == 2
 
 
+def test_create_tool_selector_can_disable_stream_tracking():
+    p1, p2, p3 = _factory_patches()
+    with p1, p2, p3:
+        result = create_tool_selector_middleware(track_stream_selection=False)
+        assert isinstance(result, list)
+        assert len(result) == 1
+        assert type(result[0]).__name__ == "_ConditionalToolSelectorMiddleware"
+
+
 def test_create_tool_selector_always_include():
     p1, p2, p3 = _factory_patches()
     with p1, p2, p3 as mock_cls:
@@ -171,6 +180,34 @@ def test_default_middleware_includes_tool_selector(mock_config, mock_model, mock
     type_names = [type(m).__name__ for m in mw]
     assert "_ConditionalToolSelectorMiddleware" in type_names
     assert "_ToolSelectionTrackerMiddleware" in type_names
+
+
+@patch(
+    "EvoScientist.middleware.create_tool_selector_middleware",
+    side_effect=lambda *a, **kw: _patched_create(),
+)
+@patch("EvoScientist.EvoScientist._ensure_chat_model")
+@patch("EvoScientist.EvoScientist._ensure_config")
+def test_async_subagent_middleware_disables_stream_tracking(
+    mock_config, mock_model, mock_ts
+):
+    mock_model.return_value = _mock_model()
+    cfg = MagicMock()
+    cfg.enable_ask_user = False
+    cfg.auto_approve = False
+    cfg.model_fallbacks = None
+    cfg.auxiliary_model = ""
+    cfg.auxiliary_provider = ""
+    cfg.memory_profile_enabled = False
+    cfg.memory_observations_enabled = False
+    cfg.memory_workers_enabled = False
+    mock_config.return_value = cfg
+
+    from EvoScientist.EvoScientist import _get_default_middleware
+
+    _get_default_middleware(for_async_subagent=True)
+
+    assert mock_ts.call_args.kwargs["track_stream_selection"] is False
 
 
 @patch("EvoScientist.EvoScientist._ensure_chat_model")

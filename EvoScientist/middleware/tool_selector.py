@@ -45,18 +45,23 @@ class _ConditionalToolSelectorMiddleware(AgentMiddleware):
     Skips the selection LLM call when ``len(request.tools) <= threshold``,
     avoiding unnecessary overhead for agents with few tools.
 
-    Sets ``_selector_active`` flag during the selector's internal LLM call
-    so the streaming layer can suppress its output.
+    When stream tracking is enabled, sets ``_selector_active`` during the
+    selector's internal LLM call so the streaming layer can suppress its output.
     """
 
     name = "conditional_tool_selector"
 
     def __init__(
-        self, selector: AgentMiddleware, threshold: int = DEFAULT_TOOL_THRESHOLD
+        self,
+        selector: AgentMiddleware,
+        threshold: int = DEFAULT_TOOL_THRESHOLD,
+        *,
+        track_stream_selection: bool = True,
     ):
         super().__init__()
         self._selector = selector
         self._threshold = threshold
+        self._track_stream_selection = track_stream_selection
 
     def wrap_model_call(
         self,
@@ -66,9 +71,10 @@ class _ConditionalToolSelectorMiddleware(AgentMiddleware):
         if len(request.tools or []) <= self._threshold:
             return handler(request)
 
-        global _selector_active, _total_tools_count
-        _selector_active = True
-        _total_tools_count = len(request.tools or [])
+        if self._track_stream_selection:
+            global _selector_active, _total_tools_count
+            _selector_active = True
+            _total_tools_count = len(request.tools or [])
 
         # Track whether handler was called — if so, any exception is from
         # the downstream model, not the selector, and must propagate.
@@ -76,9 +82,10 @@ class _ConditionalToolSelectorMiddleware(AgentMiddleware):
 
         def _handler_after_selection(req: ModelRequest) -> ModelResponse:
             nonlocal _handler_called
-            global _selector_active
             _handler_called = True
-            _selector_active = False
+            if self._track_stream_selection:
+                global _selector_active
+                _selector_active = False
             return handler(req)
 
         try:
@@ -88,10 +95,12 @@ class _ConditionalToolSelectorMiddleware(AgentMiddleware):
                 raise  # Error from downstream model — don't retry
             # Selector itself failed (e.g., structured output not supported).
             logger.debug("Tool selector failed, using all tools", exc_info=True)
-            _selector_active = False
+            if self._track_stream_selection:
+                _selector_active = False
             return handler(request)
         finally:
-            _selector_active = False
+            if self._track_stream_selection:
+                _selector_active = False
 
     async def awrap_model_call(
         self,
@@ -101,17 +110,19 @@ class _ConditionalToolSelectorMiddleware(AgentMiddleware):
         if len(request.tools or []) <= self._threshold:
             return await handler(request)
 
-        global _selector_active, _total_tools_count
-        _selector_active = True
-        _total_tools_count = len(request.tools or [])
+        if self._track_stream_selection:
+            global _selector_active, _total_tools_count
+            _selector_active = True
+            _total_tools_count = len(request.tools or [])
 
         _handler_called = False
 
         async def _handler_after_selection(req: ModelRequest) -> ModelResponse:
             nonlocal _handler_called
-            global _selector_active
             _handler_called = True
-            _selector_active = False
+            if self._track_stream_selection:
+                global _selector_active
+                _selector_active = False
             return await handler(req)
 
         try:
@@ -122,10 +133,12 @@ class _ConditionalToolSelectorMiddleware(AgentMiddleware):
             if _handler_called:
                 raise
             logger.debug("Tool selector failed, using all tools", exc_info=True)
-            _selector_active = False
+            if self._track_stream_selection:
+                _selector_active = False
             return await handler(request)
         finally:
-            _selector_active = False
+            if self._track_stream_selection:
+                _selector_active = False
 
 
 class _ToolSelectionTrackerMiddleware(AgentMiddleware):
@@ -167,19 +180,24 @@ def create_tool_selector_middleware(
     threshold: int = DEFAULT_TOOL_THRESHOLD,
     *,
     model: BaseChatModel | None = None,
+    track_stream_selection: bool = True,
 ):
     """Build LLMToolSelectorMiddleware + tracker with EvoScientist defaults.
 
-    Returns a list of two middleware:
+    Returns middleware for adaptive tool selection:
     1. Conditional wrapper around ``LLMToolSelectorMiddleware`` — only
        activates when ``len(tools) > threshold``
-    2. ``_ToolSelectionTrackerMiddleware`` — captures selected tool names
+    2. Optional ``_ToolSelectionTrackerMiddleware`` — captures selected tool
+       names for the main-agent stream UI when ``track_stream_selection`` is true
 
     Args:
         model: Chat model for tool selection.  If *None*, the default
             model is resolved via ``_ensure_chat_model()``.
         threshold: Minimum number of tools to trigger selection.
             Default 20.  Set to 0 to always run selection.
+        track_stream_selection: Whether to update process-global stream/UI
+            state. Disable for async sub-agents that should not drive the
+            main-agent tool-selection widget.
 
     ``think_tool`` and ``task`` are always included because:
 
@@ -210,7 +228,13 @@ def create_tool_selector_middleware(
         always_include=["think_tool", "task"],
     )
 
-    return [
-        _ConditionalToolSelectorMiddleware(selector, threshold=threshold),
-        _ToolSelectionTrackerMiddleware(),
+    middleware: list[AgentMiddleware] = [
+        _ConditionalToolSelectorMiddleware(
+            selector,
+            threshold=threshold,
+            track_stream_selection=track_stream_selection,
+        ),
     ]
+    if track_stream_selection:
+        middleware.append(_ToolSelectionTrackerMiddleware())
+    return middleware

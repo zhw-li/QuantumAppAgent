@@ -55,9 +55,12 @@ class TestGetSystemPrompt:
             "experiment-pipeline",
             "success signals",
             "verification_report.md",
+            "application_manifest.json",
+            "delivery_profile",
             "cqlib-sdk",
             "qccp-frontend",
             "qccp-service",
+            "validate_quantum_application",
             "FastAPI",
             "Java",
         ):
@@ -74,6 +77,36 @@ class TestGetSystemPrompt:
             "release-gate",
         ):
             assert term not in result
+
+    def test_quantum_application_workflow_does_not_fix_artifact_paths(self):
+        for path in (
+            "/research_request.md",
+            "/todos.md",
+            "/solution_plan.md",
+            "/artifacts/",
+            "/experiment_log.md",
+            "/final_report.md",
+        ):
+            assert path not in EXPERIMENT_WORKFLOW
+            assert path not in REPORT_TEMPLATE
+
+        for artifact in (
+            "application_manifest.json",
+            "requirements.json",
+            "solution_plan.md",
+            "baseline_report.json",
+            "quantum_report.json",
+            "verification_report.md",
+            "README.md",
+            "INTEGRATE.md",
+        ):
+            assert artifact in EXPERIMENT_WORKFLOW
+
+        assert "validate_quantum_application(app_dir)" in EXPERIMENT_WORKFLOW
+        assert "Do not assume a default artifact directory" in EXPERIMENT_WORKFLOW
+        assert "delivery_profile" in EXPERIMENT_WORKFLOW
+        assert "local_fastapi_demo" in EXPERIMENT_WORKFLOW
+        assert "qccp_web_page" in EXPERIMENT_WORKFLOW
 
     def test_no_numeric_limits(self):
         result = get_system_prompt()
@@ -255,6 +288,7 @@ class TestQuantumApplicationSubagentHints:
             "README.md",
             "INTEGRATE.md",
             "verification_report.md",
+            "validate_quantum_application",
             "slides",
         ):
             assert term in text
@@ -272,3 +306,19 @@ class TestQuantumApplicationSubagentHints:
             "release-gate",
         ):
             assert term not in text
+
+    def test_subagent_prompts_do_not_fix_artifact_paths(self):
+        config_dir = Path(__file__).resolve().parents[1] / "EvoScientist" / "subagents"
+        text = "\n".join(
+            path.read_text(encoding="utf-8") for path in config_dir.glob("*.yaml")
+        )
+
+        for path in (
+            "/artifacts/",
+            "/experiment_log.md",
+            "/experiments/",
+        ):
+            assert path not in text
+
+        assert "actual output paths" in text
+        assert "Validation status" in text

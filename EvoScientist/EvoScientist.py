@@ -477,14 +477,22 @@ def _build_base_kwargs(
     base_backend, base_middleware, *, cfg=None, chat_model=None, workspace_dir=None
 ):
     """Build agent kwargs *without* MCP (fast, no subprocess spawning)."""
-    from .tools import skill_manager, tavily_search, think_tool
+    from .tools import (
+        skill_manager,
+        tavily_search,
+        think_tool,
+        validate_quantum_application,
+    )
     from .utils import load_subagents
 
     cfg = cfg if cfg is not None else _ensure_config()
-    tool_registry = {"think_tool": think_tool}
+    tool_registry = {
+        "think_tool": think_tool,
+        "validate_quantum_application": validate_quantum_application,
+    }
     if os.environ.get("TAVILY_API_KEY"):
         tool_registry["tavily_search"] = tavily_search
-    base_tools = [think_tool, skill_manager]
+    base_tools = [think_tool, skill_manager, validate_quantum_application]
 
     subs = load_subagents(
         SUBAGENTS_CONFIG,
@@ -529,7 +537,12 @@ def load_mcp_and_build_kwargs(
         chat_model: Explicit chat model to bind instead of
             ``_ensure_chat_model()`` (which would write module globals).
     """
-    from .tools import skill_manager, tavily_search, think_tool
+    from .tools import (
+        skill_manager,
+        tavily_search,
+        think_tool,
+        validate_quantum_application,
+    )
     from .utils import load_subagents
 
     cfg = cfg if cfg is not None else _ensure_config()
@@ -543,10 +556,13 @@ def load_mcp_and_build_kwargs(
             workspace_dir=workspace_dir,
         )
 
-    tool_registry = {"think_tool": think_tool}
+    tool_registry = {
+        "think_tool": think_tool,
+        "validate_quantum_application": validate_quantum_application,
+    }
     if os.environ.get("TAVILY_API_KEY"):
         tool_registry["tavily_search"] = tavily_search
-    base_tools = [think_tool, skill_manager]
+    base_tools = [think_tool, skill_manager, validate_quantum_application]
 
     # Fresh tool registry — start from base tools + MCP tools
     registry = dict(tool_registry)
@@ -725,7 +741,10 @@ def _get_default_middleware(
         ModelFallbackMiddleware(),
         ContextOverflowMapperMiddleware(),
         ToolErrorHandlerMiddleware(),
-        *create_tool_selector_middleware(model=tool_selector_model),
+        *create_tool_selector_middleware(
+            model=tool_selector_model,
+            track_stream_selection=not for_async_subagent,
+        ),
         # Interpreter prompt must land before runtime/memory context, so this
         # middleware sits ahead of runtime_context in the stack.
         create_code_interpreter_middleware(

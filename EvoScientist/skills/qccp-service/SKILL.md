@@ -8,20 +8,20 @@ metadata:
   tags: [backend, qccp, service, api, cloud-showcase]
 ---
 
-# qccp-service Backend Dispatcher
+# qccp-service Backend and Local Demo Dispatcher
 
-Use this skill as the concise backend entrypoint for quantum application cloud-showcase services. First choose the backend path, then load only the reference file needed for the current task.
+Use this skill as the owner of backend/API contracts and the `local_fastapi_demo` delivery profile. First choose the backend path, then load only the reference file needed for the current task.
 
 ## When to Use
 
 - User needs backend/API/deployment artifacts for a quantum application or cloud showcase.
-- User is packaging a local Python FastAPI quantum app service with health checks, API contracts, static frontend hosting, or INTEGRATE evidence.
+- User is packaging a local Python FastAPI quantum app service with health checks, API contracts, local HTML/static demo hosting, or INTEGRATE evidence.
 - User explicitly targets Java/Spring Cloud qccp-service modules, Controller/Service/Mapper/XML, Feign, config, security/current-user, Maven verification, endpoint contract, or health-check guidance.
 - `experiment-pipeline` Stage 3 needs backend or deployment packaging evidence.
 
 ## When NOT to Use
 
-- **Frontend page, route, or i18n output** -> use `qccp-ui` and `qccp-frontend`.
+- **qccp-web Vue SFC page, route, or i18n output** -> use `qccp-ui` and `qccp-frontend`.
 - **Quantum algorithm implementation or simulator/cloud circuit execution** -> use `cqlib-sdk` and algorithm skills.
 - **Planning only or final verification** -> use `paper-planning` or `experiment-pipeline`.
 
@@ -46,15 +46,17 @@ Use this skill as the concise backend entrypoint for quantum application cloud-s
 
 1. Select the backend path from the evidence in the request and repository.
 2. Read the relevant reference file before editing.
-3. Define the smallest API contract needed by the frontend and verification artifacts.
-4. Keep algorithm execution, backend service wrapping, frontend display schema, deployment notes, and verification evidence separate.
-5. Run the smallest relevant local verification command for the selected path.
+3. Read `application_manifest.json` when it exists; otherwise define the smallest API contract needed by the selected delivery profile.
+4. For `local_fastapi_demo`, record backend endpoints in `local_demo`: endpoint path, method, request schema, response schema, error cases, sample request when needed, static asset mappings, backend entry point, local demo entrypoint, and verification command.
+5. Keep algorithm execution, backend service wrapping, frontend display schema, deployment notes, and verification evidence separate.
+6. Run the smallest relevant local verification command for the selected path.
 
 ## Application delivery handoff
 
 For quantum application delivery, backend work contributes app packaging and verification evidence. Provide:
 
 - endpoint paths, methods, request/response schema, and error cases
+- `application_manifest.json` `local_demo` contract updates when the manifest exists
 - service boundaries and persistence or job-execution ownership
 - required environment variables or ignored local config keys
 - health-check and build/test commands for the selected backend path
@@ -66,6 +68,7 @@ Do not decide delivery readiness from this skill. Provide reviewable backend/API
 
 - [ ] Backend path is explicitly identified as Python FastAPI or Java qccp-service.
 - [ ] Endpoint contract and error cases are documented.
+- [ ] `local_demo` contract is recorded in `application_manifest.json` when the application manifest is in scope.
 - [ ] Health check and smallest relevant verification command are reported.
 - [ ] Frontend/backend integration evidence is captured when in scope.
 - [ ] Java module/call chain is confirmed before Java edits.

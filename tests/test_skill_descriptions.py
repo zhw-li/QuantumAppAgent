@@ -145,6 +145,61 @@ def test_experiment_pipeline_logs_actual_skill_usage():
     assert "Skill Used" in tracker
 
 
+def test_experiment_pipeline_mentions_deterministic_validator():
+    text = _read_skill("experiment-pipeline")
+
+    assert "validate_quantum_application" in text
+    assert "application_manifest.json" in text
+    assert "delivery_profile" in text
+    assert "algorithm_only" in text
+    assert "local_fastapi_demo" in text
+    assert "qccp_web_page" in text
+    assert "full_delivery" in text
+    assert "baseline_report.json" in text
+    assert "quantum_report.json" in text
+    assert "higher_is_better" in text
+    assert "Blockers must be fixed or reported by layer" in text
+
+
+def test_experiment_pipeline_does_not_prescribe_fixed_artifact_dirs():
+    ep_dir = _skill_path("experiment-pipeline")
+    checked_paths = [
+        ep_dir / "SKILL.md",
+        ep_dir / "assets" / "stage-log-template.md",
+        ep_dir / "references" / "code-trajectory-logging.md",
+    ]
+    text = "\n".join(path.read_text(encoding="utf-8") for path in checked_paths)
+
+    for path in (
+        "/experiments/",
+        "/artifacts/",
+        "/requirements.json",
+        "/solution_plan.md",
+    ):
+        assert path not in text
+
+    assert "selected artifact location" in text
+    assert "validate_quantum_application(app_dir)" in text
+
+
+def test_quantum_delivery_skills_reference_application_contract():
+    for name in ("cqlib-sdk", "qccp-service", "qccp-ui", "qccp-frontend"):
+        text = _read_skill(name)
+        assert "application_manifest.json" in text, name
+
+    frontend = _read_skill("qccp-frontend")
+    assert "must not invent endpoint prefixes" in frontend
+    assert "caller-provided or current project artifact location" in frontend
+    assert "qccp-page-output" not in frontend
+    assert "does not own local FastAPI HTML demo" in frontend
+
+    service = _read_skill("qccp-service")
+    assert "request schema" in service
+    assert "response schema" in service
+    assert "static asset" in service
+    assert "local_fastapi_demo" in service
+
+
 def test_skills_do_not_reintroduce_release_gate_system():
     checked_paths = [
         _skill_path(name) / "SKILL.md"

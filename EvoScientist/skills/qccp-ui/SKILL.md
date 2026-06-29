@@ -10,7 +10,7 @@ metadata:
 
 # UI Design Spec
 
-This skill defines the visual discipline for TianYan Quantum Computing Cloud Platform-style pages. For qccp-web implementation, use this as the visual reference before `qccp-frontend`; qccp-web uses Vue SFC + scoped SCSS + Element Plus, not Tailwind.
+This skill defines the visual discipline for TianYan Quantum Computing Cloud Platform-style pages in the `qccp_web_page` delivery profile. For qccp-web implementation, use this as the visual reference before `qccp-frontend`; qccp-web uses Vue SFC + scoped SCSS + Element Plus, not Tailwind.
 
 ## When to Use
 
@@ -142,6 +142,8 @@ Tags:
 - [ ] Radius uses 4px, 6px, or 8px according to component type.
 - [ ] Components are reused rather than hand-styled repeatedly.
 - [ ] Chinese and English text both fit without overlap.
+
+When `application_manifest.json` is in scope, record or request a `qccp_web` UI evidence entry that identifies the SFC path, token/color/radius/font checks, bilingual-fit status, and any visual limitations. This is evidence for validation, not final delivery approval.
 
 ## Handoff
 

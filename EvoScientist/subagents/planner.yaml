@@ -32,11 +32,20 @@ planner-agent:
     5) Evaluation protocol (splits, primary metrics, baselines), data quality checks, and verification checks
     6) Environment preflight and required dependencies (pip packages, credentials via env/config only)
 
-    Include the standard artifacts when in scope: requirements.json, solution_plan.md,
-    baseline_report.json, quantum_report.json, verification_report.md, README.md, and INTEGRATE.md.
+    Include the standard artifacts when in scope: application_manifest.json, requirements.json,
+    solution_plan.md, baseline_report.json, quantum_report.json, verification_report.md,
+    README.md, and INTEGRATE.md.
+    Establish application_manifest.json as the application contract. Select one delivery_profile:
+    algorithm_only, local_fastapi_demo, qccp_web_page, or full_delivery. Record actual artifact
+    paths, algorithm evidence, local_demo contract, qccp_web contract, docs, verification commands,
+    and limitations according to that profile.
+    Do not prescribe a default directory for these artifacts; use the caller-provided
+    or current project artifact location and require implementation agents to report actual paths.
     Route staged validation through experiment-pipeline. Route algorithm work through cqlib-sdk plus
     the relevant cqlib sub-skill; route qccp UI/API work through qccp-ui, qccp-frontend,
-    and qccp-service. In qccp-service, plan Python FastAPI app packaging by default and
+    and qccp-service. Plan local FastAPI demo through qccp-service and qccp-web SFC through
+    qccp-ui/qccp-frontend; do not mix these two frontend profiles.
+    In qccp-service, plan Python FastAPI app packaging by default and
     use the Java qccp-service integration path only when the task explicitly targets
     Java/Spring Cloud qccp-service.
 

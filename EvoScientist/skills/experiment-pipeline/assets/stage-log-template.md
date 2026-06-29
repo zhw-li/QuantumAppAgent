@@ -16,7 +16,7 @@
 | 2 | | | | | | | [ ] |
 | 3 | | | | | | | [ ] |
 
-*Add rows as needed. This table is the quick-reference stage trajectory log — save to `/experiments/stageN_name/trajectory.md`. For detailed per-attempt write-ups (e.g., for evo-memory ESE extraction), use the expanded markdown format in [code-trajectory-logging.md](../references/code-trajectory-logging.md).*
+*Add rows as needed. This table is the quick-reference stage trajectory log — save it in the selected artifact location and record the actual path. For detailed per-attempt write-ups (e.g., for evo-memory ESE extraction), use the expanded markdown format in [code-trajectory-logging.md](../references/code-trajectory-logging.md).*
 
 ## Gate Assessment
 
@@ -40,7 +40,7 @@
 ## Next Stage Preparation
 
 - [ ] Gate condition verified
-- [ ] Results documented and saved to `/experiments/stageN_name/`
+- [ ] Results documented and saved in the selected artifact location
 - [ ] Trajectory log completed
 - [ ] Skill Used values recorded for each attempt
 - [ ] Key artifacts ready for next stage

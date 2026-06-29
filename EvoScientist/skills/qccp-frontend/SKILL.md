@@ -10,13 +10,13 @@ metadata:
 
 # qccp-web Frontend Page
 
-Generate a new self-contained page for the CT TianYan Quantum Computing Cloud Platform. The agent usually cannot access the real `qccp-web` repo, so output copyable files under an isolated folder and provide integration snippets.
+Generate qccp-web Vue SFC artifacts for the `qccp_web_page` delivery profile. This skill does not own local FastAPI HTML demo layout or static mounting; use `qccp-service` for the `local_fastapi_demo` profile.
 
 ## When to Use
 
 - User needs a qccp-web compatible Vue 3 SFC page for a quantum application or cloud showcase.
 - User needs route snippets, i18n entries, page-local data/API boundary, component structure, or build/integration evidence.
-- `experiment-pipeline` Stage 3 needs frontend packaging evidence.
+- `experiment-pipeline` Stage 3 needs qccp-web frontend packaging evidence.
 
 ## When NOT to Use
 
@@ -29,33 +29,27 @@ Generate a new self-contained page for the CT TianYan Quantum Computing Cloud Pl
 
 1. Read `qccp-ui` before generating or reviewing visual layout, tokens, spacing, radius, typography, or component styling.
 2. Follow `agent.md` project facts over generic UI-generation rules when available.
-3. Target stack is Vue 3 SFC, JavaScript, `<script setup>`, Element Plus, Vue I18n, scoped SCSS.
-4. Do not generate React, TypeScript, JSX/TSX, Nuxt, Tailwind CSS, standalone HTML, or a new Vite project.
-5. Do not create or replace app-level files such as `package.json`, `main.js`, `App.vue`, router file, language files, Header, or Footer.
-6. Keep Chinese/English switching fully supported. Every visible string must use i18n keys and `INTEGRATE.md` must include complete zh/en entries.
-7. Use a vertical top-to-bottom page structure by default: banner/header section, content sections, data/process sections, action/footer section. Avoid left-right split hero layouts unless the request explicitly requires them.
+3. Read `application_manifest.json` when it exists. API paths, qccp pageKey, route, and data schema must come from `qccp_web` or the backend contract.
+4. Target stack is Vue 3 SFC, JavaScript, `<script setup>`, Element Plus, Vue I18n, scoped SCSS.
+5. Do not generate React, TypeScript, JSX/TSX, Nuxt, Tailwind CSS, standalone HTML, CDN Vue/ECharts, or a new Vite project.
+6. Do not create or replace app-level files such as `package.json`, `main.js`, `App.vue`, router file, language files, Header, or Footer.
+7. Keep Chinese/English switching fully supported. Every visible string must use i18n keys and `INTEGRATE.md` must include complete zh/en entries.
+8. Use a vertical top-to-bottom page structure by default: banner/header section, content sections, data/process sections, action/footer section. Avoid left-right split hero layouts unless the request explicitly requires them.
+9. qccp frontend artifacts must not invent endpoint prefixes such as `/api/<pageKey>/...`; consume the backend contract exactly, or state that a proxy/alias is required.
 
 ## Output location
 
-Write all generated artifacts to:
+Write generated artifacts in the caller-provided or current project artifact location and report the actual paths. When producing copyable qccp-web artifacts, mirror the target project paths inside a project-files subtree at the selected location:
 
 ```text
-qccp-page-output/<pageKey>/
-```
-
-Mirror the target project paths inside `project-files`:
-
-```text
-qccp-page-output/<pageKey>/
-├─ project-files/
-│  └─ src/
-│     ├─ views/<module>/<pageKey>/
-│     │  ├─ index.vue
-│     │  ├─ components/
-│     │  └─ data.js
-│     ├─ api/<pageKey>/index.js
-│     └─ assets/images/<pageKey>/
-└─ INTEGRATE.md
+project-files/
+└─ src/
+   ├─ views/<module>/<pageKey>/
+   │  ├─ index.vue
+   │  ├─ components/
+   │  └─ data.js
+   ├─ api/<pageKey>/index.js
+   └─ assets/images/<pageKey>/
 ```
 
 Only create `api/<pageKey>/index.js` when real endpoint details are provided. Otherwise use `data.js`.
@@ -117,6 +111,14 @@ import { getPageData } from '@/api/<pageKey>/index.js';
 
 Do not import unknown shared components. Header is already rendered globally and must not be imported.
 
+## API and chart reliability
+
+- Use only API paths declared in the backend contract or `application_manifest.json`.
+- If the backend contract exposes `/api/solve`, do not call `/api/<pageKey>/solve` unless the backend also declares that alias or `INTEGRATE.md` documents an explicit proxy mapping.
+- qccp SFC files must not assume global `echarts`; import it from the project dependency.
+- Chart containers need an explicit height or stable aspect ratio.
+- Render charts after `nextTick`, retry or guard when the container is absent, handle window resize, and dispose chart instances in `onBeforeUnmount`.
+
 ## References
 
 Load these only when needed:
@@ -159,6 +161,8 @@ Never claim the page has already been integrated into qccp-web.
 ## Application delivery handoff
 
 For quantum application delivery, frontend work contributes app packaging and verification evidence. In `INTEGRATE.md`, include route path, i18n keys, API/mock boundary, request/response assumptions, and build command so `experiment-pipeline` or backend reviewers can check contract consistency.
+
+When `application_manifest.json` is in scope, update or request updates for `qccp_web` with pageKey, route, SFC path, API module path, API paths consumed, frontend data schema, and verification command.
 
 Do not decide delivery readiness from this skill. Provide reviewable frontend evidence for the application packaging and verification stages.
 
