@@ -1,6 +1,6 @@
 """Tests for Rich markup escape safety in formatter."""
 
-from EvoScientist.stream.formatter import ToolResultFormatter
+from tyqa.stream.formatter import ToolResultFormatter
 
 
 class TestRichMarkupEscape:

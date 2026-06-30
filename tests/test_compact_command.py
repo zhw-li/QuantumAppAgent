@@ -10,21 +10,21 @@ class TestCompactGuards:
     """Guard conditions that return early without touching the middleware."""
 
     def test_no_agent(self):
-        from EvoScientist.cli.commands import compact_conversation
+        from tyqa.cli.commands import compact_conversation
 
         result = _run(compact_conversation(agent=None, thread_id="abc"))
         assert result.status == "noop"
         assert "Nothing to compact" in result.message
 
     def test_no_thread_id(self):
-        from EvoScientist.cli.commands import compact_conversation
+        from tyqa.cli.commands import compact_conversation
 
         result = _run(compact_conversation(agent=MagicMock(), thread_id=None))
         assert result.status == "noop"
         assert "Nothing to compact" in result.message
 
     def test_empty_messages(self):
-        from EvoScientist.cli.commands import compact_conversation
+        from tyqa.cli.commands import compact_conversation
 
         agent = MagicMock()
         snapshot = SimpleNamespace(values={"messages": []})
@@ -35,7 +35,7 @@ class TestCompactGuards:
         assert "no messages" in result.message
 
     def test_state_read_failure(self):
-        from EvoScientist.cli.commands import compact_conversation
+        from tyqa.cli.commands import compact_conversation
 
         agent = MagicMock()
         agent.aget_state = AsyncMock(side_effect=RuntimeError("DB gone"))
@@ -49,7 +49,7 @@ class TestCompactCutoffZero:
     """When cutoff == 0, conversation is within retention budget."""
 
     def test_nothing_to_compact_short_conversation(self):
-        from EvoScientist.cli.commands import compact_conversation
+        from tyqa.cli.commands import compact_conversation
 
         agent = MagicMock()
         msgs = [MagicMock() for _ in range(3)]
@@ -64,9 +64,9 @@ class TestCompactCutoffZero:
         model = SimpleNamespace(profile={"max_input_tokens": 1000})
 
         with (
-            patch("EvoScientist.EvoScientist._ensure_chat_model", return_value=model),
+            patch("tyqa.agent_graph._ensure_chat_model", return_value=model),
             patch(
-                "EvoScientist.EvoScientist._get_default_backend",
+                "tyqa.agent_graph._get_default_backend",
                 return_value=MagicMock(),
             ),
             patch(
@@ -93,7 +93,7 @@ class TestCompactNegligibleSavings:
     """When cutoff > 0 but savings are too small to be worth it."""
 
     def test_skip_when_few_messages_and_low_tokens(self):
-        from EvoScientist.cli.commands import compact_conversation
+        from tyqa.cli.commands import compact_conversation
 
         agent = MagicMock()
         msgs = [MagicMock() for _ in range(15)]
@@ -115,9 +115,9 @@ class TestCompactNegligibleSavings:
         token_values = iter([22_200, 200, 22_000])
 
         with (
-            patch("EvoScientist.EvoScientist._ensure_chat_model", return_value=model),
+            patch("tyqa.agent_graph._ensure_chat_model", return_value=model),
             patch(
-                "EvoScientist.EvoScientist._get_default_backend",
+                "tyqa.agent_graph._get_default_backend",
                 return_value=MagicMock(),
             ),
             patch(
@@ -144,7 +144,7 @@ class TestCompactNegligibleSavings:
         """2 messages but they account for >2% of tokens — should compact."""
         from langchain_core.messages import HumanMessage
 
-        from EvoScientist.cli.commands import compact_conversation
+        from tyqa.cli.commands import compact_conversation
 
         agent = MagicMock()
         msgs = [MagicMock() for _ in range(10)]
@@ -172,9 +172,9 @@ class TestCompactNegligibleSavings:
         token_values = iter([20_000, 5_000, 15_000, 500])
 
         with (
-            patch("EvoScientist.EvoScientist._ensure_chat_model", return_value=model),
+            patch("tyqa.agent_graph._ensure_chat_model", return_value=model),
             patch(
-                "EvoScientist.EvoScientist._get_default_backend",
+                "tyqa.agent_graph._get_default_backend",
                 return_value=MagicMock(),
             ),
             patch(
@@ -200,7 +200,7 @@ class TestCompactSuccess:
     """Normal compaction flow."""
 
     def test_manual_threshold_blocks_low_context_compaction(self):
-        from EvoScientist.cli.commands import compact_conversation
+        from tyqa.cli.commands import compact_conversation
 
         agent = MagicMock()
         msgs = [MagicMock() for _ in range(20)]
@@ -215,9 +215,9 @@ class TestCompactSuccess:
         model = SimpleNamespace(profile={"max_input_tokens": 100_000})
 
         with (
-            patch("EvoScientist.EvoScientist._ensure_chat_model", return_value=model),
+            patch("tyqa.agent_graph._ensure_chat_model", return_value=model),
             patch(
-                "EvoScientist.EvoScientist._get_default_backend",
+                "tyqa.agent_graph._get_default_backend",
                 return_value=MagicMock(),
             ),
             patch(
@@ -244,7 +244,7 @@ class TestCompactSuccess:
     def test_successful_compaction(self):
         from langchain_core.messages import HumanMessage
 
-        from EvoScientist.cli.commands import compact_conversation
+        from tyqa.cli.commands import compact_conversation
 
         agent = MagicMock()
         msgs = [MagicMock() for _ in range(20)]
@@ -276,9 +276,9 @@ class TestCompactSuccess:
         token_values = iter([6000, 5000, 1000, 200])
 
         with (
-            patch("EvoScientist.EvoScientist._ensure_chat_model", return_value=model),
+            patch("tyqa.agent_graph._ensure_chat_model", return_value=model),
             patch(
-                "EvoScientist.EvoScientist._get_default_backend",
+                "tyqa.agent_graph._get_default_backend",
                 return_value=MagicMock(),
             ),
             patch(
@@ -317,7 +317,7 @@ class TestCompactSuccess:
         """Offload failure should not prevent compaction."""
         from langchain_core.messages import HumanMessage
 
-        from EvoScientist.cli.commands import compact_conversation
+        from tyqa.cli.commands import compact_conversation
 
         agent = MagicMock()
         msgs = [MagicMock() for _ in range(10)]
@@ -344,9 +344,9 @@ class TestCompactSuccess:
         model = SimpleNamespace(profile={"max_input_tokens": 2_000})
 
         with (
-            patch("EvoScientist.EvoScientist._ensure_chat_model", return_value=model),
+            patch("tyqa.agent_graph._ensure_chat_model", return_value=model),
             patch(
-                "EvoScientist.EvoScientist._get_default_backend",
+                "tyqa.agent_graph._get_default_backend",
                 return_value=MagicMock(),
             ),
             patch(
@@ -376,7 +376,7 @@ class TestRenderCompactResult:
     """Test the Rich rendering of CompactResult."""
 
     def test_render_noop(self):
-        from EvoScientist.cli.commands import CompactResult, render_compact_result
+        from tyqa.cli.commands import CompactResult, render_compact_result
 
         result = CompactResult("noop", "Nothing to compact", tokens_before=500)
         text = render_compact_result(result)
@@ -385,7 +385,7 @@ class TestRenderCompactResult:
         assert "500" in plain
 
     def test_render_noop_no_tokens(self):
-        from EvoScientist.cli.commands import CompactResult, render_compact_result
+        from tyqa.cli.commands import CompactResult, render_compact_result
 
         result = CompactResult(
             "noop", "Nothing to compact — no messages in conversation."
@@ -394,7 +394,7 @@ class TestRenderCompactResult:
         assert "Nothing to compact" in text.plain
 
     def test_render_error(self):
-        from EvoScientist.cli.commands import CompactResult, render_compact_result
+        from tyqa.cli.commands import CompactResult, render_compact_result
 
         result = CompactResult("error", "Failed to read state: DB gone")
         text = render_compact_result(result)
@@ -405,9 +405,9 @@ class TestCompactCommandUI:
     """TUI-specific compact progress indicator behavior."""
 
     def test_command_uses_tui_indicator_when_available(self):
-        from EvoScientist.cli.commands import CompactResult
-        from EvoScientist.commands.base import CommandContext
-        from EvoScientist.commands.implementation.session import CompactCommand
+        from tyqa.cli.commands import CompactResult
+        from tyqa.commands.base import CommandContext
+        from tyqa.commands.implementation.session import CompactCommand
 
         class _UI:
             supports_interactive = True
@@ -449,15 +449,15 @@ class TestCompactCommandUI:
 
         with (
             patch(
-                "EvoScientist.cli.commands.compact_conversation",
+                "tyqa.cli.commands.compact_conversation",
                 AsyncMock(return_value=result),
             ),
             patch(
-                "EvoScientist.cli.commands.render_compact_result",
+                "tyqa.cli.commands.render_compact_result",
                 return_value="result-panel",
             ),
             patch(
-                "EvoScientist.cli.commands.build_compact_summary_renderable",
+                "tyqa.cli.commands.build_compact_summary_renderable",
                 return_value="summary-panel",
             ),
         ):
@@ -470,7 +470,7 @@ class TestCompactCommandUI:
         assert ui.updated_tokens == [1200]
 
     def test_render_ok(self):
-        from EvoScientist.cli.commands import CompactResult, render_compact_result
+        from tyqa.cli.commands import CompactResult, render_compact_result
 
         result = CompactResult(
             "ok",
@@ -495,7 +495,7 @@ class TestCompactCommandUI:
         assert "60% used" in plain
 
     def test_build_compact_summary_renderable(self):
-        from EvoScientist.cli.commands import (
+        from tyqa.cli.commands import (
             CompactResult,
             build_compact_summary_renderable,
         )
@@ -507,7 +507,7 @@ class TestCompactCommandUI:
         assert renderable.summary_text == "Summary body"
 
     def test_str_fallback(self):
-        from EvoScientist.cli.commands import CompactResult
+        from tyqa.cli.commands import CompactResult
 
         result = CompactResult("ok", "hello world")
         assert str(result) == "hello world"

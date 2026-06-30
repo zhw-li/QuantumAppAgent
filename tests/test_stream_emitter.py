@@ -1,6 +1,6 @@
-"""Tests for EvoScientist/stream/emitter.py."""
+"""Tests for tyqa/stream/emitter.py."""
 
-from EvoScientist.stream.emitter import StreamEvent, StreamEventEmitter
+from tyqa.stream.emitter import StreamEvent, StreamEventEmitter
 
 
 class TestStreamEventEmitter:

@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from EvoScientist.commands.channel_ui import ChannelCommandUI
+from tyqa.commands.channel_ui import ChannelCommandUI
 from tests.conftest import run_async as _run
 
 
@@ -37,9 +37,9 @@ async def _run_resume(ui, thread_id: str, workspace_dir: str):
         return task
 
     with (
-        patch("EvoScientist.cli.channel._bus_loop", new=loop),
+        patch("tyqa.cli.channel._bus_loop", new=loop),
         patch(
-            "EvoScientist.commands.channel_ui.asyncio.run_coroutine_threadsafe",
+            "tyqa.commands.channel_ui.asyncio.run_coroutine_threadsafe",
             side_effect=_schedule,
         ),
     ):
@@ -65,7 +65,7 @@ def test_handle_session_resume_sends_history_back_to_channel_without_local_dupli
     ]
 
     with patch(
-        "EvoScientist.sessions.get_thread_messages",
+        "tyqa.sessions.get_thread_messages",
         new=AsyncMock(return_value=messages),
     ):
         _run(_run_resume(ui, "thread-42", "/workspace"))
@@ -76,7 +76,7 @@ def test_handle_session_resume_sends_history_back_to_channel_without_local_dupli
     assert "Resumed session: thread-42" in text
     assert "Conversation history:" in text
     assert "User: How does this work?" in text
-    assert "EvoScientist: Here is the saved answer." in text
+    assert "TYQA: Here is the saved answer." in text
 
 
 def test_handle_session_resume_propagates_callback_abort_without_history():
@@ -85,7 +85,7 @@ def test_handle_session_resume_propagates_callback_abort_without_history():
     ui, captured = _make_ui(callback=callback, bus_ref=bus_ref)
 
     with patch(
-        "EvoScientist.sessions.get_thread_messages",
+        "tyqa.sessions.get_thread_messages",
         new=AsyncMock(),
     ) as get_messages:
         with pytest.raises(RuntimeError, match="workspace conflict"):
@@ -103,7 +103,7 @@ def test_handle_session_resume_reports_history_load_error():
     ui, captured = _make_ui(callback=callback, bus_ref=bus_ref)
 
     with patch(
-        "EvoScientist.sessions.get_thread_messages",
+        "tyqa.sessions.get_thread_messages",
         new=AsyncMock(side_effect=RuntimeError("db locked")),
     ):
         _run(_run_resume(ui, "thread-42", "/workspace"))
@@ -120,7 +120,7 @@ def test_handle_session_resume_distinguishes_non_displayable_messages():
     ui, captured = _make_ui(bus_ref=bus_ref)
 
     with patch(
-        "EvoScientist.sessions.get_thread_messages",
+        "tyqa.sessions.get_thread_messages",
         new=AsyncMock(return_value=[SimpleNamespace(type="tool", content="hidden")]),
     ):
         _run(_run_resume(ui, "thread-42", "/workspace"))

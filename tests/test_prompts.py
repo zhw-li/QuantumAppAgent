@@ -1,10 +1,10 @@
-"""Tests for EvoScientist/prompts.py."""
+"""Tests for tyqa/prompts.py."""
 
 from pathlib import Path
 
-from EvoScientist.prompts import (
+from tyqa.prompts import (
     DELEGATION_STRATEGY,
-    EVOSCIENTIST_IDENTITY,
+    TYQA_IDENTITY,
     EXPERIMENT_WORKFLOW,
     REPORT_TEMPLATE,
     SHELL_GUIDELINES,
@@ -21,16 +21,16 @@ class TestGetSystemPrompt:
 
     def test_contains_identity(self):
         result = get_system_prompt()
-        assert "EvoScientist" in result
+        assert "TYQA" in result
         assert "self-evolving" in result
 
     def test_contains_workflow(self):
         result = get_system_prompt()
-        assert "Experiment Workflow" in result
+        assert "Quantum Application Workflow" in result
 
     def test_contains_report_template(self):
         result = get_system_prompt()
-        assert "Experiment Report Template" in result
+        assert "Delivery Report Template" in result
 
     def test_contains_writing_guidelines(self):
         result = get_system_prompt()
@@ -52,7 +52,7 @@ class TestGetSystemPrompt:
         for term in (
             "quantum application",
             "cloud showcase",
-            "experiment-pipeline",
+            "application-pipeline",
             "success signals",
             "verification_report.md",
             "application_manifest.json",
@@ -124,7 +124,7 @@ class TestGetSystemPrompt:
         """Identity must precede workflow; workflow must precede delegation."""
         result = get_system_prompt()
         idx_identity = result.find("# Identity")
-        idx_workflow = result.find("# Experiment Workflow")
+        idx_workflow = result.find("# Quantum Application Workflow")
         idx_delegation = result.find("# Sub-Agent Delegation")
         assert 0 <= idx_identity < idx_workflow < idx_delegation
 
@@ -183,16 +183,16 @@ class TestGetSystemPrompt:
         assert "Memory Evolution" not in result
 
 
-class TestEvoScientistIdentity:
+class TestTYQAIdentity:
     def test_constant_not_empty(self):
-        assert len(EVOSCIENTIST_IDENTITY) > 0
+        assert len(TYQA_IDENTITY) > 0
 
     def test_states_role(self):
-        assert "You are EvoScientist" in EVOSCIENTIST_IDENTITY
+        assert "You are TYQA" in TYQA_IDENTITY
 
     def test_mentions_human_on_the_loop_paradigm(self):
         # Behavioral cue: agent should know it isn't asking permission for every action
-        assert "on-the-loop" in EVOSCIENTIST_IDENTITY
+        assert "on-the-loop" in TYQA_IDENTITY
 
 
 class TestReportTemplate:
@@ -204,7 +204,7 @@ class TestReportTemplate:
         body = REPORT_TEMPLATE.lower()
         for section in (
             "summary",
-            "experiment plan",
+            "delivery plan",
             "setup",
             "baselines",
             "results",
@@ -215,7 +215,7 @@ class TestReportTemplate:
     def test_not_duplicated_in_workflow_step5(self):
         """Step 5 should reference REPORT_TEMPLATE, not redefine the schema."""
         # Positive: Step 5 must actually reference the report template.
-        assert "Experiment Report Template" in EXPERIMENT_WORKFLOW
+        assert "Delivery Report Template" in EXPERIMENT_WORKFLOW
         # Negative: section headers unique to REPORT_TEMPLATE must not appear
         # inlined inside EXPERIMENT_WORKFLOW (would mean the schema was
         # duplicated again, regardless of indentation style).
@@ -273,11 +273,11 @@ class TestDangerousShellGuidelines:
 
 class TestQuantumApplicationSubagentHints:
     def test_subagent_prompts_replace_native_workflow_with_application_routes(self):
-        config_dir = Path(__file__).resolve().parents[1] / "EvoScientist" / "subagents"
+        config_dir = Path(__file__).resolve().parents[1] / "TYQA" / "subagents"
         text = "\n".join(path.read_text(encoding="utf-8") for path in config_dir.glob("*.yaml"))
 
         for term in (
-            "experiment-pipeline",
+            "application-pipeline",
             "cqlib-sdk",
             "cqlib-qaoa",
             "qccp-ui",
@@ -294,7 +294,7 @@ class TestQuantumApplicationSubagentHints:
             assert term in text
 
     def test_subagent_prompts_avoid_top_level_release_gates(self):
-        config_dir = Path(__file__).resolve().parents[1] / "EvoScientist" / "subagents"
+        config_dir = Path(__file__).resolve().parents[1] / "TYQA" / "subagents"
         text = "\n".join(path.read_text(encoding="utf-8") for path in config_dir.glob("*.yaml"))
 
         for term in (
@@ -308,7 +308,7 @@ class TestQuantumApplicationSubagentHints:
             assert term not in text
 
     def test_subagent_prompts_do_not_fix_artifact_paths(self):
-        config_dir = Path(__file__).resolve().parents[1] / "EvoScientist" / "subagents"
+        config_dir = Path(__file__).resolve().parents[1] / "TYQA" / "subagents"
         text = "\n".join(
             path.read_text(encoding="utf-8") for path in config_dir.glob("*.yaml")
         )

@@ -7,8 +7,8 @@ from tests.conftest import run_async as _run
 
 class TestCurrentCommand:
     def test_prints_thread_workspace_and_memory(self):
-        from EvoScientist.commands.base import CommandContext
-        from EvoScientist.commands.implementation.general import CurrentCommand
+        from tyqa.commands.base import CommandContext
+        from tyqa.commands.implementation.general import CurrentCommand
 
         ui = MagicMock()
         ctx = CommandContext(
@@ -25,8 +25,8 @@ class TestCurrentCommand:
         assert any("Memory dir:" in s for s in calls)
 
     def test_skips_workspace_when_none(self):
-        from EvoScientist.commands.base import CommandContext
-        from EvoScientist.commands.implementation.general import CurrentCommand
+        from tyqa.commands.base import CommandContext
+        from tyqa.commands.implementation.general import CurrentCommand
 
         ui = MagicMock()
         ctx = CommandContext(

@@ -15,7 +15,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from EvoScientist.llm import patches as patches_mod
+from tyqa.llm import patches as patches_mod
 from tests.conftest import run_async as _run
 
 # =============================================================================
@@ -135,7 +135,7 @@ class TestStartAsyncTaskInjection:
         tool = ds_mod._build_start_tool(agent_map, cache, "desc")
 
         with patch(
-            "EvoScientist.EvoScientist._ensure_config",
+            "tyqa.agent_graph._ensure_config",
             return_value=_stub_cfg(model="gpt-5", provider="openai"),
         ):
             tool.func(
@@ -173,7 +173,7 @@ class TestStartAsyncTaskInjection:
         tool = ds_mod._build_start_tool(agent_map, cache, "desc")
 
         with patch(
-            "EvoScientist.EvoScientist._ensure_config",
+            "tyqa.agent_graph._ensure_config",
             return_value=_stub_cfg(model="claude-haiku-4-5", provider="anthropic"),
         ):
             _run(
@@ -222,7 +222,7 @@ class TestLiveConfigRead:
         tool = ds_mod._build_start_tool(agent_map, cache, "desc")
 
         with patch(
-            "EvoScientist.EvoScientist._ensure_config",
+            "tyqa.agent_graph._ensure_config",
             return_value=_stub_cfg(model="model-a", provider="anthropic"),
         ):
             tool.func(
@@ -233,7 +233,7 @@ class TestLiveConfigRead:
         first_kwargs = runs_sync.create.call_args.kwargs
 
         with patch(
-            "EvoScientist.EvoScientist._ensure_config",
+            "tyqa.agent_graph._ensure_config",
             return_value=_stub_cfg(model="model-b", provider="openai"),
         ):
             tool.func(
@@ -293,7 +293,7 @@ class TestUpdateAsyncTaskInjection:
         tool = ds_mod._build_update_tool(agent_map, cache)
 
         with patch(
-            "EvoScientist.EvoScientist._ensure_config",
+            "tyqa.agent_graph._ensure_config",
             return_value=_stub_cfg(model="gpt-5", provider="openai"),
         ):
             _run(
@@ -347,7 +347,7 @@ class TestUpdateAsyncTaskInjection:
         tool = ds_mod._build_update_tool(agent_map, cache)
 
         with patch(
-            "EvoScientist.EvoScientist._ensure_config",
+            "tyqa.agent_graph._ensure_config",
             return_value=_stub_cfg(model="gpt-5", provider="openai"),
         ):
             tool.func(
@@ -398,7 +398,7 @@ class TestNonInterceptedMethods:
         tool = ds_mod._build_start_tool(agent_map, cache, "desc")
 
         with patch(
-            "EvoScientist.EvoScientist._ensure_config",
+            "tyqa.agent_graph._ensure_config",
             return_value=_stub_cfg(),
         ):
             tool.func(
@@ -439,7 +439,7 @@ class TestEmptyCfg:
         tool = ds_mod._build_start_tool(agent_map, cache, "desc")
 
         with patch(
-            "EvoScientist.EvoScientist._ensure_config",
+            "tyqa.agent_graph._ensure_config",
             return_value=SimpleNamespace(model=None, provider=None),
         ):
             tool.func(
@@ -465,7 +465,7 @@ class TestPreserveExistingConfig:
     def test_existing_configurable_preserved(self):
         """Direct unit test of the merge helper (integration covered above)."""
         with patch(
-            "EvoScientist.EvoScientist._ensure_config",
+            "tyqa.agent_graph._ensure_config",
             return_value=_stub_cfg(model="gpt-5", provider="openai"),
         ):
             merged = patches_mod._merge_runs_config_kwargs(
@@ -500,7 +500,7 @@ class TestPreserveExistingConfig:
             """Stand-in for any non-dict config-shaped object."""
 
         with patch(
-            "EvoScientist.EvoScientist._ensure_config",
+            "tyqa.agent_graph._ensure_config",
             return_value=_stub_cfg(model="gpt-5", provider="openai"),
         ):
             merged = patches_mod._merge_runs_config_kwargs(

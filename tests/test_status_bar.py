@@ -9,7 +9,7 @@ from typing import ClassVar
 
 from langchain_core.messages import HumanMessage
 
-from EvoScientist.cli.status_bar import (
+from tyqa.cli.status_bar import (
     SessionStatusSnapshot,
     apply_assistant_text_to_snapshot,
     apply_user_text_to_snapshot,
@@ -53,7 +53,7 @@ def test_build_status_fragments_wide_layout():
 
 def test_build_status_fragments_shows_memory_worker_indicator(monkeypatch):
     monkeypatch.setattr(
-        "EvoScientist.cli.status_bar.get_memory_worker_status",
+        "tyqa.cli.status_bar.get_memory_worker_status",
         lambda: SimpleNamespace(
             is_running=False,
             profile_updates=4,
@@ -83,7 +83,7 @@ def test_build_status_fragments_shows_memory_worker_indicator_when_running(
     monkeypatch,
 ):
     monkeypatch.setattr(
-        "EvoScientist.cli.status_bar.get_memory_worker_status",
+        "tyqa.cli.status_bar.get_memory_worker_status",
         lambda: SimpleNamespace(
             is_running=True,
             profile_updates=0,
@@ -111,7 +111,7 @@ def test_build_status_fragments_shows_memory_worker_indicator_when_running(
 
 def test_build_status_fragments_hides_memory_indicator_when_idle(monkeypatch):
     monkeypatch.setattr(
-        "EvoScientist.cli.status_bar.get_memory_worker_status",
+        "tyqa.cli.status_bar.get_memory_worker_status",
         lambda: SimpleNamespace(
             is_running=False,
             profile_updates=0,
@@ -222,15 +222,15 @@ def test_build_session_status_snapshot_uses_fallback_window(monkeypatch):
         return 42_000
 
     monkeypatch.setattr(
-        "EvoScientist.cli.status_bar.get_thread_messages",
+        "tyqa.cli.status_bar.get_thread_messages",
         _fake_messages,
     )
     monkeypatch.setattr(
-        "EvoScientist.cli.status_bar._get_default_chat_model",
+        "tyqa.cli.status_bar._get_default_chat_model",
         lambda: _FakeModel(),
     )
     monkeypatch.setattr(
-        "EvoScientist.cli.status_bar.count_tokens_approximately",
+        "tyqa.cli.status_bar.count_tokens_approximately",
         _fake_count,
     )
 
@@ -258,7 +258,7 @@ def test_apply_assistant_text_to_snapshot_updates_context(monkeypatch):
     )
 
     monkeypatch.setattr(
-        "EvoScientist.cli.status_bar.estimate_message_tokens",
+        "tyqa.cli.status_bar.estimate_message_tokens",
         lambda text, message_type="ai": 550,
     )
 
@@ -279,7 +279,7 @@ def test_apply_user_text_to_snapshot_updates_context(monkeypatch):
     )
 
     monkeypatch.setattr(
-        "EvoScientist.cli.status_bar.estimate_message_tokens",
+        "tyqa.cli.status_bar.estimate_message_tokens",
         lambda text, message_type="human": 320,
     )
 
@@ -296,7 +296,7 @@ def test_make_usage_status_snapshot_marks_usage_source(monkeypatch):
         profile: ClassVar[dict[str, object]] = {"max_input_tokens": 128_000}
 
     monkeypatch.setattr(
-        "EvoScientist.cli.status_bar._get_default_chat_model",
+        "tyqa.cli.status_bar._get_default_chat_model",
         lambda: _FakeModel(),
     )
 

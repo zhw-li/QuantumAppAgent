@@ -2,7 +2,7 @@
 
 from unittest.mock import MagicMock
 
-from EvoScientist.cli.interactive import SlashCommandCompleter
+from tyqa.cli.interactive import SlashCommandCompleter
 
 
 def _doc(text: str):

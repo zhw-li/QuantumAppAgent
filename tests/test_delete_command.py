@@ -6,7 +6,7 @@ from tests.conftest import run_async as _run
 
 
 def _ctx(thread_id="current"):
-    from EvoScientist.commands.base import CommandContext
+    from tyqa.commands.base import CommandContext
 
     ui = MagicMock()
     ui.supports_interactive = True
@@ -20,25 +20,25 @@ def _patches(thread_exists=False, similar=None, deleted=True, threads=None):
     stack = ExitStack()
     stack.enter_context(
         patch(
-            "EvoScientist.sessions.thread_exists",
+            "tyqa.sessions.thread_exists",
             new=AsyncMock(return_value=thread_exists),
         )
     )
     stack.enter_context(
         patch(
-            "EvoScientist.sessions.find_similar_threads",
+            "tyqa.sessions.find_similar_threads",
             new=AsyncMock(return_value=similar or []),
         )
     )
     stack.enter_context(
         patch(
-            "EvoScientist.sessions.delete_thread",
+            "tyqa.sessions.delete_thread",
             new=AsyncMock(return_value=deleted),
         )
     )
     stack.enter_context(
         patch(
-            "EvoScientist.sessions.list_threads",
+            "tyqa.sessions.list_threads",
             new=AsyncMock(return_value=threads or []),
         )
     )
@@ -47,7 +47,7 @@ def _patches(thread_exists=False, similar=None, deleted=True, threads=None):
 
 class TestDeleteCommand:
     def test_refuses_to_delete_current(self):
-        from EvoScientist.commands.implementation.session import DeleteCommand
+        from tyqa.commands.implementation.session import DeleteCommand
 
         ctx, ui = _ctx(thread_id="current")
         # Inline the patches here (rather than using ``_patches``) so we
@@ -58,16 +58,16 @@ class TestDeleteCommand:
         mock_delete = AsyncMock(return_value=True)
         with (
             patch(
-                "EvoScientist.sessions.thread_exists",
+                "tyqa.sessions.thread_exists",
                 new=AsyncMock(return_value=True),
             ),
-            patch("EvoScientist.sessions.delete_thread", new=mock_delete),
+            patch("tyqa.sessions.delete_thread", new=mock_delete),
             patch(
-                "EvoScientist.sessions.find_similar_threads",
+                "tyqa.sessions.find_similar_threads",
                 new=AsyncMock(return_value=[]),
             ),
             patch(
-                "EvoScientist.sessions.list_threads",
+                "tyqa.sessions.list_threads",
                 new=AsyncMock(return_value=[]),
             ),
         ):
@@ -77,7 +77,7 @@ class TestDeleteCommand:
         assert any("Cannot delete the current session" in m for m in msgs)
 
     def test_happy_path_success(self):
-        from EvoScientist.commands.implementation.session import DeleteCommand
+        from tyqa.commands.implementation.session import DeleteCommand
 
         ctx, ui = _ctx(thread_id="current")
         with _patches(thread_exists=True, deleted=True):
@@ -86,7 +86,7 @@ class TestDeleteCommand:
         assert any("Deleted session other-thread" in m for m in msgs)
 
     def test_not_found(self):
-        from EvoScientist.commands.implementation.session import DeleteCommand
+        from tyqa.commands.implementation.session import DeleteCommand
 
         ctx, ui = _ctx()
         with _patches(thread_exists=False, similar=[]):
@@ -95,7 +95,7 @@ class TestDeleteCommand:
         assert any("not found" in m for m in msgs)
 
     def test_ambiguous_prefix(self):
-        from EvoScientist.commands.implementation.session import DeleteCommand
+        from tyqa.commands.implementation.session import DeleteCommand
 
         ctx, ui = _ctx()
         with _patches(thread_exists=False, similar=["abc-one", "abc-two"]):
@@ -104,7 +104,7 @@ class TestDeleteCommand:
         assert any("Ambiguous" in m for m in msgs)
 
     def test_prefix_resolves_to_unique_match(self):
-        from EvoScientist.commands.implementation.session import DeleteCommand
+        from tyqa.commands.implementation.session import DeleteCommand
 
         ctx, ui = _ctx()
         with _patches(thread_exists=False, similar=["abc-one"], deleted=True):
@@ -113,7 +113,7 @@ class TestDeleteCommand:
         assert any("Deleted session abc-one" in m for m in msgs)
 
     def test_no_arg_empty_sessions_prints_notice(self):
-        from EvoScientist.commands.implementation.session import DeleteCommand
+        from tyqa.commands.implementation.session import DeleteCommand
 
         ctx, ui = _ctx()
         with _patches(threads=[]):
@@ -123,7 +123,7 @@ class TestDeleteCommand:
 
     def test_no_arg_calls_picker_returns_none(self):
         """When no arg and picker returns None, nothing is deleted."""
-        from EvoScientist.commands.implementation.session import DeleteCommand
+        from tyqa.commands.implementation.session import DeleteCommand
 
         ctx, ui = _ctx()
         ui.wait_for_thread_pick = AsyncMock(return_value=None)

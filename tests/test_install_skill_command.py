@@ -6,7 +6,7 @@ from tests.conftest import run_async as _run
 
 
 def _ctx():
-    from EvoScientist.commands.base import CommandContext
+    from tyqa.commands.base import CommandContext
 
     ui = MagicMock()
     ui.supports_interactive = True
@@ -15,7 +15,7 @@ def _ctx():
 
 class TestInstallSkill:
     def test_usage_message_when_no_args(self):
-        from EvoScientist.commands.implementation.skills import InstallSkill
+        from tyqa.commands.implementation.skills import InstallSkill
 
         ctx, ui = _ctx()
         _run(InstallSkill().execute(ctx, []))
@@ -23,11 +23,11 @@ class TestInstallSkill:
         assert any("Usage:" in m for m in msgs)
 
     def test_happy_path(self):
-        from EvoScientist.commands.implementation.skills import InstallSkill
+        from tyqa.commands.implementation.skills import InstallSkill
 
         ctx, ui = _ctx()
         with patch(
-            "EvoScientist.tools.skills_manager.install_skill",
+            "tyqa.tools.skills_manager.install_skill",
             return_value={
                 "success": True,
                 "name": "demo-skill",
@@ -42,7 +42,7 @@ class TestInstallSkill:
 
 class TestUninstallSkill:
     def test_usage_message_when_no_args(self):
-        from EvoScientist.commands.implementation.skills import UninstallSkill
+        from tyqa.commands.implementation.skills import UninstallSkill
 
         ctx, ui = _ctx()
         _run(UninstallSkill().execute(ctx, []))
@@ -50,11 +50,11 @@ class TestUninstallSkill:
         assert any("Usage:" in m for m in msgs)
 
     def test_uninstall_success(self):
-        from EvoScientist.commands.implementation.skills import UninstallSkill
+        from tyqa.commands.implementation.skills import UninstallSkill
 
         ctx, ui = _ctx()
         with patch(
-            "EvoScientist.tools.skills_manager.uninstall_skill",
+            "tyqa.tools.skills_manager.uninstall_skill",
             return_value={"success": True},
         ):
             _run(UninstallSkill().execute(ctx, ["demo-skill"]))
@@ -62,11 +62,11 @@ class TestUninstallSkill:
         assert any("Uninstalled: demo-skill" in m for m in msgs)
 
     def test_uninstall_failure(self):
-        from EvoScientist.commands.implementation.skills import UninstallSkill
+        from tyqa.commands.implementation.skills import UninstallSkill
 
         ctx, ui = _ctx()
         with patch(
-            "EvoScientist.tools.skills_manager.uninstall_skill",
+            "tyqa.tools.skills_manager.uninstall_skill",
             return_value={"success": False, "error": "not found"},
         ):
             _run(UninstallSkill().execute(ctx, ["missing"]))

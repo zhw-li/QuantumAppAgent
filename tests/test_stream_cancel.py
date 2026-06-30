@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from EvoScientist.stream import display as display_mod
+from tyqa.stream import display as display_mod
 
 
 @pytest.fixture(autouse=True)
@@ -47,7 +47,7 @@ def test_consume_breaks_on_cancel_event():
             yield {"type": "text", "content": f"chunk-{i}"}
 
     with patch(
-        "EvoScientist.stream.display.stream_agent_events",
+        "tyqa.stream.display.stream_agent_events",
         new=_fake_stream,
     ):
         result = display_mod._run_streaming(
@@ -84,7 +84,7 @@ def test_run_streaming_short_circuits_when_scope_already_cancelled():
     display_mod.request_stream_cancel(cancel_scope)
 
     with patch(
-        "EvoScientist.stream.display.stream_agent_events",
+        "tyqa.stream.display.stream_agent_events",
         new=_fake_stream,
     ):
         result = display_mod._run_streaming(
@@ -109,7 +109,7 @@ def test_run_streaming_ignores_other_scope_cancel():
         yield {"type": "text", "content": "ok"}
 
     with patch(
-        "EvoScientist.stream.display.stream_agent_events",
+        "tyqa.stream.display.stream_agent_events",
         new=_fake_stream,
     ):
         result = display_mod._run_streaming(
@@ -150,7 +150,7 @@ def test_run_streaming_pending_interrupt_short_circuits_on_cancel():
         prompt_called = True
         return None
 
-    with patch("EvoScientist.stream.display.stream_agent_events", new=_empty_stream):
+    with patch("tyqa.stream.display.stream_agent_events", new=_empty_stream):
         result = display_mod._run_streaming(
             agent=MagicMock(),
             message="hello",

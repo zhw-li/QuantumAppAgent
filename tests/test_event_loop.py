@@ -5,7 +5,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from EvoScientist.stream.display import _create_event_loop, _get_event_loop
+from tyqa.stream.display import _create_event_loop, _get_event_loop
 
 
 class _TrackingEventLoopPolicy(asyncio.DefaultEventLoopPolicy):
@@ -123,7 +123,7 @@ class TestMultipleStreamingCalls:
 
     def test_sequential_streaming_calls(self):
         """Multiple sequential calls should work without 'Event loop is closed' error."""
-        from EvoScientist.stream.display import _run_streaming
+        from tyqa.stream.display import _run_streaming
 
         # Mock agent that returns simple events
         mock_agent = Mock()
@@ -143,10 +143,10 @@ class TestMultipleStreamingCalls:
 
         # Patch the stream_agent_events function
         with patch(
-            "EvoScientist.stream.display.stream_agent_events", side_effect=mock_stream
+            "tyqa.stream.display.stream_agent_events", side_effect=mock_stream
         ):
             # Patch Live to avoid terminal output during tests
-            with patch("EvoScientist.stream.display.Live"):
+            with patch("tyqa.stream.display.Live"):
                 # First call
                 _run_streaming(
                     agent=mock_agent,
@@ -221,7 +221,7 @@ class TestMultipleStreamingCalls:
 
     def test_recursive_streaming_does_not_resend_same_thinking(self):
         """Resumed runs should not replay the original thinking to channels."""
-        from EvoScientist.stream.display import _run_streaming
+        from tyqa.stream.display import _run_streaming
 
         mock_agent = Mock()
         thinking = "Initial plan. " * 20
@@ -246,10 +246,10 @@ class TestMultipleStreamingCalls:
         sent_thinking: list[str] = []
 
         with patch(
-            "EvoScientist.stream.display.stream_agent_events",
+            "tyqa.stream.display.stream_agent_events",
             side_effect=mock_stream,
         ):
-            with patch("EvoScientist.stream.display.Live"):
+            with patch("tyqa.stream.display.Live"):
                 result = _run_streaming(
                     agent=mock_agent,
                     message="test message",
@@ -268,7 +268,7 @@ class TestMultipleStreamingCalls:
 
     def test_recursive_streaming_sends_new_thinking_after_resume(self):
         """Genuinely new thinking in resumed rounds should be relayed."""
-        from EvoScientist.stream.display import _run_streaming
+        from tyqa.stream.display import _run_streaming
 
         mock_agent = Mock()
         thinking_r1 = "Initial plan. " * 20
@@ -295,10 +295,10 @@ class TestMultipleStreamingCalls:
         sent_thinking: list[str] = []
 
         with patch(
-            "EvoScientist.stream.display.stream_agent_events",
+            "tyqa.stream.display.stream_agent_events",
             side_effect=mock_stream,
         ):
-            with patch("EvoScientist.stream.display.Live"):
+            with patch("tyqa.stream.display.Live"):
                 result = _run_streaming(
                     agent=mock_agent,
                     message="test message",

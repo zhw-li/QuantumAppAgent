@@ -39,10 +39,10 @@ bridge/package-lock.json
 .bg_processes/
 workspace/
 skills/
-!EvoScientist/skills/
-!EvoScientist/skills/**
+!tyqa/skills/
+!tyqa/skills/**
 memory/
-!EvoScientist/memory/
+!tyqa/memory/
 media/
 conversation_history/
 .deno_cache/

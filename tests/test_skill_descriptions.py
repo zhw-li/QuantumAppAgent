@@ -1,8 +1,8 @@
-"""Text checks for EvoScientist built-in skills.
+"""Text checks for TYQA built-in skills.
 
 The workspace layer (`./skills/`) is intentionally gitignored and may override
 or extend skills at runtime, but it is not a release baseline. Required skills
-must live in `EvoScientist/skills/` so clean checkouts and packaged wheels do
+must live in `tyqa/skills/` so clean checkouts and packaged wheels do
 not depend on local ignored files.
 """
 
@@ -15,23 +15,23 @@ import pytest
 
 
 ROOT = Path(__file__).resolve().parents[1]
-# Built-in layer: ships inside the package (EvoScientist/skills/).
-BUILTIN_SKILLS_DIR = ROOT / "EvoScientist" / "skills"
+# Built-in layer: ships inside the package (tyqa/skills/).
+BUILTIN_SKILLS_DIR = ROOT / "tyqa" / "skills"
 
 NATIVE_QUANTUM_SKILLS = [
-    "academic-slides",
-    "evo-memory",
-    "experiment-craft",
-    "experiment-iterative-coder",
-    "experiment-pipeline",
+    "showcase-slides",
+    "application-memory",
+    "application-debugging",
+    "implementation-iteration",
+    "application-pipeline",
     "nano-banana",
-    "paper-navigator",
-    "paper-planning",
-    "paper-rebuttal",
-    "paper-review",
-    "paper-writing",
-    "research-ideation",
-    "research-survey",
+    "evidence-navigator",
+    "delivery-planning",
+    "stakeholder-response",
+    "delivery-review",
+    "delivery-writing",
+    "application-intake",
+    "solution-landscape",
 ]
 
 CQ_QCCP_SKILLS = [
@@ -125,14 +125,14 @@ def test_cqlib_qccp_skills_follow_native_frontmatter_shape(name: str):
 @pytest.mark.parametrize("name", CQ_QCCP_SKILLS)
 def test_cqlib_qccp_skills_contribute_evidence_not_final_readiness(name: str):
     text = _read_skill(name).lower()
-    assert "experiment-pipeline" in text, name
+    assert "application-pipeline" in text, name
     assert "evidence" in text, name
     assert "final delivery readiness" in text or "do not decide delivery readiness" in text
 
 
 def test_experiment_pipeline_logs_actual_skill_usage():
-    text = _read_skill("experiment-pipeline")
-    ep_dir = _skill_path("experiment-pipeline")
+    text = _read_skill("application-pipeline")
+    ep_dir = _skill_path("application-pipeline")
     stage_log = (ep_dir / "assets" / "stage-log-template.md").read_text(
         encoding="utf-8"
     )
@@ -146,7 +146,7 @@ def test_experiment_pipeline_logs_actual_skill_usage():
 
 
 def test_experiment_pipeline_mentions_deterministic_validator():
-    text = _read_skill("experiment-pipeline")
+    text = _read_skill("application-pipeline")
 
     assert "validate_quantum_application" in text
     assert "application_manifest.json" in text
@@ -162,7 +162,7 @@ def test_experiment_pipeline_mentions_deterministic_validator():
 
 
 def test_experiment_pipeline_does_not_prescribe_fixed_artifact_dirs():
-    ep_dir = _skill_path("experiment-pipeline")
+    ep_dir = _skill_path("application-pipeline")
     checked_paths = [
         ep_dir / "SKILL.md",
         ep_dir / "assets" / "stage-log-template.md",
@@ -205,7 +205,7 @@ def test_skills_do_not_reintroduce_release_gate_system():
         _skill_path(name) / "SKILL.md"
         for name in NATIVE_QUANTUM_SKILLS + CQ_QCCP_SKILLS
     ]
-    ep_dir = _skill_path("experiment-pipeline")
+    ep_dir = _skill_path("application-pipeline")
     checked_paths.extend(
         [
             ep_dir / "assets" / "stage-log-template.md",
@@ -224,7 +224,7 @@ def test_required_skills_are_packaged_as_builtins():
 
 
 def test_prompt_referenced_core_skills_exist_in_builtin_layer():
-    from EvoScientist.prompts import get_system_prompt
+    from tyqa.prompts import get_system_prompt
 
     text = get_system_prompt()
     referenced = set(re.findall(r"`([a-z][a-z0-9-]+)`", text))

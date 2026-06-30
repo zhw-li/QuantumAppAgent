@@ -2,8 +2,8 @@
 
 from unittest.mock import AsyncMock, MagicMock
 
-from EvoScientist.channels.base import OutboundMessage
-from EvoScientist.channels.qq.channel import (
+from tyqa.channels.base import OutboundMessage
+from tyqa.channels.qq.channel import (
     QQChannel,
     QQConfig,
     _build_qq_keyboard,
@@ -347,7 +347,7 @@ class TestQQInteractionCallback:
 
     @staticmethod
     def _make_channel() -> QQChannel:
-        from EvoScientist.channels.bus.events import InboundMessage
+        from tyqa.channels.bus.events import InboundMessage
 
         channel = QQChannel(QQConfig(app_id="id", app_secret="secret"))
         channel._running = True
@@ -469,7 +469,7 @@ class TestQQInteractionCallback:
 
 class TestQQCapabilitiesButtons:
     def test_inline_buttons_enabled(self):
-        from EvoScientist.channels.capabilities import QQ
+        from tyqa.channels.capabilities import QQ
 
         assert QQ.inline_buttons is True
         assert QQ.supports("inline_buttons") is True

@@ -8,7 +8,7 @@ headless ``serve``).
 
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from EvoScientist.cli.channel import (
+from tyqa.cli.channel import (
     ChannelMessage,
     dispatch_channel_slash_command,
 )
@@ -54,7 +54,7 @@ def test_unresolved_slash_returns_false():
     msg = _make_msg(content="/unknown-cmd")
     append = MagicMock()
     with patch(
-        "EvoScientist.commands.manager.manager.resolve",
+        "tyqa.commands.manager.manager.resolve",
         return_value=None,
     ):
         handled = _run(
@@ -79,14 +79,14 @@ def test_successful_slash_execution_sets_response_and_breadcrumb():
     append = MagicMock()
     with (
         patch(
-            "EvoScientist.commands.manager.manager.resolve",
+            "tyqa.commands.manager.manager.resolve",
             return_value=(fake_cmd, ["core"]),
         ),
         patch(
-            "EvoScientist.commands.manager.manager.execute",
+            "tyqa.commands.manager.manager.execute",
             new=AsyncMock(return_value=True),
         ) as mock_execute,
-        patch("EvoScientist.cli.channel._set_channel_response") as mock_set_resp,
+        patch("tyqa.cli.channel._set_channel_response") as mock_set_resp,
     ):
         handled = _run(
             dispatch_channel_slash_command(
@@ -122,14 +122,14 @@ def test_needs_agent_awaits_loader_and_passes_result():
 
     with (
         patch(
-            "EvoScientist.commands.manager.manager.resolve",
+            "tyqa.commands.manager.manager.resolve",
             return_value=(fake_cmd, []),
         ),
         patch(
-            "EvoScientist.commands.manager.manager.execute",
+            "tyqa.commands.manager.manager.execute",
             new=AsyncMock(return_value=True),
         ) as mock_execute,
-        patch("EvoScientist.cli.channel._set_channel_response"),
+        patch("tyqa.cli.channel._set_channel_response"),
     ):
         handled = _run(
             dispatch_channel_slash_command(
@@ -159,10 +159,10 @@ def test_await_agent_ready_failure_sets_error_response():
 
     with (
         patch(
-            "EvoScientist.commands.manager.manager.resolve",
+            "tyqa.commands.manager.manager.resolve",
             return_value=(fake_cmd, []),
         ),
-        patch("EvoScientist.cli.channel._set_channel_response") as mock_set_resp,
+        patch("tyqa.cli.channel._set_channel_response") as mock_set_resp,
     ):
         handled = _run(
             dispatch_channel_slash_command(
@@ -191,14 +191,14 @@ def test_cmd_manager_raises_returns_true_with_error():
     append = MagicMock()
     with (
         patch(
-            "EvoScientist.commands.manager.manager.resolve",
+            "tyqa.commands.manager.manager.resolve",
             return_value=(fake_cmd, []),
         ),
         patch(
-            "EvoScientist.commands.manager.manager.execute",
+            "tyqa.commands.manager.manager.execute",
             new=AsyncMock(side_effect=RuntimeError("boom")),
         ),
-        patch("EvoScientist.cli.channel._set_channel_response") as mock_set_resp,
+        patch("tyqa.cli.channel._set_channel_response") as mock_set_resp,
     ):
         handled = _run(
             dispatch_channel_slash_command(
@@ -240,14 +240,14 @@ def test_on_cmd_completed_awaited_with_ctx_original_agent_and_cmd():
 
     with (
         patch(
-            "EvoScientist.commands.manager.manager.resolve",
+            "tyqa.commands.manager.manager.resolve",
             return_value=(fake_cmd, []),
         ),
         patch(
-            "EvoScientist.commands.manager.manager.execute",
+            "tyqa.commands.manager.manager.execute",
             new=_fake_execute,
         ),
-        patch("EvoScientist.cli.channel._set_channel_response"),
+        patch("tyqa.cli.channel._set_channel_response"),
     ):
         handled = _run(
             dispatch_channel_slash_command(
@@ -281,14 +281,14 @@ def test_on_cmd_completed_receives_cmd_for_new_and_compact():
 
         with (
             patch(
-                "EvoScientist.commands.manager.manager.resolve",
+                "tyqa.commands.manager.manager.resolve",
                 return_value=(fake_cmd, []),
             ),
             patch(
-                "EvoScientist.commands.manager.manager.execute",
+                "tyqa.commands.manager.manager.execute",
                 new=AsyncMock(return_value=True),
             ),
-            patch("EvoScientist.cli.channel._set_channel_response"),
+            patch("tyqa.cli.channel._set_channel_response"),
         ):
             _run(
                 dispatch_channel_slash_command(
@@ -315,7 +315,7 @@ def test_on_cmd_completed_skipped_on_fall_through_and_error():
         completed(*args, **kwargs)
 
     # Non-slash
-    with patch("EvoScientist.cli.channel._set_channel_response"):
+    with patch("tyqa.cli.channel._set_channel_response"):
         _run(
             dispatch_channel_slash_command(
                 _make_msg(content="hi"),
@@ -330,10 +330,10 @@ def test_on_cmd_completed_skipped_on_fall_through_and_error():
     # Unresolved slash
     with (
         patch(
-            "EvoScientist.commands.manager.manager.resolve",
+            "tyqa.commands.manager.manager.resolve",
             return_value=None,
         ),
-        patch("EvoScientist.cli.channel._set_channel_response"),
+        patch("tyqa.cli.channel._set_channel_response"),
     ):
         _run(
             dispatch_channel_slash_command(
@@ -349,14 +349,14 @@ def test_on_cmd_completed_skipped_on_fall_through_and_error():
     # Execute raises
     with (
         patch(
-            "EvoScientist.commands.manager.manager.resolve",
+            "tyqa.commands.manager.manager.resolve",
             return_value=(fake_cmd, []),
         ),
         patch(
-            "EvoScientist.commands.manager.manager.execute",
+            "tyqa.commands.manager.manager.execute",
             new=AsyncMock(side_effect=RuntimeError("boom")),
         ),
-        patch("EvoScientist.cli.channel._set_channel_response"),
+        patch("tyqa.cli.channel._set_channel_response"),
     ):
         _run(
             dispatch_channel_slash_command(
@@ -388,14 +388,14 @@ def test_command_error_skips_completion_hook_and_reports_error():
 
     with (
         patch(
-            "EvoScientist.commands.manager.manager.resolve",
+            "tyqa.commands.manager.manager.resolve",
             return_value=(fake_cmd, ["abc"]),
         ),
         patch(
-            "EvoScientist.commands.manager.manager.execute",
+            "tyqa.commands.manager.manager.execute",
             side_effect=_execute,
         ),
-        patch("EvoScientist.cli.channel._set_channel_response") as mock_set_resp,
+        patch("tyqa.cli.channel._set_channel_response") as mock_set_resp,
     ):
         handled = _run(
             dispatch_channel_slash_command(
@@ -427,14 +427,14 @@ def test_empty_command_error_still_reports_error():
 
     with (
         patch(
-            "EvoScientist.commands.manager.manager.resolve",
+            "tyqa.commands.manager.manager.resolve",
             return_value=(fake_cmd, ["abc"]),
         ),
         patch(
-            "EvoScientist.commands.manager.manager.execute",
+            "tyqa.commands.manager.manager.execute",
             side_effect=_execute,
         ),
-        patch("EvoScientist.cli.channel._set_channel_response") as mock_set_resp,
+        patch("tyqa.cli.channel._set_channel_response") as mock_set_resp,
     ):
         handled = _run(
             dispatch_channel_slash_command(
@@ -464,14 +464,14 @@ def test_on_cmd_completed_exception_is_absorbed():
 
     with (
         patch(
-            "EvoScientist.commands.manager.manager.resolve",
+            "tyqa.commands.manager.manager.resolve",
             return_value=(fake_cmd, []),
         ),
         patch(
-            "EvoScientist.commands.manager.manager.execute",
+            "tyqa.commands.manager.manager.execute",
             new=AsyncMock(return_value=True),
         ),
-        patch("EvoScientist.cli.channel._set_channel_response") as mock_set_resp,
+        patch("tyqa.cli.channel._set_channel_response") as mock_set_resp,
     ):
         handled = _run(
             dispatch_channel_slash_command(
@@ -499,10 +499,10 @@ def test_top_level_exception_is_absorbed():
     msg = _make_msg()
     with (
         patch(
-            "EvoScientist.commands.manager.manager.resolve",
+            "tyqa.commands.manager.manager.resolve",
             side_effect=RuntimeError("exploded during resolve"),
         ),
-        patch("EvoScientist.cli.channel._set_channel_response") as mock_set_resp,
+        patch("tyqa.cli.channel._set_channel_response") as mock_set_resp,
     ):
         handled = _run(
             dispatch_channel_slash_command(
@@ -530,14 +530,14 @@ def test_cmd_execute_returning_false_falls_through():
     append = MagicMock()
     with (
         patch(
-            "EvoScientist.commands.manager.manager.resolve",
+            "tyqa.commands.manager.manager.resolve",
             return_value=(fake_cmd, []),
         ),
         patch(
-            "EvoScientist.commands.manager.manager.execute",
+            "tyqa.commands.manager.manager.execute",
             new=AsyncMock(return_value=False),
         ),
-        patch("EvoScientist.cli.channel._set_channel_response") as mock_set_resp,
+        patch("tyqa.cli.channel._set_channel_response") as mock_set_resp,
     ):
         handled = _run(
             dispatch_channel_slash_command(

@@ -2,14 +2,14 @@
 
 import pytest
 
-from EvoScientist.channels.base import ChannelError, OutboundMessage
-from EvoScientist.channels.email.channel import EmailChannel, EmailConfig
-from EvoScientist.channels.imessage.channel_rpc import (
+from tyqa.channels.base import ChannelError, OutboundMessage
+from tyqa.channels.email.channel import EmailChannel, EmailConfig
+from tyqa.channels.imessage.channel_rpc import (
     IMessageChannelRpc,
     IMessageConfig,
 )
-from EvoScientist.channels.qq.channel import QQChannel, QQConfig
-from EvoScientist.channels.signal.channel import SignalChannel, SignalConfig
+from tyqa.channels.qq.channel import QQChannel, QQConfig
+from tyqa.channels.signal.channel import SignalChannel, SignalConfig
 from tests.conftest import run_async as _run
 
 
@@ -51,7 +51,7 @@ class TestSignalChannelSmoke:
 
 class TestQQChannelSmoke:
     def test_start_raises_when_sdk_missing(self, monkeypatch):
-        from EvoScientist.channels.qq import channel as qq_module
+        from tyqa.channels.qq import channel as qq_module
 
         monkeypatch.setattr(qq_module, "QQ_AVAILABLE", False)
         channel = QQChannel(QQConfig(app_id="id", app_secret="secret"))
@@ -59,7 +59,7 @@ class TestQQChannelSmoke:
             _run(channel.start())
 
     def test_start_raises_without_credentials_when_sdk_available(self, monkeypatch):
-        from EvoScientist.channels.qq import channel as qq_module
+        from tyqa.channels.qq import channel as qq_module
 
         monkeypatch.setattr(qq_module, "QQ_AVAILABLE", True)
         channel = QQChannel(QQConfig(app_id="", app_secret=""))
@@ -82,7 +82,7 @@ class TestIMessageChannelSmoke:
         async def _broken_start(self):
             raise RuntimeError("imsg not found")
 
-        from EvoScientist.channels.imessage import channel_rpc as imessage_module
+        from tyqa.channels.imessage import channel_rpc as imessage_module
 
         monkeypatch.setattr(imessage_module.ImsgRpcClient, "start", _broken_start)
         channel = IMessageChannelRpc(IMessageConfig())

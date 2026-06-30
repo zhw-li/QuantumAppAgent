@@ -3,7 +3,7 @@
 We appreciate your interest and the time you spend helping improve TYQA (TianYan Quantum Agent). Please read the following guidelines before contributing.
 
 > [!NOTE]
-> The project is rebranding to **tyqa**. For now the Python package name, the `EvoSci` / `evosci` CLI commands, and the `~/.config/evoscientist/` config path still use the upstream `EvoScientist` identifiers and remain fully functional.
+> The project is rebranding to **tyqa**. For now the Python package name, the `tyqa` / `tyqa` CLI commands, and the `~/.config/tyqa/` config path still use the upstream `TYQA` identifiers and remain fully functional.
 
 ## How you can contribute
 
@@ -20,7 +20,7 @@ We aim to keep TYQA focused on core functionality that benefits the majority of 
 - Documentation updates and examples
 - Meaningful additions to the test suite
 
-If you want to add a niche or specialized workflow, consider packaging it as a skill under [`skills/`](./skills) (workspace skills override built-ins) or the upstream [EvoSkills repository](https://github.com/EvoScientist/EvoSkills).
+If you want to add a niche or specialized workflow, consider packaging it as a skill under [`skills/`](./skills) (workspace skills override built-ins) or the upstream [EvoSkills repository](https://github.com/tyqa/EvoSkills).
 
 ## Development setup
 
@@ -63,7 +63,7 @@ If you want to add a niche or specialized workflow, consider packaging it as a s
 
 ## Project overview
 
-TYQA (TianYan Quantum Agent) is a multi-agent AI framework that takes a research question from idea to a validated quantum application and cloud showcase — end to end. Built on the [EvoScientist](https://github.com/EvoScientist/EvoScientist) agent harness and the [cqlib](https://github.com/cqlib-quantum/cqlib) quantum SDK, it orchestrates specialized sub-agents that survey methods, establish classical baselines, build the quantum algorithm (QAOA / VQE / QML / hybrid), package a runnable application, generate the TianYan (天衍) quantum-cloud showcase UI, and verify the evidence.
+TYQA (TianYan Quantum Agent) is a multi-agent AI framework that takes a research question from idea to a validated quantum application and cloud showcase — end to end. Built on the [TYQA](https://github.com/tyqa/TYQA) agent harness and the [cqlib](https://github.com/cqlib-quantum/cqlib) quantum SDK, it orchestrates specialized sub-agents that survey methods, establish classical baselines, build the quantum algorithm (QAOA / VQE / QML / hybrid), package a runnable application, generate the TianYan (天衍) quantum-cloud showcase UI, and verify the evidence.
 
 | Fact | Value |
 |------|-------|
@@ -73,11 +73,11 @@ TYQA (TianYan Quantum Agent) is a multi-agent AI framework that takes a research
 | Quantum SDK | [cqlib](https://github.com/cqlib-quantum/cqlib) — circuits, simulators, QCIS |
 | Default model | `claude-sonnet-4-6` (Anthropic) |
 | Tests | ~890 across 36 files, no API keys needed |
-| Config file | `~/.config/evoscientist/config.yaml` |
+| Config file | `~/.config/tyqa/config.yaml` |
 | Workspace skills | `./skills/` (cqlib-*, qccp-*, qccp-ui override built-ins) |
 | Examples | `./quantum_app_example/` (Finance_QAOA, MaxCut_QAOA, UC_QAOA, H2_VQE, Finance_QRC) |
 
-### Sub-Agents (defined in `EvoScientist/subagents/*.yaml`)
+### Sub-Agents (defined in `tyqa/subagents/*.yaml`)
 
 | Agent | Purpose |
 |-------|---------|
@@ -95,7 +95,7 @@ User Input (CLI / TUI / 10 Channel Integrations)
     |
 CLI (cli/) / TUI (cli/tui_*) / Channel Server (channels/)
     |
-Main Agent (EvoScientist.py) -- create_deep_agent()
+Main Agent (tyqa.py) -- create_deep_agent()
     +-- System Prompt (prompts.py) -- quantum-application identity & 6-phase workflow
     +-- Chat Model (llm/ -- multi-provider)
     +-- Middleware: Memory (middleware/memory.py)

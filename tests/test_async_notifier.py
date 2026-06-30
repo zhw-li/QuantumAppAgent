@@ -5,8 +5,8 @@ import queue
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock
 
-from EvoScientist.cli import async_notifier
-from EvoScientist.cli.async_notifier import (
+from tyqa.cli import async_notifier
+from tyqa.cli.async_notifier import (
     dedup_notifications,
     drain_notifications,
     format_batch_message,
@@ -427,7 +427,7 @@ def test_dedup_preserves_order():
 def test_consume_notifications_calls_runner_with_batched_message(run_async):
     """When notifications arrive and agent is idle, consume_notifications fires
     the supplied async runner once with the formatted batch message and notifs list."""
-    from EvoScientist.cli import async_notifier as an
+    from tyqa.cli import async_notifier as an
 
     # Set up two pending notifications, no dedup match
     while True:
@@ -454,7 +454,7 @@ def test_consume_notifications_calls_runner_with_batched_message(run_async):
 
 
 def test_consume_notifications_no_op_when_queue_empty(run_async):
-    from EvoScientist.cli import async_notifier as an
+    from tyqa.cli import async_notifier as an
 
     while True:
         try:
@@ -495,7 +495,7 @@ def test_notification_consuming_flag_prevents_reentry(run_async):
     2. Blocked: flag pre-set to True → guarded_consume bails out immediately.
     3. Exception path: runner raises → flag is still cleared by finally.
     """
-    from EvoScientist.cli import async_notifier as an
+    from tyqa.cli import async_notifier as an
 
     # Clear the queue
     while True:
@@ -598,7 +598,7 @@ def _drain_all(an_mod):
 def test_consume_only_drains_matching_thread(run_async):
     """Notifications tagged with origin_cli_thread_id only drain when the
     consumer is invoked with the matching current_thread_id."""
-    from EvoScientist.cli import async_notifier as an
+    from tyqa.cli import async_notifier as an
 
     _drain_all(an)
     n_a = an.AsyncTaskNotification(
@@ -630,7 +630,7 @@ def test_consume_only_drains_matching_thread(run_async):
 def test_unrouted_notifications_drain_on_any_thread(run_async):
     """Notifications without origin_cli_thread_id (legacy / direct put) drain
     regardless of the current_thread_id arg."""
-    from EvoScientist.cli import async_notifier as an
+    from tyqa.cli import async_notifier as an
 
     _drain_all(an)
     an._notification_queue.put(
@@ -655,7 +655,7 @@ def test_unrouted_notifications_drain_on_any_thread(run_async):
 def test_thread_switch_drains_pending(run_async):
     """Pending notifications for thread B are not delivered while consumer
     asks for thread A; once consumer runs with thread B they drain."""
-    from EvoScientist.cli import async_notifier as an
+    from tyqa.cli import async_notifier as an
 
     _drain_all(an)
     an._enqueue(
@@ -689,7 +689,7 @@ def test_thread_switch_drains_pending(run_async):
 
 def test_has_pending_notifications_respects_routing():
     """has_pending_notifications returns true only for matching or unrouted."""
-    from EvoScientist.cli import async_notifier as an
+    from tyqa.cli import async_notifier as an
 
     _drain_all(an)
     # Unrouted always counts
@@ -962,7 +962,7 @@ def test_consume_notifications_propagates_inject_exception(run_async):
     poller task does not die."""
     import pytest
 
-    from EvoScientist.cli import async_notifier as an
+    from tyqa.cli import async_notifier as an
 
     _drain_all(an)
     an._notification_queue.put(

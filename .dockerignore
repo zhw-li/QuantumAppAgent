@@ -51,9 +51,13 @@ memory/
 memories/
 media/
 conversation_history/
+.bg_processes/
 .deno_cache/
 .langgraph_api/
 large_tool_results/
+**/results/
+**/artifacts/
+**/qccp-page-output/
 *.log
 botpy.log
 

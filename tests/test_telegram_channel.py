@@ -2,8 +2,8 @@
 
 import pytest
 
-from EvoScientist.channels.base import ChannelError
-from EvoScientist.channels.telegram.channel import TelegramChannel, TelegramConfig
+from tyqa.channels.base import ChannelError
+from tyqa.channels.telegram.channel import TelegramChannel, TelegramConfig
 from tests.conftest import run_async as _run
 
 
@@ -44,7 +44,7 @@ class TestTelegramChannel:
         _run(channel.stop())
 
     def test_send_returns_false_without_app(self):
-        from EvoScientist.channels.base import OutboundMessage
+        from tyqa.channels.base import OutboundMessage
 
         config = TelegramConfig(bot_token="test")
         channel = TelegramChannel(config)

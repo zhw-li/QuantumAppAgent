@@ -4,7 +4,7 @@ import asyncio
 import logging
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from EvoScientist.channels.debug import (
+from tyqa.channels.debug import (
     TraceMixin,
     debug_trace_enabled,
     emit_debug_event,
@@ -58,7 +58,7 @@ def test_emit_debug_event_if_disabled_does_not_log(caplog):
 
 def _make_raw(**overrides):
     """Create a minimal RawIncoming for testing."""
-    from EvoScientist.channels.base import RawIncoming
+    from tyqa.channels.base import RawIncoming
 
     defaults = {"sender_id": "user1", "chat_id": "chat1", "text": "hello"}
     defaults.update(overrides)
@@ -76,7 +76,7 @@ def _make_channel_context(*, debug_trace=True, name="test_channel"):
 
 
 def test_middleware_dedup_emits_structured_event(caplog):
-    from EvoScientist.channels.middleware import DedupMiddleware
+    from tyqa.channels.middleware import DedupMiddleware
 
     async def _run():
         mw = DedupMiddleware()
@@ -99,7 +99,7 @@ def test_middleware_dedup_emits_structured_event(caplog):
 
 
 def test_middleware_allowlist_emits_structured_event(caplog):
-    from EvoScientist.channels.middleware import AllowListMiddleware
+    from tyqa.channels.middleware import AllowListMiddleware
 
     async def _run():
         mw = AllowListMiddleware(allowed_senders={"allowed_user"})
@@ -115,7 +115,7 @@ def test_middleware_allowlist_emits_structured_event(caplog):
 
 
 def test_middleware_mention_gating_emits_structured_event(caplog):
-    from EvoScientist.channels.middleware import MentionGatingMiddleware
+    from tyqa.channels.middleware import MentionGatingMiddleware
 
     async def _run():
         mw = MentionGatingMiddleware(require_mention="group")
@@ -131,7 +131,7 @@ def test_middleware_mention_gating_emits_structured_event(caplog):
 
 
 def test_typing_manager_emits_trace_events(caplog):
-    from EvoScientist.channels.middleware import TypingManager
+    from tyqa.channels.middleware import TypingManager
 
     async def _run():
         send_action = AsyncMock(side_effect=RuntimeError("typing api down"))
@@ -152,7 +152,7 @@ def test_typing_manager_emits_trace_events(caplog):
 
 
 def test_ack_reaction_emits_error_traces(caplog):
-    from EvoScientist.channels.middleware import AckReactionMiddleware
+    from tyqa.channels.middleware import AckReactionMiddleware
 
     async def _run():
         send_fn = AsyncMock()
@@ -189,7 +189,7 @@ def test_ack_reaction_emits_error_traces(caplog):
 
 def test_inbound_raw_event_emitted(caplog):
     """Integration-style: _enqueue_raw emits inbound_raw at the top."""
-    from EvoScientist.channels.base import Channel, RawIncoming
+    from tyqa.channels.base import Channel, RawIncoming
 
     # Create a minimal concrete channel
     class _TestChannel(Channel):
@@ -232,7 +232,7 @@ def test_inbound_raw_event_emitted(caplog):
 
 def test_format_fallback_emits_event(caplog):
     """_send_with_format_fallback emits outbound_format_fallback on fallback."""
-    from EvoScientist.channels.base import Channel
+    from tyqa.channels.base import Channel
 
     class _TestChannel(Channel):
         name = "test_fallback"
@@ -305,9 +305,9 @@ def test_trace_mixin_trace_event(caplog):
 
 
 def test_standalone_dispatcher_treats_false_send_as_error(caplog):
-    from EvoScientist.channels.bus import MessageBus
-    from EvoScientist.channels.bus.events import OutboundMessage
-    from EvoScientist.channels.standalone import standalone_outbound_dispatcher
+    from tyqa.channels.bus import MessageBus
+    from tyqa.channels.bus.events import OutboundMessage
+    from tyqa.channels.standalone import standalone_outbound_dispatcher
 
     channel = MagicMock()
     channel.name = "test"
@@ -334,9 +334,9 @@ def test_standalone_dispatcher_treats_false_send_as_error(caplog):
 
 
 def test_standalone_dispatcher_sends_media():
-    from EvoScientist.channels.bus import MessageBus
-    from EvoScientist.channels.bus.events import OutboundMessage
-    from EvoScientist.channels.standalone import standalone_outbound_dispatcher
+    from tyqa.channels.bus import MessageBus
+    from tyqa.channels.bus.events import OutboundMessage
+    from tyqa.channels.standalone import standalone_outbound_dispatcher
 
     channel = MagicMock()
     channel.name = "test"
@@ -371,7 +371,7 @@ def test_standalone_dispatcher_sends_media():
 
 
 def test_emit_debug_event_warns_on_level_mismatch(caplog):
-    import EvoScientist.channels.debug as dbg
+    import tyqa.channels.debug as dbg
 
     # Reset the global warning flag
     dbg._warned_debug_level_mismatch = False

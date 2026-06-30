@@ -7,7 +7,7 @@ from tests.conftest import run_async as _run
 
 
 def _ctx():
-    from EvoScientist.commands.base import ChannelRuntime, CommandContext
+    from tyqa.commands.base import ChannelRuntime, CommandContext
 
     ui = MagicMock()
     ui.supports_interactive = True
@@ -26,27 +26,27 @@ class TestNeedsAgent:
     """status + stop must not require the agent (recovery from broken load)."""
 
     def test_status_does_not_need_agent(self):
-        from EvoScientist.commands.implementation.channel import ChannelCommand
+        from tyqa.commands.implementation.channel import ChannelCommand
 
         assert ChannelCommand().needs_agent(["status"]) is False
 
     def test_stop_does_not_need_agent(self):
-        from EvoScientist.commands.implementation.channel import ChannelCommand
+        from tyqa.commands.implementation.channel import ChannelCommand
 
         assert ChannelCommand().needs_agent(["stop"]) is False
 
     def test_stop_with_target_does_not_need_agent(self):
-        from EvoScientist.commands.implementation.channel import ChannelCommand
+        from tyqa.commands.implementation.channel import ChannelCommand
 
         assert ChannelCommand().needs_agent(["stop", "telegram"]) is False
 
     def test_start_subcommand_needs_agent(self):
-        from EvoScientist.commands.implementation.channel import ChannelCommand
+        from tyqa.commands.implementation.channel import ChannelCommand
 
         assert ChannelCommand().needs_agent(["telegram"]) is True
 
     def test_no_args_needs_agent(self):
-        from EvoScientist.commands.implementation.channel import ChannelCommand
+        from tyqa.commands.implementation.channel import ChannelCommand
 
         # no subcmd → falls through to start flow, needs agent
         assert ChannelCommand().needs_agent([]) is True
@@ -56,7 +56,7 @@ class TestStartPath:
     """Start flow must propagate agent/thread_id globals."""
 
     def test_start_binds_channel_runtime(self):
-        from EvoScientist.commands.implementation.channel import ChannelCommand
+        from tyqa.commands.implementation.channel import ChannelCommand
 
         ctx, _ui = _ctx()
         config = SimpleNamespace(
@@ -66,14 +66,14 @@ class TestStartPath:
 
         with (
             patch(
-                "EvoScientist.cli.channel._channels_is_running",
+                "tyqa.cli.channel._channels_is_running",
                 return_value=False,
             ),
             patch(
-                "EvoScientist.cli.channel._start_channels_bus_mode",
+                "tyqa.cli.channel._start_channels_bus_mode",
             ),
             patch(
-                "EvoScientist.config.load_config",
+                "tyqa.config.load_config",
                 return_value=config,
             ),
         ):
@@ -83,7 +83,7 @@ class TestStartPath:
 
     def test_start_propagates_send_thinking(self):
         """send_thinking flag must reach _start_channels_bus_mode."""
-        from EvoScientist.commands.implementation.channel import ChannelCommand
+        from tyqa.commands.implementation.channel import ChannelCommand
 
         ctx, _ui = _ctx()
         config = SimpleNamespace(
@@ -99,15 +99,15 @@ class TestStartPath:
 
         with (
             patch(
-                "EvoScientist.cli.channel._channels_is_running",
+                "tyqa.cli.channel._channels_is_running",
                 return_value=False,
             ),
             patch(
-                "EvoScientist.cli.channel._start_channels_bus_mode",
+                "tyqa.cli.channel._start_channels_bus_mode",
                 _fake_start,
             ),
             patch(
-                "EvoScientist.config.load_config",
+                "tyqa.config.load_config",
                 return_value=config,
             ),
         ):
@@ -119,7 +119,7 @@ class TestStartPath:
 
 class TestAddToRunningPath:
     def test_add_to_running_binds_channel_runtime(self):
-        from EvoScientist.commands.implementation.channel import ChannelCommand
+        from tyqa.commands.implementation.channel import ChannelCommand
 
         ctx, _ui = _ctx()
         config = SimpleNamespace(
@@ -129,14 +129,14 @@ class TestAddToRunningPath:
 
         with (
             patch(
-                "EvoScientist.cli.channel._channels_is_running",
+                "tyqa.cli.channel._channels_is_running",
                 return_value=True,
             ),
             patch(
-                "EvoScientist.cli.channel._add_channel_to_running_bus",
+                "tyqa.cli.channel._add_channel_to_running_bus",
             ),
             patch(
-                "EvoScientist.config.load_config",
+                "tyqa.config.load_config",
                 return_value=config,
             ),
         ):
@@ -146,7 +146,7 @@ class TestAddToRunningPath:
 
     def test_add_to_running_propagates_send_thinking(self):
         """Adding to a running bus must honor config.channel_send_thinking."""
-        from EvoScientist.commands.implementation.channel import ChannelCommand
+        from tyqa.commands.implementation.channel import ChannelCommand
 
         ctx, _ui = _ctx()
         config = SimpleNamespace(
@@ -161,15 +161,15 @@ class TestAddToRunningPath:
 
         with (
             patch(
-                "EvoScientist.cli.channel._channels_is_running",
+                "tyqa.cli.channel._channels_is_running",
                 return_value=True,
             ),
             patch(
-                "EvoScientist.cli.channel._add_channel_to_running_bus",
+                "tyqa.cli.channel._add_channel_to_running_bus",
                 _fake_add,
             ),
             patch(
-                "EvoScientist.config.load_config",
+                "tyqa.config.load_config",
                 return_value=config,
             ),
         ):
@@ -180,21 +180,21 @@ class TestAddToRunningPath:
 
 class TestStatusPath:
     def test_status_without_running_channels(self):
-        from EvoScientist.commands.implementation.channel import ChannelCommand
+        from tyqa.commands.implementation.channel import ChannelCommand
 
         ctx, ui = _ctx()
         config = SimpleNamespace(channel_enabled="", channel_send_thinking=False)
         with (
             patch(
-                "EvoScientist.cli.channel._channels_is_running",
+                "tyqa.cli.channel._channels_is_running",
                 return_value=False,
             ),
             patch(
-                "EvoScientist.cli.channel._channels_running_list",
+                "tyqa.cli.channel._channels_running_list",
                 return_value=[],
             ),
             patch(
-                "EvoScientist.config.load_config",
+                "tyqa.config.load_config",
                 return_value=config,
             ),
         ):

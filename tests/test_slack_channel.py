@@ -2,8 +2,8 @@
 
 import pytest
 
-from EvoScientist.channels.base import ChannelError
-from EvoScientist.channels.slack.channel import SlackChannel, SlackConfig
+from tyqa.channels.base import ChannelError
+from tyqa.channels.slack.channel import SlackChannel, SlackConfig
 from tests.conftest import run_async as _run
 
 
@@ -56,7 +56,7 @@ class TestSlackChannel:
         _run(channel.stop())
 
     def test_send_returns_false_without_client(self):
-        from EvoScientist.channels.base import OutboundMessage
+        from tyqa.channels.base import OutboundMessage
 
         config = SlackConfig(bot_token="xoxb-test", app_token="xapp-test")
         channel = SlackChannel(config)
@@ -72,7 +72,7 @@ class TestSlackChannel:
 
 class TestSlackChannelRegistration:
     def test_slack_registered(self):
-        from EvoScientist.channels.channel_manager import available_channels
+        from tyqa.channels.channel_manager import available_channels
 
         channels = available_channels()
         assert "slack" in channels

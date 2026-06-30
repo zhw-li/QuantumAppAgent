@@ -20,7 +20,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-install-project --no-dev \
         --extra all-channels
 
-COPY EvoScientist ./EvoScientist
+COPY tyqa ./tyqa
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-dev --no-editable \
         --extra all-channels
@@ -43,33 +43,33 @@ RUN ln -sf /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
 
 ARG UID=1000
 ARG GID=1000
-RUN groupadd --gid ${GID} evosci \
-    && useradd  --uid ${UID} --gid ${GID} --create-home --shell /bin/bash evosci
+RUN groupadd --gid ${GID} tyqa \
+    && useradd  --uid ${UID} --gid ${GID} --create-home --shell /bin/bash tyqa
 
 COPY --from=builder /opt/venv /opt/venv
 
-ENV PATH="/opt/venv/bin:/home/evosci/.evoscientist/.local/bin:${PATH}" \
+ENV PATH="/opt/venv/bin:/home/tyqa/.tyqa/.local/bin:${PATH}" \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    EVOSCIENTIST_WORKSPACE_DIR=/workspace \
-    EVOSCIENTIST_DATA_DIR=/home/evosci/.evoscientist \
-    XDG_CONFIG_HOME=/home/evosci/.evoscientist/.config \
-    UV_TOOL_DIR=/home/evosci/.evoscientist/.local/share/uv/tools \
-    UV_TOOL_BIN_DIR=/home/evosci/.evoscientist/.local/bin
+    TYQA_WORKSPACE_DIR=/workspace \
+    TYQA_DATA_DIR=/home/tyqa/.tyqa \
+    XDG_CONFIG_HOME=/home/tyqa/.tyqa/.config \
+    UV_TOOL_DIR=/home/tyqa/.tyqa/.local/share/uv/tools \
+    UV_TOOL_BIN_DIR=/home/tyqa/.tyqa/.local/bin
 
 RUN mkdir -p /workspace \
-        /home/evosci/.evoscientist/.config/evoscientist \
-        /home/evosci/.evoscientist/.local/bin \
-        /home/evosci/.evoscientist/.local/share/uv/tools \
-    && chown -R ${UID}:${GID} /workspace /home/evosci
+        /home/tyqa/.tyqa/.config/tyqa \
+        /home/tyqa/.tyqa/.local/bin \
+        /home/tyqa/.tyqa/.local/share/uv/tools \
+    && chown -R ${UID}:${GID} /workspace /home/tyqa
 
-USER evosci
+USER tyqa
 WORKDIR /workspace
 
-LABEL org.opencontainers.image.title="EvoScientist" \
-      org.opencontainers.image.description="EvoScientist agent with core + all-channels dependencies pre-installed." \
-      org.opencontainers.image.source="https://github.com/EvoScientist/EvoScientist" \
-      org.opencontainers.image.documentation="https://github.com/EvoScientist/EvoScientist#-docker" \
+LABEL org.opencontainers.image.title="TYQA" \
+      org.opencontainers.image.description="TYQA agent with core + all-channels dependencies pre-installed." \
+      org.opencontainers.image.source="https://github.com/zhw-li/QuantumAppAgent" \
+      org.opencontainers.image.documentation="https://github.com/zhw-li/QuantumAppAgent#-docker" \
       org.opencontainers.image.licenses="Apache-2.0"
 
-ENTRYPOINT ["tini", "--", "evosci"]
+ENTRYPOINT ["tini", "--", "tyqa"]

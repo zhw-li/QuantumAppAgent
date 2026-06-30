@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from EvoScientist.tools.quantum_validation import (
+from tyqa.tools.quantum_validation import (
     validate_quantum_application,
     validate_quantum_application_artifacts,
 )

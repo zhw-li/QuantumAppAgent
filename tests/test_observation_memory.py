@@ -19,15 +19,15 @@ from langchain_core.runnables import RunnableConfig
 from langgraph.runtime import ExecutionInfo, Runtime
 from pydantic import BaseModel
 
-from EvoScientist.config import MemoryObservationWriter
-from EvoScientist.memory import worker_activity
-from EvoScientist.memory.observations import (
+from tyqa.config import MemoryObservationWriter
+from tyqa.memory import worker_activity
+from tyqa.memory.observations import (
     MemoryScope,
     MemorySourceType,
     MemoryType,
     record_observation_file,
 )
-from EvoScientist.middleware import memory_lifecycle
+from tyqa.middleware import memory_lifecycle
 
 
 def _read_memory_document(path) -> tuple[dict[str, Any], str]:
@@ -176,7 +176,7 @@ def test_record_observation_file_writes_contract_and_dedupes(tmp_path):
 
 
 def test_record_observation_tool_can_use_worker_config_source(tmp_path):
-    from EvoScientist.middleware.memory import create_memory_middleware
+    from tyqa.middleware.memory import create_memory_middleware
 
     workspace = tmp_path / "workspace"
     workspace.mkdir()
@@ -223,7 +223,7 @@ def test_record_observation_tool_can_use_worker_config_source(tmp_path):
 
 
 def test_record_observation_tool_schema_hides_runtime(tmp_path):
-    from EvoScientist.middleware.memory import create_memory_middleware
+    from tyqa.middleware.memory import create_memory_middleware
 
     workspace = tmp_path / "workspace"
     workspace.mkdir()
@@ -248,7 +248,7 @@ def test_record_observation_tool_schema_hides_runtime(tmp_path):
 
 
 def test_record_observation_tool_keeps_injected_runtime_through_validation(tmp_path):
-    from EvoScientist.middleware.memory import create_memory_middleware
+    from tyqa.middleware.memory import create_memory_middleware
 
     workspace = tmp_path / "workspace"
     workspace.mkdir()
@@ -256,7 +256,7 @@ def test_record_observation_tool_keeps_injected_runtime_through_validation(tmp_p
         str(tmp_path / "memories"),
         workspace_dir=workspace,
         source_type=MemorySourceType.TURN,
-        source_agent="EvoScientist",
+        source_agent="TYQA",
     )
     tool = middleware.tools[0]
     payload = _record_observation_payload(
@@ -281,7 +281,7 @@ def test_record_observation_tool_keeps_injected_runtime_through_validation(tmp_p
         "summary": "Injected runtime metadata survives tool validation.",
         "memory_type": "semantic",
         "scope": "global",
-        "source": {"type": "turn", "agent": "EvoScientist"},
+        "source": {"type": "turn", "agent": "TYQA"},
     }
 
 
@@ -290,7 +290,7 @@ def test_turn_compaction_hides_task_call_and_keeps_orchestrator_response():
         HumanMessage("please delegate"),
         AIMessage(
             content="",
-            name="EvoScientist",
+            name="TYQA",
             tool_calls=[
                 {
                     "name": "task",
@@ -301,13 +301,13 @@ def test_turn_compaction_hides_task_call_and_keeps_orchestrator_response():
         ),
         ToolMessage("raw subagent result body", tool_call_id="task-1"),
         AIMessage(
-            "final orchestrator text with summarized finding", name="EvoScientist"
+            "final orchestrator text with summarized finding", name="TYQA"
         ),
     ]
 
     compact = memory_lifecycle._compact_turn_messages(
         messages,
-        source_agent="EvoScientist",
+        source_agent="TYQA",
     )
 
     assert compact == [
@@ -315,7 +315,7 @@ def test_turn_compaction_hides_task_call_and_keeps_orchestrator_response():
         {
             "role": "ai",
             "content": "final orchestrator text with summarized finding",
-            "name": "EvoScientist",
+            "name": "TYQA",
         },
     ]
 
@@ -323,19 +323,19 @@ def test_turn_compaction_hides_task_call_and_keeps_orchestrator_response():
 def test_turn_compaction_uses_latest_user_turn_only():
     messages = [
         HumanMessage("old request"),
-        AIMessage("old answer", name="EvoScientist"),
+        AIMessage("old answer", name="TYQA"),
         HumanMessage("current request"),
-        AIMessage("current answer", name="EvoScientist"),
+        AIMessage("current answer", name="TYQA"),
     ]
 
     compact = memory_lifecycle._compact_turn_messages(
         messages,
-        source_agent="EvoScientist",
+        source_agent="TYQA",
     )
 
     assert compact == [
         {"role": "human", "content": "current request"},
-        {"role": "ai", "content": "current answer", "name": "EvoScientist"},
+        {"role": "ai", "content": "current answer", "name": "TYQA"},
     ]
 
 
@@ -352,12 +352,12 @@ def test_lifecycle_schedules_turn_worker_without_awaiting(
         "_alaunch_memory_worker",
         fake_launch,
     )
-    middleware = memory_lifecycle.EvoMemoryLifecycleMiddleware(
+    middleware = memory_lifecycle.TYQAMemoryLifecycleMiddleware(
         memory_dir=tmp_path / "memories",
         workspace_dir=tmp_path / "workspace",
         project_id="P-project",
         role=memory_lifecycle.MemoryLifecycleRole.TURN,
-        source_agent="EvoScientist",
+        source_agent="TYQA",
     )
     runtime = _runtime("thread-1")
 
@@ -381,7 +381,7 @@ def test_lifecycle_schedules_turn_worker_without_awaiting(
     assert len(calls) == 1
     assert calls[0]["role"] == memory_lifecycle.MemoryLifecycleRole.TURN
     assert calls[0]["session_id"] == "thread-1"
-    assert calls[0]["source_agent"] == "EvoScientist"
+    assert calls[0]["source_agent"] == "TYQA"
     assert calls[0]["project_id"] == "P-project"
     assert calls[0]["trajectory"] == [
         {"role": "human", "content": "hi"},
@@ -449,7 +449,7 @@ def test_memory_worker_run_kwargs_use_graph_id_and_source_metadata_only():
 
     assert kwargs["assistant_id"] == memory_lifecycle.SUBAGENT_MEMORY_WORKER_GRAPH_ID
     assert kwargs["metadata"] == {
-        "agent_name": "EvoScientist",
+        "agent_name": "TYQA",
         "run_kind": "evomemory_subagent_worker",
         "source_session_id": "thread-1",
         "source_agent": "writing-agent",
@@ -902,7 +902,7 @@ def test_async_watcher_deletes_worker_thread_on_terminal_status(
 def test_memory_worker_skips_when_langgraph_dev_unavailable(tmp_path, monkeypatch):
     monkeypatch.setattr(memory_lifecycle, "_memory_worker_url", lambda: "http://x")
     monkeypatch.setattr(
-        "EvoScientist.langgraph_dev.manager.is_langgraph_dev_running",
+        "tyqa.langgraph_dev.manager.is_langgraph_dev_running",
         lambda **_kwargs: False,
     )
 
@@ -919,7 +919,7 @@ def test_memory_worker_skips_when_langgraph_dev_unavailable(tmp_path, monkeypatc
         role=memory_lifecycle.MemoryLifecycleRole.TURN,
         memory_dir=tmp_path / "memories",
         project_id="P-project",
-        source_agent="EvoScientist",
+        source_agent="TYQA",
         session_id="thread-1",
         trajectory=trajectory,
     )
@@ -929,7 +929,7 @@ def test_memory_worker_launch_marks_active_status(tmp_path, monkeypatch):
     worker_activity.reset_memory_worker_status_for_tests()
     monkeypatch.setattr(memory_lifecycle, "_memory_worker_url", lambda: "http://x")
     monkeypatch.setattr(
-        "EvoScientist.langgraph_dev.manager.is_langgraph_dev_running",
+        "tyqa.langgraph_dev.manager.is_langgraph_dev_running",
         lambda **_kwargs: True,
     )
 
@@ -954,7 +954,7 @@ def test_memory_worker_launch_marks_active_status(tmp_path, monkeypatch):
         role=memory_lifecycle.MemoryLifecycleRole.TURN,
         memory_dir=memory_dir,
         project_id="P-project",
-        source_agent="EvoScientist",
+        source_agent="TYQA",
         session_id="thread-1",
         trajectory=trajectory,
     )
@@ -999,7 +999,7 @@ def test_async_memory_worker_launch_offloads_blocking_work(
         )
 
     monkeypatch.setattr(
-        "EvoScientist.langgraph_dev.manager.is_langgraph_dev_running",
+        "tyqa.langgraph_dev.manager.is_langgraph_dev_running",
         fake_is_running,
     )
     monkeypatch.setattr(memory_lifecycle, "snapshot_memory_outputs", fake_snapshot)
@@ -1028,7 +1028,7 @@ def test_async_memory_worker_launch_offloads_blocking_work(
             role=memory_lifecycle.MemoryLifecycleRole.TURN,
             memory_dir=tmp_path / "memories",
             project_id="P-project",
-            source_agent="EvoScientist",
+            source_agent="TYQA",
             session_id="thread-1",
             trajectory=[{"role": "human", "content": "hi"}],
         )

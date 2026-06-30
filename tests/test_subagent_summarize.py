@@ -13,12 +13,12 @@ import asyncio
 from dataclasses import dataclass
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from EvoScientist.channels.base import Channel
-from EvoScientist.channels.bus.events import InboundMessage as BusInbound
-from EvoScientist.channels.bus.message_bus import MessageBus
-from EvoScientist.channels.channel_manager import ChannelManager
-from EvoScientist.channels.consumer import InboundConsumer, _join_subagent_text
-from EvoScientist.stream.emitter import StreamEvent, StreamEventEmitter
+from tyqa.channels.base import Channel
+from tyqa.channels.bus.events import InboundMessage as BusInbound
+from tyqa.channels.bus.message_bus import MessageBus
+from tyqa.channels.channel_manager import ChannelManager
+from tyqa.channels.consumer import InboundConsumer, _join_subagent_text
+from tyqa.stream.emitter import StreamEvent, StreamEventEmitter
 from tests.conftest import run_async as _run
 from tests.stream_v3_fakes import (
     FakeSubagent,
@@ -264,7 +264,7 @@ class TestConsumerSubagentTextFallback:
 
         async def _test():
             with patch(
-                "EvoScientist.stream.events.stream_agent_events",
+                "tyqa.stream.events.stream_agent_events",
                 new=fake_stream,
             ):
                 msg = BusInbound(
@@ -304,7 +304,7 @@ class TestConsumerSubagentTextFallback:
 
         async def _test():
             with patch(
-                "EvoScientist.stream.events.stream_agent_events",
+                "tyqa.stream.events.stream_agent_events",
                 new=fake_stream,
             ):
                 msg = BusInbound(
@@ -372,7 +372,7 @@ class TestConsumerSubagentTextFallback:
 
         async def _test():
             with patch(
-                "EvoScientist.stream.events.stream_agent_events",
+                "tyqa.stream.events.stream_agent_events",
                 new=_fake_stream,
             ):
                 await bus.publish_inbound(
@@ -445,7 +445,7 @@ class TestConsumerSubagentTextFallback:
 
         async def _test():
             with patch(
-                "EvoScientist.stream.events.stream_agent_events",
+                "tyqa.stream.events.stream_agent_events",
                 new=_fake_stream,
             ):
                 await bus.publish_inbound(
@@ -481,7 +481,7 @@ class TestConsumerSubagentTextFallback:
 
         async def _test():
             with patch(
-                "EvoScientist.stream.events.stream_agent_events",
+                "tyqa.stream.events.stream_agent_events",
                 new=fake_stream,
             ):
                 msg = BusInbound(
@@ -517,7 +517,7 @@ class TestConsumerSubagentTextFallback:
 
         async def _test():
             with patch(
-                "EvoScientist.stream.events.stream_agent_events",
+                "tyqa.stream.events.stream_agent_events",
                 new=fake_stream,
             ):
                 msg = BusInbound(
@@ -643,7 +643,7 @@ class TestConsumerParallelSubagentFallback:
 
         async def _test():
             with patch(
-                "EvoScientist.stream.events.stream_agent_events",
+                "tyqa.stream.events.stream_agent_events",
                 new=fake_stream,
             ):
                 msg = BusInbound(
@@ -680,7 +680,7 @@ class TestConsumerParallelSubagentFallback:
 
         async def _test():
             with patch(
-                "EvoScientist.stream.events.stream_agent_events",
+                "tyqa.stream.events.stream_agent_events",
                 new=fake_stream,
             ):
                 msg = BusInbound(
@@ -744,7 +744,7 @@ class TestConsumerSameNameInterleaved:
 
         async def _test():
             with patch(
-                "EvoScientist.stream.events.stream_agent_events",
+                "tyqa.stream.events.stream_agent_events",
                 new=fake_stream,
             ):
                 msg = BusInbound(

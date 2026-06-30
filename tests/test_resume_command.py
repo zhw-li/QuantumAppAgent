@@ -7,7 +7,7 @@ from tests.conftest import run_async as _run
 
 
 def _ctx(thread_id="current", workspace_dir="/ws"):
-    from EvoScientist.commands.base import CommandContext
+    from tyqa.commands.base import CommandContext
 
     ui = MagicMock()
     ui.supports_interactive = True
@@ -28,25 +28,25 @@ def _patches(
     stack = ExitStack()
     stack.enter_context(
         patch(
-            "EvoScientist.sessions.thread_exists",
+            "tyqa.sessions.thread_exists",
             new=AsyncMock(return_value=thread_exists),
         )
     )
     stack.enter_context(
         patch(
-            "EvoScientist.sessions.find_similar_threads",
+            "tyqa.sessions.find_similar_threads",
             new=AsyncMock(return_value=similar or []),
         )
     )
     stack.enter_context(
         patch(
-            "EvoScientist.sessions.list_threads",
+            "tyqa.sessions.list_threads",
             new=AsyncMock(return_value=threads or []),
         )
     )
     stack.enter_context(
         patch(
-            "EvoScientist.sessions.get_thread_metadata",
+            "tyqa.sessions.get_thread_metadata",
             new=AsyncMock(return_value=metadata or {}),
         )
     )
@@ -55,7 +55,7 @@ def _patches(
 
 class TestResumeCommand:
     def test_with_arg_resolves_and_calls_ui(self):
-        from EvoScientist.commands.implementation.session import ResumeCommand
+        from tyqa.commands.implementation.session import ResumeCommand
 
         ctx, ui = _ctx()
         with _patches(thread_exists=True, metadata={"workspace_dir": "/restored"}):
@@ -66,7 +66,7 @@ class TestResumeCommand:
         assert ctx.workspace_dir == "/restored"
 
     def test_no_arg_empty_threads_prints_message(self):
-        from EvoScientist.commands.implementation.session import ResumeCommand
+        from tyqa.commands.implementation.session import ResumeCommand
 
         ctx, ui = _ctx()
         with _patches(threads=[]):
@@ -77,7 +77,7 @@ class TestResumeCommand:
         ui.handle_session_resume.assert_not_called()
 
     def test_no_arg_calls_picker(self):
-        from EvoScientist.commands.implementation.session import ResumeCommand
+        from tyqa.commands.implementation.session import ResumeCommand
 
         ctx, ui = _ctx()
         ui.wait_for_thread_pick.return_value = "picked-tid"
@@ -88,7 +88,7 @@ class TestResumeCommand:
         ui.handle_session_resume.assert_awaited_once()
 
     def test_picker_cancel_returns(self):
-        from EvoScientist.commands.implementation.session import ResumeCommand
+        from tyqa.commands.implementation.session import ResumeCommand
 
         ctx, ui = _ctx()
         ui.wait_for_thread_pick.return_value = None
@@ -98,7 +98,7 @@ class TestResumeCommand:
         ui.handle_session_resume.assert_not_called()
 
     def test_ambiguous_prefix(self):
-        from EvoScientist.commands.implementation.session import ResumeCommand
+        from tyqa.commands.implementation.session import ResumeCommand
 
         ctx, ui = _ctx()
         with _patches(thread_exists=False, similar=["abc-one", "abc-two"]):
@@ -108,7 +108,7 @@ class TestResumeCommand:
         ui.handle_session_resume.assert_not_called()
 
     def test_not_found(self):
-        from EvoScientist.commands.implementation.session import ResumeCommand
+        from tyqa.commands.implementation.session import ResumeCommand
 
         ctx, ui = _ctx()
         with _patches(thread_exists=False, similar=[]):
@@ -118,7 +118,7 @@ class TestResumeCommand:
         ui.handle_session_resume.assert_not_called()
 
     def test_prefix_resolves_to_unique_match(self):
-        from EvoScientist.commands.implementation.session import ResumeCommand
+        from tyqa.commands.implementation.session import ResumeCommand
 
         ctx, ui = _ctx()
         with _patches(
@@ -131,7 +131,7 @@ class TestResumeCommand:
         assert ctx.thread_id == "abc-one"
 
     def test_empty_workspace_metadata_preserves_ctx_workspace(self):
-        from EvoScientist.commands.implementation.session import ResumeCommand
+        from tyqa.commands.implementation.session import ResumeCommand
 
         ctx, ui = _ctx(workspace_dir="/keep")
         with _patches(thread_exists=True, metadata={}):

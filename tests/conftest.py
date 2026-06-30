@@ -1,4 +1,4 @@
-"""Shared fixtures for EvoScientist tests."""
+"""Shared fixtures for TYQA tests."""
 
 import asyncio
 
@@ -119,9 +119,9 @@ def runtime_paths(tmp_path, monkeypatch):
     Tests that need a variant of a single field can still call
     ``dataclasses.replace(runtime_paths, log_file=…)`` etc. — the
     baseline is already isolated, so forgetting a field just keeps it
-    under ``tmp_path``, never ``~/.config/evoscientist``.
+    under ``tmp_path``, never ``~/.config/tyqa``.
     """
-    from EvoScientist.langgraph_dev import manager
+    from tyqa.langgraph_dev import manager
 
     runtime = manager.LanggraphRuntimePaths.for_directory(tmp_path / "runtime")
     monkeypatch.setattr(manager, "RUNTIME", runtime)
@@ -129,7 +129,7 @@ def runtime_paths(tmp_path, monkeypatch):
 
 
 # Capture deepagents tool factories at conftest load time — BEFORE any test
-# imports EvoScientist, which can trigger ``_patch_deepagents_model_passthrough``
+# imports TYQA, which can trigger ``_patch_deepagents_model_passthrough``
 # during agent construction. Once captured here, the ``restore_model_passthrough_patch``
 # fixture has a stable "truly unpatched" baseline to reset to between tests, even
 # if upstream code paths apply the patch as a side effect.
@@ -154,7 +154,7 @@ def restore_model_passthrough_patch():
     known-unpatched state regardless of what other tests / agent fixtures
     did to the module before.
     """
-    from EvoScientist.llm import patches as patches_mod
+    from tyqa.llm import patches as patches_mod
 
     if _ds_async_subagents is None:
         # deepagents not importable — fixture is a no-op (the patch fn itself

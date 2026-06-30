@@ -7,8 +7,8 @@ from tests.conftest import run_async as _run
 
 class TestExitCommand:
     def test_execute_calls_force_quit(self):
-        from EvoScientist.commands.base import CommandContext
-        from EvoScientist.commands.implementation.session import ExitCommand
+        from tyqa.commands.base import CommandContext
+        from tyqa.commands.implementation.session import ExitCommand
 
         ui = MagicMock()
         ctx = CommandContext(
@@ -22,7 +22,7 @@ class TestExitCommand:
 
     def test_aliases_registered(self):
         """/quit and /q resolve to the same ExitCommand as /exit."""
-        from EvoScientist.commands.manager import manager
+        from tyqa.commands.manager import manager
 
         assert manager.get_command("/exit").name == "/exit"
         assert manager.get_command("/quit").name == "/exit"

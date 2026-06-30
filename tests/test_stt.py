@@ -11,7 +11,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from EvoScientist.stt import STT_MODELS, is_audio_file, transcribe_file
+from tyqa.stt import STT_MODELS, is_audio_file, transcribe_file
 from tests.conftest import run_async
 
 # ── is_audio_file ─────────────────────────────────────────────────────
@@ -79,7 +79,7 @@ def _patch_whisper(whisper_model):
 
 
 def test_transcribe_en_uses_whisper():
-    import EvoScientist.stt as stt_mod
+    import tyqa.stt as stt_mod
 
     stt_mod._engine = None
     with _patch_whisper(_make_whisper_mock("Hello world")):
@@ -89,7 +89,7 @@ def test_transcribe_en_uses_whisper():
 
 
 def test_transcribe_auto_uses_whisper():
-    import EvoScientist.stt as stt_mod
+    import tyqa.stt as stt_mod
 
     stt_mod._engine = None
     with _patch_whisper(_make_whisper_mock("Bonjour monde")):
@@ -99,7 +99,7 @@ def test_transcribe_auto_uses_whisper():
 
 
 def test_transcribe_zh_uses_whisper():
-    import EvoScientist.stt as stt_mod
+    import tyqa.stt as stt_mod
 
     stt_mod._engine = None
     with _patch_whisper(_make_whisper_mock("你好世界")):
@@ -110,7 +110,7 @@ def test_transcribe_zh_uses_whisper():
 
 def test_transcribe_custom_model_override():
     """stt_model config overrides the default model mapping."""
-    import EvoScientist.stt as stt_mod
+    import tyqa.stt as stt_mod
 
     stt_mod._engine = None
     captured_model_id = []
@@ -136,7 +136,7 @@ def test_transcribe_custom_model_override():
 def test_transcribe_missing_dep_returns_none():
     import sys
 
-    import EvoScientist.stt as stt_mod
+    import tyqa.stt as stt_mod
 
     stt_mod._engine = None
     saved = sys.modules.pop("faster_whisper", None)
@@ -155,7 +155,7 @@ def test_transcribe_missing_dep_returns_none():
 
 
 def _make_channel():
-    from EvoScientist.channels.telegram.channel import TelegramChannel, TelegramConfig
+    from tyqa.channels.telegram.channel import TelegramChannel, TelegramConfig
 
     cfg = TelegramConfig(bot_token="dummy")
     ch = TelegramChannel(cfg)
@@ -171,7 +171,7 @@ def _make_channel():
 
 def test_enqueue_raw_stt_prepends_transcript():
     """_enqueue_raw prepends STT transcript to raw.text when stt_enabled."""
-    from EvoScientist.channels.base import RawIncoming
+    from tyqa.channels.base import RawIncoming
 
     ch, captured = _make_channel()
     ch._stt_enabled = True
@@ -192,9 +192,9 @@ def test_enqueue_raw_stt_prepends_transcript():
     async def _run():
         with (
             patch(
-                "EvoScientist.stt.transcribe_file", new=AsyncMock(return_value="你好")
+                "tyqa.stt.transcribe_file", new=AsyncMock(return_value="你好")
             ),
-            patch("EvoScientist.stt.is_audio_file", return_value=True),
+            patch("tyqa.stt.is_audio_file", return_value=True),
         ):
             await ch._enqueue_raw(raw)
 
@@ -206,7 +206,7 @@ def test_enqueue_raw_stt_prepends_transcript():
 
 def test_enqueue_raw_stt_disabled_skips_transcription():
     """When stt_enabled=False, transcription is not called."""
-    from EvoScientist.channels.base import RawIncoming
+    from tyqa.channels.base import RawIncoming
 
     ch, captured = _make_channel()
     ch._stt_enabled = False
@@ -222,7 +222,7 @@ def test_enqueue_raw_stt_disabled_skips_transcription():
     mock_transcribe = AsyncMock()
 
     async def _run():
-        with patch("EvoScientist.stt.transcribe_file", mock_transcribe):
+        with patch("tyqa.stt.transcribe_file", mock_transcribe):
             await ch._enqueue_raw(raw)
 
     run_async(_run())
@@ -232,7 +232,7 @@ def test_enqueue_raw_stt_disabled_skips_transcription():
 
 def test_enqueue_raw_stt_appends_to_existing_text():
     """Transcript is prepended before any existing caption text."""
-    from EvoScientist.channels.base import RawIncoming
+    from tyqa.channels.base import RawIncoming
 
     ch, captured = _make_channel()
     ch._stt_enabled = True
@@ -252,10 +252,10 @@ def test_enqueue_raw_stt_appends_to_existing_text():
     async def _run():
         with (
             patch(
-                "EvoScientist.stt.transcribe_file",
+                "tyqa.stt.transcribe_file",
                 new=AsyncMock(return_value="hello world"),
             ),
-            patch("EvoScientist.stt.is_audio_file", return_value=True),
+            patch("tyqa.stt.is_audio_file", return_value=True),
         ):
             await ch._enqueue_raw(raw)
 
@@ -266,19 +266,19 @@ def test_enqueue_raw_stt_appends_to_existing_text():
 # ── Manual integration test (run by hand) ────────────────────────────
 #
 # 1. Install deps:
-#      uv pip install 'EvoScientist[stt]'
+#      uv pip install 'TYQA[stt]'
 #
 # 2. Enable STT:
-#      EvoSci config set stt_enabled true
-#      EvoSci config set stt_language zh   # zh / en / auto
+#      tyqa config set stt_enabled true
+#      tyqa config set stt_language zh   # zh / en / auto
 #
 # 3. Transcribe a local audio file directly:
 #      python -c "
 #      import asyncio
-#      from EvoScientist.stt import transcribe_file
+#      from tyqa.stt import transcribe_file
 #      print(asyncio.run(transcribe_file('sample.ogg', language='zh')))
 #      "
 #
 # 4. End-to-end via Telegram:
-#      EvoSci serve
+#      tyqa serve
 #      → send a voice message → bot receives transcribed text

@@ -13,7 +13,7 @@ A clear and concise description of what the bug is.
 
 **To Reproduce**
 Steps to reproduce the behavior:
-1. Run `EvoSci ...`
+1. Run `tyqa ...`
 2. Provide input '...'
 3. See error
 
@@ -31,7 +31,7 @@ If applicable, paste the relevant terminal output or traceback.
  - OS: [e.g. Ubuntu 22.04, macOS 14.3, Windows 11]
  - Python version: [e.g. 3.11.8]
  - Terminal: [e.g. iTerm2, Alacritty, Windows Terminal]
- - TYQA version: [e.g. 0.1.6 — run `EvoSci --version`]
+ - TYQA version: [e.g. 0.1.6 — run `tyqa --version`]
  - LLM provider: [e.g. Anthropic, OpenAI, Ollama]
 
 **Additional context**

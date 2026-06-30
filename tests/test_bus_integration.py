@@ -9,10 +9,10 @@ import asyncio
 
 import pytest
 
-from EvoScientist.channels.base import Channel, OutgoingMessage
-from EvoScientist.channels.bus.events import InboundMessage
-from EvoScientist.channels.bus.message_bus import MessageBus
-from EvoScientist.channels.channel_manager import ChannelManager
+from tyqa.channels.base import Channel, OutgoingMessage
+from tyqa.channels.bus.events import InboundMessage
+from tyqa.channels.bus.message_bus import MessageBus
+from tyqa.channels.channel_manager import ChannelManager
 from tests.conftest import run_async as _run
 
 
@@ -28,9 +28,9 @@ def _drain_queue(q):
 @pytest.fixture(autouse=True)
 def clean_channel_state():
     """Reset shared channel bridge state before and after each test."""
-    from EvoScientist.cli import channel as channel_mod
-    from EvoScientist.cli.channel import _message_queue
-    from EvoScientist.stream import display as display_mod
+    from tyqa.cli import channel as channel_mod
+    from tyqa.cli.channel import _message_queue
+    from tyqa.stream import display as display_mod
 
     def _reset() -> None:
         _drain_queue(_message_queue)
@@ -98,7 +98,7 @@ class TestBusInboundConsumer:
 
     def test_processes_inbound_and_publishes_outbound(self):
         """InboundMessage -> queue -> response -> OutboundMessage flow."""
-        from EvoScientist.cli.channel import (
+        from tyqa.cli.channel import (
             _bus_inbound_consumer,
             _message_queue,
             _set_channel_response,
@@ -155,7 +155,7 @@ class TestBusInboundConsumer:
 
     def test_no_response_fallback(self):
         """Empty response is replaced with 'No response' fallback."""
-        from EvoScientist.cli.channel import (
+        from tyqa.cli.channel import (
             _bus_inbound_consumer,
             _message_queue,
             _set_channel_response,
@@ -205,8 +205,8 @@ class TestBusInboundConsumer:
 
     def test_late_response_after_timeout_still_publishes(self, monkeypatch):
         """A response that arrives after the bridge timeout is still forwarded."""
-        from EvoScientist.cli import channel as channel_mod
-        from EvoScientist.cli.channel import (
+        from tyqa.cli import channel as channel_mod
+        from tyqa.cli.channel import (
             _bus_inbound_consumer,
             _message_queue,
             _set_channel_response,
@@ -268,15 +268,15 @@ class TestBusInboundConsumer:
 
     def test_late_timeout_keeps_active_request_cancellable(self, monkeypatch):
         """Late timeout must not discard an active request's cancel scope."""
-        from EvoScientist.cli import channel as channel_mod
-        from EvoScientist.cli.channel import (
+        from tyqa.cli import channel as channel_mod
+        from tyqa.cli.channel import (
             _channel_message_cancel_scope,
             _channel_request_state,
             _claim_channel_request,
             _handle_bus_message,
             _message_queue,
         )
-        from EvoScientist.stream import display as display_mod
+        from tyqa.stream import display as display_mod
 
         monkeypatch.setattr(channel_mod, "_RESPONSE_TIMEOUT", 0.05)
         monkeypatch.setattr(channel_mod, "_LATE_RESPONSE_TIMEOUT", 0.05)
@@ -342,8 +342,8 @@ class TestBusInboundConsumer:
 
     def test_cancelled_wait_cleans_pending_response(self):
         """Cancelling a pending bus message should not leak its response slot."""
-        from EvoScientist.cli import channel as channel_mod
-        from EvoScientist.cli.channel import _handle_bus_message, _message_queue
+        from tyqa.cli import channel as channel_mod
+        from tyqa.cli.channel import _handle_bus_message, _message_queue
 
         async def _test():
             bus = MessageBus()
@@ -384,8 +384,8 @@ class TestBusInboundConsumer:
 
     def test_consumer_shutdown_cleans_pending_response(self):
         """Stopping the consumer should cancel late waits and clear state."""
-        from EvoScientist.cli import channel as channel_mod
-        from EvoScientist.cli.channel import _bus_inbound_consumer, _message_queue
+        from tyqa.cli import channel as channel_mod
+        from tyqa.cli.channel import _bus_inbound_consumer, _message_queue
 
         async def _test():
             bus = MessageBus()
@@ -423,8 +423,8 @@ class TestBusInboundConsumer:
 
     def test_stop_during_hitl_wait_releases_wait_and_acks(self):
         """`/stop` should wake pending HITL wait and publish immediate ack."""
-        from EvoScientist.cli import channel as channel_mod
-        from EvoScientist.cli.channel import _bus_inbound_consumer, _message_queue
+        from tyqa.cli import channel as channel_mod
+        from tyqa.cli.channel import _bus_inbound_consumer, _message_queue
 
         async def _test():
             bus = MessageBus()
@@ -467,8 +467,8 @@ class TestBusInboundConsumer:
 
     def test_stop_cancels_queued_request_before_main_thread_processes_it(self):
         """`/stop` should cancel a queued request instead of only acking."""
-        from EvoScientist.cli import channel as channel_mod
-        from EvoScientist.cli.channel import (
+        from tyqa.cli import channel as channel_mod
+        from tyqa.cli.channel import (
             _claim_or_complete_channel_request,
             _handle_bus_message,
             _message_queue,
@@ -542,8 +542,8 @@ class TestBusInboundConsumer:
 
     def test_stop_leaves_resolved_response_available_for_delivery(self):
         """`/stop` must not steal a response whose waiter already resolved."""
-        from EvoScientist.cli import channel as channel_mod
-        from EvoScientist.cli.channel import (
+        from tyqa.cli import channel as channel_mod
+        from tyqa.cli.channel import (
             ChannelMessage,
             _cancel_channel_session,
             _claim_channel_request,
@@ -590,7 +590,7 @@ class TestBusInboundConsumer:
 
     def test_message_counting(self):
         """Messages are counted via record_message."""
-        from EvoScientist.cli.channel import (
+        from tyqa.cli.channel import (
             _bus_inbound_consumer,
             _message_queue,
             _set_channel_response,
@@ -638,7 +638,7 @@ class TestBusInboundConsumer:
 
     def test_channel_message_carries_metadata(self):
         """ChannelMessage carries metadata, chat_id, and message_id."""
-        from EvoScientist.cli.channel import (
+        from tyqa.cli.channel import (
             _bus_inbound_consumer,
             _message_queue,
             _set_channel_response,

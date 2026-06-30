@@ -10,7 +10,7 @@ from tests.conftest import run_async as _run
 
 def _make_ui(**kwargs):
     """Build a RichCLICommandUI backed by a MagicMock console."""
-    from EvoScientist.cli.rich_command_ui import RichCLICommandUI
+    from tyqa.cli.rich_command_ui import RichCLICommandUI
 
     console = MagicMock(spec=Console)
     ui = RichCLICommandUI(console, **kwargs)
@@ -214,7 +214,7 @@ class TestWaitForThreadPick:
         ]
 
     def test_returns_selected_thread_id(self, monkeypatch):
-        import EvoScientist.cli.rich_command_ui as mod
+        import tyqa.cli.rich_command_ui as mod
 
         ui, _ = _make_ui()
         prompt = self._fake_prompt("abc123")
@@ -324,7 +324,7 @@ class TestPhaseCMigrated:
 
         picker = MagicMock(return_value=["skill-a", "skill-b"])
         monkeypatch.setattr(
-            "EvoScientist.cli.skills_cmd._pick_skills_interactive",
+            "tyqa.cli.skills_cmd._pick_skills_interactive",
             picker,
         )
         ui, _ = _make_ui()
@@ -336,7 +336,7 @@ class TestPhaseCMigrated:
         from unittest.mock import MagicMock
 
         monkeypatch.setattr(
-            "EvoScientist.cli.skills_cmd._pick_skills_interactive",
+            "tyqa.cli.skills_cmd._pick_skills_interactive",
             MagicMock(return_value=None),
         )
         ui, _ = _make_ui()
@@ -349,7 +349,7 @@ class TestPhaseCMigrated:
         sentinel_entries = [MagicMock(name="entry1"), MagicMock(name="entry2")]
         picker = MagicMock(return_value=sentinel_entries)
         monkeypatch.setattr(
-            "EvoScientist.cli.mcp_install_cmd._browse_and_select",
+            "tyqa.cli.mcp_install_cmd._browse_and_select",
             picker,
         )
         ui, _ = _make_ui()
@@ -361,7 +361,7 @@ class TestPhaseCMigrated:
         from unittest.mock import MagicMock
 
         monkeypatch.setattr(
-            "EvoScientist.cli.mcp_install_cmd._browse_and_select",
+            "tyqa.cli.mcp_install_cmd._browse_and_select",
             MagicMock(return_value=None),
         )
         ui, _ = _make_ui()

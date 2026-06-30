@@ -2,8 +2,8 @@
 
 import pytest
 
-from EvoScientist.channels.base import ChannelError
-from EvoScientist.channels.discord.channel import DiscordChannel, DiscordConfig
+from tyqa.channels.base import ChannelError
+from tyqa.channels.discord.channel import DiscordChannel, DiscordConfig
 from tests.conftest import run_async as _run
 
 
@@ -26,7 +26,7 @@ class TestDiscordChannel:
         _run(channel.stop())
 
     def test_send_returns_false_without_client(self):
-        from EvoScientist.channels.base import OutboundMessage
+        from tyqa.channels.base import OutboundMessage
 
         config = DiscordConfig(bot_token="test")
         channel = DiscordChannel(config)

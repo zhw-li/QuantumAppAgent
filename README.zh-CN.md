@@ -1,28 +1,23 @@
- > [!WARNING]
- > 这是社区翻译版本，欢迎修正！
-
----
-
 <div align="center">
     <picture>
-      <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/logo-dark.svg">
-      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/logo-light.svg">
-      <img alt="TYQA Logo" src="https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/logo-dark.svg" width="80%">
+      <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/zhw-li/QuantumAppAgent/main/.github/assets/logo-dark.svg">
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/zhw-li/QuantumAppAgent/main/.github/assets/logo-light.svg">
+      <img alt="TYQA Logo" src=".github/assets/TYQA.png" width="80%">
     </picture>
 </div>
 
 <div align="center">
-<a href="https://github.com/EvoScientist/EvoScientist/blob/main/LICENSE"><picture>
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/badge-license-light.svg">
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/badge-license-dark.svg">
-  <img alt="License Apache 2.0" src="https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/badge-license-light.svg" height="28">
+<a href="https://github.com/zhw-li/QuantumAppAgent/blob/main/LICENSE"><picture>
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/zhw-li/QuantumAppAgent/main/.github/assets/badge-license-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/zhw-li/QuantumAppAgent/main/.github/assets/badge-license-dark.svg">
+  <img alt="License Apache 2.0" src="https://raw.githubusercontent.com/zhw-li/QuantumAppAgent/main/.github/assets/badge-license-light.svg" height="28">
 </picture></a>
 </div>
 
 ---
 
 <div align="center">
-<a href="https://github.com/zhw-li/TYQA"><img src="https://readme-typing-svg.demolab.com?font=Sans-Serif&pause=1000&color=64B5F6&center=true&vCenter=true&width=435&lines=TianYan+Quantum+Agent;Quantum+Applications%2C+End+to+End" alt="Typing SVG" /></a>
+<a href="https://github.com/zhw-li/QuantumAppAgent"><img src="https://readme-typing-svg.demolab.com?font=Sans-Serif&pause=1000&color=64B5F6&center=true&vCenter=true&width=435&lines=TianYan+Quantum+Agent;Quantum+Applications%2C+End+to+End" alt="Typing SVG" /></a>
 </div>
 
 <div align="center">
@@ -31,11 +26,11 @@
 
 </div>
 
-**TYQA（TianYan Quantum Agent，天衍量智）是一个自进化智能体框架，把一个研究问题从想法推进到可验证的量子应用与云端展示——端到端覆盖全流程。
-它基于 [EvoScientist](https://github.com/EvoScientist/EvoScientist) 智能体框架与 [cqlib](https://github.com/cqlib-quantum/cqlib) 量子 SDK 构建，编排多个专职子智能体完成：调研方法、建立经典基线、构建量子算法、打包可运行应用、生成天衍（TianYan）量子云展示界面，并验证证据——在每一轮中持续进化自身的技能与记忆。**
+**TYQA（TianYan Quantum Agent，天衍量智）是面向量子应用交付的自进化多智能体框架，用于端到端构建可验证的量子应用与天衍量子云展示。
+它将规划、调研、编码、调试、分析和交付智能体与 [cqlib](https://github.com/cqlib-quantum/cqlib) 量子 SDK 结合，把业务或科研需求推进为经典基线、量子方法、后端 API、QCCP 展示页面和验证证据，形成可复核的一体化交付流程。**
 
 > [!NOTE]
-> 本项目正在更名为 **tyqa**。目前 Python 包名、`EvoSci` / `evosci` CLI 命令以及 `~/.config/evoscientist/` 配置路径仍沿用上游 `EvoScientist` 的标识，且功能完全正常。全栈改名（包名、CLI、配置目录、环境变量）将作为后续版本推进。
+> canonical 仓库为 **`zhw-li/QuantumAppAgent`**。Python 包名、安装目标和主 CLI 命令仍为小写 **`tyqa`**；大写 `TYQA` 仅作为展示名和兼容 CLI alias 保留。
 
 ## ✨ 特性
 
@@ -53,7 +48,7 @@
 
 ## 🧪 量子应用示例
 
-开箱即用的量子应用位于 [`quantum_app_example/`](./quantum_app_example)。每个示例都包含经典基线、量子方法、验证报告以及天衍云 SFC 展示页面。
+历史量子应用 demo 位于 [`quantum_app_example/`](./quantum_app_example)。这些示例可作为经典基线、量子方法、验证报告和天衍云展示页面的参考产物，但它们早于当前 `application_manifest.json` validator 合同；在补齐 manifest 前，不应视为符合当前发布框架的应用包。
 
 | 示例 | 量子方法 | 经典基线 | 主要指标 |
 | --- | --- | --- | --- |
@@ -68,11 +63,11 @@
 TYQA 通过分阶段的量子应用生命周期驱动每个项目，在各阶段编排相应的技能：
 
 ```
-research-survey / paper-navigator   ←  方法、数据集、基线、已有结果
+solution-landscape / evidence-navigator   ←  方法、数据集、基线、已有结果
         │
-research-ideation / paper-planning  ←  应用定位、验证与产物计划
+application-intake / delivery-planning  ←  应用定位、验证与产物计划
         │
-   experiment-pipeline               ←  阶段门禁执行（基线 → 量子 → 应用 → 验证）
+   application-pipeline               ←  阶段门禁执行（基线 → 量子 → 应用 → 验证）
         │
 cqlib-sdk → cqlib-qaoa / cqlib-vqe   ←  量子算法 + quantum_report.json
           / cqlib-qml / cqlib-hybrid
@@ -80,142 +75,139 @@ cqlib-sdk → cqlib-qaoa / cqlib-vqe   ←  量子算法 + quantum_report.json
 qccp-ui → qccp-frontend /     ←  云展示 UI + API/服务 + 部署证据
                  qccp-service  ←  默认 FastAPI 应用服务；明确 Java 集成时走 qccp-service Java 路径
         │
-paper-writing / paper-review /       ←  报告、README、INTEGRATE 说明、幻灯片
-academic-slides
+delivery-writing / delivery-review /       ←  报告、README、INTEGRATE 说明、幻灯片
+showcase-slides
 ```
 
-并非每个项目都需要走完全部阶段——起点取决于你已有的内容。阶段门禁与技能路由规则详见 [`EvoScientist/skills/experiment-pipeline/SKILL.md`](./EvoScientist/skills/experiment-pipeline/SKILL.md)；内置量子算法技能文档位于 [`EvoScientist/skills/`](./EvoScientist/skills)。
+并非每个项目都需要走完全部阶段——起点取决于你已有的内容。阶段门禁与技能路由规则详见 [`tyqa/skills/application-pipeline/SKILL.md`](./tyqa/skills/application-pipeline/SKILL.md)；内置量子算法技能文档位于 [`tyqa/skills/`](./tyqa/skills)。
+
+### Skill
+
+内置生命周期 skill。
+
+| skill ID |
+| --- |
+| `application-intake` |
+| `evidence-navigator` |
+| `solution-landscape` |
+| `delivery-planning` |
+| `application-pipeline` |
+| `application-debugging` |
+| `implementation-iteration` |
+| `delivery-writing` |
+| `delivery-review` |
+| `stakeholder-response` |
+| `showcase-slides` |
+| `application-memory` |
 
 ## 📖 目录
 
+- [✨ 特性](#-特性)
+- [🧪 量子应用示例](#-量子应用示例)
+- [🏗️ 框架架构](#️-框架架构)
+  - [Skill](#skill)
+- [📖 目录](#-目录)
 - [📦 安装](#-安装)
+  - [推荐方式：源码 checkout + conda](#推荐方式源码-checkout--conda)
+  - [备选方式：标准 venv](#备选方式标准-venv)
+  - [验证安装](#验证安装)
+  - [更新已有源码 checkout](#更新已有源码-checkout)
+  - [可选渠道依赖](#可选渠道依赖)
+  - [🐳 Docker](#-docker)
 - [🔑 配置](#-配置)
 - [⚡ 快速上手](#-快速上手)
 - [🍪 示例与实践](#-示例与实践)
 - [🔌 MCP 集成](#-mcp-集成)
 - [📱 渠道接入](#-渠道接入)
-- [🎯 路线图](#-ᯓ-路线图)
+- [🎯 ᯓ➤ 路线图](#-ᯓ-路线图)
 - [🤝 贡献](#-贡献)
 - [📚 致谢](#-致谢)
+- [📜 许可证](#-许可证)
 
 ## 📦 安装
 
-> [!TIP]
-> 需要 **Python 3.11+**（**< 3.14**）。推荐使用 [**uv**](https://docs.astral.sh/uv/) 或 **conda** 进行依赖管理和虚拟环境管理。想完全跳过本地 Python 安装？直接跳转到 [🐳 Docker](#-docker)。
+> [!IMPORTANT]
+> 需要 **Python 3.11 或 3.12**（`>=3.11,<3.13`）。目前最可靠的安装方式是 **源码 checkout + editable install**。在正式发布并验证 PyPI 包、`uv tool install` 包或预构建 Docker 镜像前，不建议把它们作为主安装路径。
 
-<details>
-<summary>🪛 安装 uv（如果尚未安装）</summary>
-
-```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
-```
-
-</details>
-
-### 快速安装
+### 推荐方式：源码 checkout + conda
 
 ```bash
-uv tool install EvoScientist
+git clone https://github.com/zhw-li/QuantumAppAgent.git
+cd QuantumAppAgent
+
+conda create -n tyqa python=3.11 -y
+conda activate tyqa
+
+python -m pip install -U pip
+python -m pip install -e ".[dev]"
 ```
 
-> [!NOTE]
-> 更新已安装的版本到最新，请使用 `uv tool upgrade`：
-> ```bash
-> uv tool upgrade EvoScientist
-> ```
+如果你已经有本仓库 checkout，直接从 `cd QuantumAppAgent` 开始即可。
 
-或安装到当前环境：
+### 备选方式：标准 venv
 
 ```bash
-uv pip install EvoScientist
+git clone https://github.com/zhw-li/QuantumAppAgent.git
+cd QuantumAppAgent
+
+python3.11 -m venv .venv
+source .venv/bin/activate
+
+python -m pip install -U pip
+python -m pip install -e ".[dev]"
 ```
 
-### 从 GitHub 安装最新版本
-
-获取 [PyPI](https://pypi.org/project/EvoScientist/) 发布前的最新补丁：
+### 验证安装
 
 ```bash
-uv pip install git+https://github.com/EvoScientist/EvoScientist.git
+python -m pytest tests/test_skill_descriptions.py -q
+tyqa -h
 ```
 
-### 开发安装
+更完整的本地验证可运行：
 
 ```bash
-git clone https://github.com/EvoScientist/EvoScientist.git
-cd EvoScientist
-uv sync --dev
+python -m pytest tests/test_prompts.py tests/test_skill_descriptions.py tests/test_quantum_application_validation.py -q
 ```
 
-enable pre-commit hooks:
-```bash
-uv run pre-commit install
-```
-
-<details>
-<summary> 使用 conda</summary>
+### 更新已有源码 checkout
 
 ```bash
-conda create -n EvoSci python=3.11 -y
-conda activate EvoSci
-pip install -e ".[dev]"
+git pull
+conda activate tyqa
+python -m pip install -e ".[dev]"
 ```
 
-</details>
+### 可选渠道依赖
 
-<details>
-<summary> 使用 PyPi</summary>
+消息渠道集成需要额外依赖。请在源码 checkout 中按需安装：
 
 ```bash
-pip install EvoScientist          # quick install
-pip install -e ".[dev]"           # development install
+python -m pip install -e ".[telegram]"     # Telegram
+python -m pip install -e ".[discord]"      # Discord
+python -m pip install -e ".[slack]"        # Slack
+python -m pip install -e ".[wechat]"       # 微信
+python -m pip install -e ".[qq]"           # QQ
+python -m pip install -e ".[feishu]"       # 飞书
+python -m pip install -e ".[all-channels]" # 全部
 ```
-
-</details>
-
-<details>
-<summary> 可选：渠道依赖</summary>
-
-消息渠道集成需要额外依赖，按需安装即可：
-
-```bash
-uv pip install "EvoScientist[telegram]"     # Telegram
-uv pip install "EvoScientist[discord]"      # Discord
-uv pip install "EvoScientist[slack]"        # Slack
-uv pip install "EvoScientist[wechat]"       # 微信
-uv pip install "EvoScientist[qq]"           # QQ
-uv pip install "EvoScientist[feishu]"       # 飞书
-uv pip install "EvoScientist[all-channels]" # 全部
-```
-
-</details>
-
-<details>
-<summary> 升级到最新代码库</summary>
-
-```bash
-git pull && uv sync --dev
-```
-
-</details>
 
 ### 🐳 Docker
 
-我们在 [GitHub Container Registry](https://github.com/EvoScientist/EvoScientist/pkgs/container/evoscientist) 上发布了一份预构建镜像，已经包含 `evosci onboard` 通常会为你安装的所有内容：
+当前还没有可直接面向用户使用的 TYQA 预构建 Docker 镜像。仓库中的 Dockerfile 主要用于本地打包检查和受控部署；如果需要容器化运行，请从当前 checkout 本地构建：
 
-- Python 3.11、EvoScientist 以及全部跨平台消息渠道（即 `EvoScientist[all-channels]`）
-- **`uv`** —— 用于 MCP 注册表按需安装 Python 类 MCP 服务器
-- **Node.js 24 LTS + `npx`** —— 大多数 MCP 服务器依赖此运行时
+```bash
+docker build -t tyqa:local .
+```
 
-容器中**无法使用 iMessage 渠道**——它需要 `imsg` CLI 与 macOS 的 Messages.app 通信，仅限宿主操作系统。如需 iMessage，请直接在 macOS 上运行。
-
-在容器中运行还会**沙箱化智能体的 Shell 访问**——文件编辑和 Shell 命令仅限于你显式挂载的卷。
+然后运行本地镜像：
 
 ```bash
 docker run -it --rm \
   --env-file .env \
   -v "$(pwd)/workspace:/workspace" \
-  -v evosci-data:/home/evosci/.evoscientist \
-  ghcr.io/evoscientist/evoscientist:latest
+  -v tyqa-data:/home/tyqa/.tyqa \
+  tyqa:local
 ```
 
 各挂载的用途：
@@ -224,44 +216,26 @@ docker run -it --rm \
 | --- | --- |
 | `--env-file .env` | API 密钥（`ANTHROPIC_API_KEY`、`OPENAI_API_KEY` 等） |
 | `./workspace:/workspace` | 智能体的工作目录 |
-| `evosci-data:/home/evosci/.evoscientist` | 持久化应用状态：会话数据库、全局技能、记忆，以及 `config.yaml` / `mcp.yaml` |
+| `tyqa-data:/home/tyqa/.tyqa` | 持久化应用状态：会话数据库、全局技能、记忆，以及 `config.yaml` / `mcp.yaml` |
 
 > [!IMPORTANT]
-> 镜像以非 root 用户运行（`evosci`，UID `1000`）。`./workspace` bind 挂载的宿主目录必须可被该 UID 写入。如果你的宿主用户 ID 不同，可以一次性 `chown -R 1000:1000 ./workspace`，或在每次 `docker run` 时加上 `--user "$(id -u):$(id -g)"`，让容器使用你的 UID。
+> 镜像以非 root 用户运行（`tyqa`，UID `1000`）。`./workspace` bind 挂载的宿主目录必须可被该 UID 写入。如果你的宿主用户 ID 不同，可以一次性 `chown -R 1000:1000 ./workspace`，或在每次 `docker run` 时加上 `--user "$(id -u):$(id -g)"`，让容器使用你的 UID。
+>
+> 容器中无法使用 iMessage 渠道，因为它需要 `imsg` CLI 与 macOS 的 Messages.app 通信。如需 iMessage，请直接在 macOS 上运行 TYQA。
 
-也可使用 `docker compose`（仓库自带一个起步用的 [`docker-compose.yml`](./docker-compose.yml)）：
-
-```bash
-docker compose run --rm evoscientist
-```
-
-如果想本地构建而不是拉取镜像：
+也可通过 `docker compose` 从本地 Dockerfile 构建并运行：
 
 ```bash
-docker build -t evoscientist:dev .
+docker compose build
+docker compose run --rm tyqa
 ```
 
 > [!NOTE]
-> 镜像中**未捆绑**以下内容，需要时基于镜像派生安装：
+> 本地镜像默认不捆绑以下可选组件，需要时再派生安装：
 > - **`stt`**（基于 `faster-whisper` 的语音转文字）和 **`oauth`**（`ccproxy-api`）
 > - **TinyTeX / LaTeX**（`pdflatex`、`latexmk`），供论文写作类技能使用
 >
-> ```dockerfile
-> FROM ghcr.io/evoscientist/evoscientist:latest
->
-> # Python 额外组件
-> USER root
-> RUN uv pip install --python /opt/venv/bin/python "EvoScientist[stt,oauth]"
-> USER evosci
->
-> # TinyTeX
-> # 官方安装方式是 `curl | sh`；如果你不想把未固定版本的远程脚本
-> # 直接管入 shell，可以从 https://github.com/rstudio/tinytex-releases
-> # 下载特定版本的 TinyTeX 发布包，校验校验和后解压到
-> # /home/evosci/.TinyTeX。
-> RUN curl -sL https://yihui.org/tinytex/install-bin-unix.sh | sh \
->  && /home/evosci/.TinyTeX/bin/*/tlmgr install latexmk
-> ```
+> Python 额外组件建议直接加到项目 Dockerfile 的 `uv sync` 步骤中，确保镜像仍从同一份源码 checkout 构建。LaTeX 只在 delivery-writing 工作流确实需要时，再通过派生镜像安装固定版本的 TinyTeX 或系统 TeX 包。
 
 <p align="right"><a href="#top">🔝回到顶部</a></p>
 
@@ -270,14 +244,14 @@ docker build -t evoscientist:dev .
 最简单的方式是使用交互式配置向导：
 
 ```bash
-EvoSci onboard
+tyqa onboard
 ```
 
 > [!TIP]
 > 向导将引导你完成供应商选择、密钥验证、模型选择和工作区模式设置。
 > 支持 CLI 编程智能体订阅用户通过 OAuth 直连——无需 API Key。
 
-![onboard](https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/EvoScientist_onboard.png)
+![onboard](https://raw.githubusercontent.com/zhw-li/QuantumAppAgent/main/.github/assets/tyqa_onboard.png)
 
 <details>
 <summary> 📟 通过环境变量手动配置</summary>
@@ -297,7 +271,7 @@ export NVIDIA_API_KEY="nvapi-..."   # NIM    — build.nvidia.com
 export TAVILY_API_KEY="tvly-..."    # app.tavily.com
 ```
 
-也可以使用 `EvoSci config set` 将密钥持久化到 `~/.config/evoscientist/config.yaml`。
+也可以使用 `tyqa config set` 将密钥持久化到 `~/.config/tyqa/config.yaml`。
 
 或者复制示例 `.env` 文件用于项目级配置：
 
@@ -314,30 +288,30 @@ cp .env.example .env  # 填入你的密钥
 ## ⚡ 快速上手
 
 ```bash
-EvoSci  # 或 EvoScientist — 交互模式（默认 TUI）
+tyqa  # 或 TYQA — 交互模式（默认 TUI）
 ```
 
-![demo](https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/EvoScientist_cli.png)
+![demo](https://raw.githubusercontent.com/zhw-li/QuantumAppAgent/main/.github/assets/tyqa_cli.png)
 
-> 运行 `EvoSci -h` 查看全部 CLI 选项。
+> 运行 `tyqa -h` 查看全部 CLI 选项。
 
-![cli help](https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/EvoScientist_cli_help.png)
+![cli help](https://raw.githubusercontent.com/zhw-li/QuantumAppAgent/main/.github/assets/tyqa_cli_help.png)
 
 > [!TIP]
-> 想用浏览器？运行 `EvoSci --ui webui` 打开 Web 工作区界面。需要复制长输出？使用 `--ui cli` 切换到经典模式，即可使用终端原生复制。macOS [iTerm2](https://iterm2.com/) 用户也可以按住 `⌥ Option` 拖选文字，再 `⌘+C` 复制。
+> 想用浏览器？运行 `tyqa --ui webui` 打开 Web 工作区界面。需要复制长输出？使用 `--ui cli` 切换到经典模式，即可使用终端原生复制。macOS [iTerm2](https://iterm2.com/) 用户也可以按住 `⌥ Option` 拖选文字，再 `⌘+C` 复制。
 
 <details>
 <summary>常用示例</summary>
 
 ```bash
-EvoSci                            # 交互模式（默认 TUI）
-EvoSci -p "你的问题"              # 单次查询模式
-EvoSci --workdir /path/to/project # 在指定目录下启动
-EvoSci -m run                     # 隔离的会话级工作区
-EvoSci --ui cli                   # 经典 CLI（轻量）
-EvoSci --ui webui                 # 浏览器工作区界面（需 Node/npx）
-EvoSci serve                      # 无头模式——仅渠道，无交互提示符
-EvoSci deploy                     # 独立 LangGraph 服务器——供外部 UI / SDK 客户端使用
+tyqa                            # 交互模式（默认 TUI）
+tyqa -p "你的问题"              # 单次查询模式
+tyqa --workdir /path/to/project # 在指定目录下启动
+tyqa -m run                     # 隔离的会话级工作区
+tyqa --ui cli                   # 经典 CLI（轻量）
+tyqa --ui webui                 # 浏览器工作区界面（需 Node/npx）
+tyqa serve                      # 无头模式——仅渠道，无交互提示符
+tyqa deploy                     # 独立 LangGraph 服务器——供外部 UI / SDK 客户端使用
 ```
 
 </details>
@@ -345,12 +319,12 @@ EvoSci deploy                     # 独立 LangGraph 服务器——供外部 UI
 <details>
 <summary>Desktop WebUI</summary>
 
-将 UI 后端设为 `webui`，全新的 `EvoSci` 会话便会在单个终端里同时启动 deploy 式 LangGraph 服务器**和** [`@evoscientist/webui`](https://www.npmjs.com/package/@evoscientist/webui) 前端，无需管理第二个进程：
+将 UI 后端设为 `webui`，全新的 `tyqa` 会话便会在单个终端里同时启动 deploy 式 LangGraph 服务器**和** [`@evoscientist/webui`](https://www.npmjs.com/package/@evoscientist/webui) 前端，无需管理第二个进程：
 
 ```bash
-EvoSci config set ui_backend webui   # 持久化；或用 `EvoSci --ui webui` 临时启用
-EvoSci                               # 打开 http://localhost:4716
-EvoSci config set webui_port 4800    # 修改前端端口（须与 langgraph dev 端口不同）
+tyqa config set ui_backend webui   # 持久化；或用 `tyqa --ui webui` 临时启用
+tyqa                               # 打开 http://localhost:4716
+tyqa config set webui_port 4800    # 修改前端端口（须与 langgraph dev 端口不同）
 ```
 
 需要 **Node.js 24 LTS**（提供 `npx`）；首次启动会下载 `@evoscientist/webui`，需要联网。注意：WebUI 不会显示 CLI/TUI 的历史会话，且 `-p` / `--resume` 会回退到经典 CLI。
@@ -364,14 +338,14 @@ EvoSci config set webui_port 4800    # 修改前端端口（须与 langgraph dev
 
 ```bash
 # 单次会话：通过 CLI 参数启用自动审批
-EvoSci --auto-approve
-EvoSci -p "query" --auto-approve
+tyqa --auto-approve
+tyqa -p "query" --auto-approve
 
 # 持久化：写入配置（对所有后续会话生效）
-EvoSci config set auto_approve true
+tyqa config set auto_approve true
 
 # 或仅放行特定命令前缀
-EvoSci config set shell_allow_list "python,pip,pytest,ruff,git"
+tyqa config set shell_allow_list "python,pip,pytest,ruff,git"
 ```
 
 会话中也可以在审批提示时回复 **3**（Approve all），仅对当次会话自动审批后续所有操作。
@@ -380,8 +354,8 @@ EvoSci config set shell_allow_list "python,pip,pytest,ruff,git"
 > **危险模式（Dangerous mode）** 会完全解除工作区沙箱——智能体可以读写、删除**真实文件系统上任意位置**的文件（`sudo`/`rm -rf /` 等高危命令仍被拦截）。它隐含 `--auto-approve`（不再提示审批）。请仅在你完全信任该任务时使用。
 >
 > ```bash
-> EvoSci --dangerous                       # 单次会话
-> EvoSci config set dangerous_mode true    # 持久化
+> tyqa --dangerous                       # 单次会话
+> tyqa config set dangerous_mode true    # 持久化
 > ```
 
 </details>
@@ -393,10 +367,10 @@ EvoSci config set shell_allow_list "python,pip,pytest,ruff,git"
 
 ```bash
 # 持久化：写入配置
-EvoSci config set enable_ask_user false
+tyqa config set enable_ask_user false
 
 # 重新开启
-EvoSci config set enable_ask_user true
+tyqa config set enable_ask_user true
 ```
 
 </details>
@@ -426,14 +400,14 @@ EvoSci config set enable_ask_user true
 <summary>脚本调用</summary>
 
 ```python
-from EvoScientist import EvoScientist_agent
+from tyqa import tyqa_agent
 from langchain_core.messages import HumanMessage
-from EvoScientist.utils import format_messages
+from tyqa.utils import format_messages
 
 thread = {"configurable": {"thread_id": "1"}}
 last_len = 0
 
-for state in EvoScientist_agent.stream(
+for state in tyqa_agent.stream(
     {"messages": [HumanMessage(content="Hi?")]},
     config=thread,
     stream_mode="values",
@@ -461,14 +435,14 @@ for state in EvoScientist_agent.stream(
 
 ```bash
 # 用法
-EvoSci mcp add <name> <command> [-- args...]
+tyqa mcp add <name> <command> [-- args...]
 
 # 示例
-EvoSci mcp add sequential-thinking npx -- -y @modelcontextprotocol/server-sequential-thinking
+tyqa mcp add sequential-thinking npx -- -y @modelcontextprotocol/server-sequential-thinking
 ```
 
 > [!TIP]
-> 关于命令选项、配置字段、工具路由、通配符过滤和故障排查，请参阅 **[MCP 集成指南](https://github.com/EvoScientist/EvoScientist/tree/main/EvoScientist/mcp#model-context-protocol-integration)**。
+> 关于命令选项、配置字段、工具路由、通配符过滤和故障排查，请参阅 **[MCP 集成指南](https://github.com/zhw-li/QuantumAppAgent/tree/main/tyqa/mcp#model-context-protocol-integration)**。
 
 <p align="right"><a href="#top">🔝回到顶部</a></p>
 
@@ -478,10 +452,10 @@ EvoSci mcp add sequential-thinking npx -- -y @modelcontextprotocol/server-sequen
 
 ```bash
 # 用法
-EvoSci channel setup <channel>
+tyqa channel setup <channel>
 
 # 示例
-EvoSci channel setup telegram
+tyqa channel setup telegram
 ```
 
 多个渠道可同时运行——在配置中用逗号分隔：
@@ -493,7 +467,7 @@ channel_enabled: "telegram,slack,feishu,qq"
 也可以在 CLI 会话中通过 `/channel` 交互式启动渠道。
 
 > [!TIP]
-> 关于各渠道设置指南、功能矩阵、架构详情和故障排查，请参阅 **[渠道集成指南](https://github.com/EvoScientist/EvoScientist/tree/main/EvoScientist/channels#channels)**。
+> 关于各渠道设置指南、功能矩阵、架构详情和故障排查，请参阅 **[渠道集成指南](https://github.com/zhw-li/QuantumAppAgent/tree/main/tyqa/channels#channels)**。
 
 <p align="right"><a href="#top">🔝回到顶部</a></p>
 
@@ -510,7 +484,7 @@ channel_enabled: "telegram,slack,feishu,qq"
 - [x] 📺 带工作区面板的桌面 WebUI
 
 下一步：
-- [ ] 🏷️ 全栈更名为 `tyqa`（包名、CLI、配置目录、环境变量）
+- [ ] 🏷️ 完成 `tyqa` 迁移后的发布清理（兼容 alias、配置迁移、发布产物）
 - [ ] ⚙️ 接入真实量子硬件后端（超越 cqlib 模拟器）
 - [ ] 🧩 跨领域的更多量子应用示例
 - [ ] 📊 量子应用工作流基准测试套件
@@ -528,7 +502,7 @@ channel_enabled: "telegram,slack,feishu,qq"
 
 TYQA 基于以下优秀的开源项目构建：
 
-- [**EvoScientist**](https://github.com/EvoScientist/EvoScientist) — 本项目所扩展的自进化多智能体框架。
+- [**EvoScientist**](https://arxiv.org/abs/2603.08127) — 启发并奠定本项目基础的原始自进化多智能体 AI Scientist 框架。
 - [**cqlib**](https://github.com/cqlib-quantum/cqlib) — 驱动算法层的量子 SDK（电路、模拟器、QCIS）。
 - [**LangChain**](https://github.com/langchain-ai/langchain) / [**DeepAgents**](https://github.com/langchain-ai/deepagents) / [**LangGraph**](https://github.com/langchain-ai/langgraph) — 智能体框架技术栈。
 

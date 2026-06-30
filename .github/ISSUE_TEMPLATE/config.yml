@@ -1,7 +1,7 @@
 blank_issues_enabled: false
 contact_links:
   - name: EvoSkills — niche features & custom workflows
-    url: https://github.com/EvoScientist/EvoSkills
+    url: https://github.com/tyqa/EvoSkills
     about: Want to add a feature that serves a specific use case rather than all users? Contribute it as an EvoSkill instead.
   - name: Community Discord
     url: https://discord.gg/AZ9ZMXkunY

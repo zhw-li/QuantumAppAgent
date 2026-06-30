@@ -1,23 +1,23 @@
 <div align="center">
     <picture>
-      <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/logo-dark.svg">
-      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/logo-light.svg">
-      <img alt="TYQA Logo" src="https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/logo-dark.svg" width="80%">
+      <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/zhw-li/QuantumAppAgent/main/.github/assets/logo-dark.svg">
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/zhw-li/QuantumAppAgent/main/.github/assets/logo-light.svg">
+      <img alt="TYQA Logo" src="https://raw.githubusercontent.com/zhw-li/QuantumAppAgent/main/.github/assets/logo-dark.svg" width="80%">
     </picture>
 </div>
 
 <div align="center">
-<a href="https://github.com/EvoScientist/EvoScientist/blob/main/LICENSE"><picture>
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/badge-license-light.svg">
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/badge-license-dark.svg">
-  <img alt="License Apache 2.0" src="https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/badge-license-light.svg" height="28">
+<a href="https://github.com/zhw-li/QuantumAppAgent/blob/main/LICENSE"><picture>
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/zhw-li/QuantumAppAgent/main/.github/assets/badge-license-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/zhw-li/QuantumAppAgent/main/.github/assets/badge-license-dark.svg">
+  <img alt="License Apache 2.0" src="https://raw.githubusercontent.com/zhw-li/QuantumAppAgent/main/.github/assets/badge-license-light.svg" height="28">
 </picture></a>
 </div>
 
 ---
 
 <div align="center">
-<a href="https://github.com/zhw-li/TYQA"><img src="https://readme-typing-svg.demolab.com?font=Sans-Serif&pause=1000&color=64B5F6&center=true&vCenter=true&width=435&lines=TianYan+Quantum+Agent;Quantum+Applications%2C+End+to+End" alt="Typing SVG" /></a>
+<a href="https://github.com/zhw-li/QuantumAppAgent"><img src="https://readme-typing-svg.demolab.com?font=Sans-Serif&pause=1000&color=64B5F6&center=true&vCenter=true&width=435&lines=TianYan+Quantum+Agent;Quantum+Applications%2C+End+to+End" alt="Typing SVG" /></a>
 </div>
 
 <div align="center">
@@ -26,11 +26,11 @@
 
 </div>
 
-**TYQA (TianYan Quantum Agent, 天衍量智) is a self-evolving agent framework that moves a research question from idea to a validated quantum application and cloud showcase — end to end.
-Built on the [EvoScientist](https://github.com/EvoScientist/EvoScientist) agent harness and the [cqlib](https://github.com/cqlib-quantum/cqlib) quantum SDK, it orchestrates specialized sub-agents to survey methods, establish classical baselines, build the quantum algorithm, package a runnable application, generate the TianYan (天衍) quantum-cloud showcase UI, and verify the evidence — growing its skills and memory across cycles.**
+**TYQA (TianYan Quantum Agent, 天衍量智) is a self-evolving multi-agent framework for building validated quantum applications and TianYan quantum-cloud showcases end to end.
+It combines planning, research, coding, debugging, analysis, and delivery agents with the [cqlib](https://github.com/cqlib-quantum/cqlib) quantum SDK, so a project can move from business or research intent to classical baselines, quantum methods, backend APIs, QCCP showcase pages, and verification evidence in one reviewable workflow.**
 
 > [!NOTE]
-> The project is rebranding to **tyqa**. For now the Python package name, the `EvoSci` / `evosci` CLI commands, and the `~/.config/evoscientist/` config path still use the upstream `EvoScientist` identifiers and remain fully functional. The full stack rename (package, CLI, config directory, env vars) is tracked as a follow-up.
+> The canonical repository is **`zhw-li/QuantumAppAgent`**. The Python package name, install target, and primary CLI command are lowercase **`tyqa`**; uppercase `TYQA` is kept for display and as a compatibility CLI alias.
 
 ## ✨ Features
 - **🤖 Multi-Agent Team** — 6 sub-agents (plan, research, code, debug, analyze, write) working in concert.
@@ -47,7 +47,7 @@ Built on the [EvoScientist](https://github.com/EvoScientist/EvoScientist) agent 
 
 ## 🧪 Quantum Application Examples
 
-Ready-to-run quantum applications live under [`quantum_app_example/`](./quantum_app_example). Each ships with a classical baseline, a quantum method, a verification report, and a TianYan-cloud SFC showcase page.
+Legacy quantum application demos live under [`quantum_app_example/`](./quantum_app_example). They are useful reference artifacts for classical baselines, quantum methods, verification reports, and TianYan-cloud showcase pages, but they predate the current `application_manifest.json` validator contract and should not be treated as current release-compliant application packages until manifests are added.
 
 | Example | Quantum method | Classical baseline | Primary metric |
 | --- | --- | --- | --- |
@@ -62,11 +62,11 @@ Ready-to-run quantum applications live under [`quantum_app_example/`](./quantum_
 TYQA drives every project through a staged quantum-application lifecycle, composing the right skills at each phase:
 
 ```
-research-survey / paper-navigator   ←  methods, datasets, baselines, prior results
+solution-landscape / evidence-navigator   ←  methods, datasets, baselines, prior results
         │
-research-ideation / paper-planning  ←  application framing, validation & artifact plan
+application-intake / delivery-planning  ←  application framing, validation & artifact plan
         │
-   experiment-pipeline               ←  stage-gated execution (baseline → quantum → app → verify)
+   application-pipeline               ←  stage-gated execution (baseline → quantum → app → verify)
         │
 cqlib-sdk → cqlib-qaoa / cqlib-vqe   ←  quantum algorithm + quantum_report.json
           / cqlib-qml / cqlib-hybrid
@@ -74,11 +74,30 @@ cqlib-sdk → cqlib-qaoa / cqlib-vqe   ←  quantum algorithm + quantum_report.j
 qccp-ui → qccp-frontend /     ←  cloud showcase UI + API/service + deploy evidence
                  qccp-service  ←  FastAPI app service by default; Java qccp-service integration when explicit
         │
-paper-writing / paper-review /       ←  report, README, INTEGRATE notes, slides
-academic-slides
+delivery-writing / delivery-review /       ←  report, README, INTEGRATE notes, slides
+showcase-slides
 ```
 
-Not every project needs every phase — the starting point matches what you already have. The stage gates and skill-routing rules live in [`EvoScientist/skills/experiment-pipeline/SKILL.md`](./EvoScientist/skills/experiment-pipeline/SKILL.md); the built-in quantum-algorithm skills are documented under [`EvoScientist/skills/`](./EvoScientist/skills).
+Not every project needs every phase — the starting point matches what you already have. The stage gates and skill-routing rules live in [`tyqa/skills/application-pipeline/SKILL.md`](./tyqa/skills/application-pipeline/SKILL.md); the built-in quantum-algorithm skills are documented under [`tyqa/skills/`](./tyqa/skills).
+
+### Skill Name Migration
+
+The built-in lifecycle skills were renamed from research-writing names to quantum-application delivery names. There are no compatibility aliases; update local references to the new IDs.
+
+| Old skill ID | New skill ID |
+| --- | --- |
+| `research-ideation` | `application-intake` |
+| `paper-navigator` | `evidence-navigator` |
+| `research-survey` | `solution-landscape` |
+| `paper-planning` | `delivery-planning` |
+| `experiment-pipeline` | `application-pipeline` |
+| `experiment-craft` | `application-debugging` |
+| `experiment-iterative-coder` | `implementation-iteration` |
+| `paper-writing` | `delivery-writing` |
+| `paper-review` | `delivery-review` |
+| `paper-rebuttal` | `stakeholder-response` |
+| `academic-slides` | `showcase-slides` |
+| `evo-memory` | `application-memory` |
 
 ## 📖 Table of Contents
 
@@ -94,122 +113,88 @@ Not every project needs every phase — the starting point matches what you alre
 
 ## 📦 Installation
 
-> [!TIP]
-> Requires **Python 3.11+** (**< 3.14**). We recommend [**uv**](https://docs.astral.sh/uv/) or **conda** for dependency management and virtual environments. Prefer to skip a local Python install entirely? Jump to [🐳 Docker](#-docker).
+> [!IMPORTANT]
+> Requires **Python 3.11 or 3.12** (`>=3.11,<3.13`). The reliable installation path today is **source checkout + editable install**. Do not rely on PyPI, `uv tool install`, or a pre-built Docker image until release artifacts are published and verified.
 
-<details>
-<summary> 🪛 Install uv (if you don't have it)</summary>
-
-```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
-```
-
-</details>
-
-### Quick Install
+### Recommended: source checkout + conda
 
 ```bash
-uv tool install EvoScientist
+git clone https://github.com/zhw-li/QuantumAppAgent.git
+cd QuantumAppAgent
+
+conda create -n tyqa python=3.11 -y
+conda activate tyqa
+
+python -m pip install -U pip
+python -m pip install -e ".[dev]"
 ```
 
-> [!NOTE]
-> To update an existing installation to the latest version, use `uv tool upgrade`:
-> ```bash
-> uv tool upgrade EvoScientist
-> ```
+If you already have the repository checkout, start from `cd QuantumAppAgent`.
 
-Or install into the current environment instead:
+### Alternative: standard venv
 
 ```bash
-uv pip install EvoScientist
+git clone https://github.com/zhw-li/QuantumAppAgent.git
+cd QuantumAppAgent
+
+python3.11 -m venv .venv
+source .venv/bin/activate
+
+python -m pip install -U pip
+python -m pip install -e ".[dev]"
 ```
 
-### Latest from GitHub
-
-To get the latest patches before a [PyPI](https://pypi.org/project/EvoScientist/) release:
+### Verify the install
 
 ```bash
-uv pip install git+https://github.com/EvoScientist/EvoScientist.git
+python -m pytest tests/test_skill_descriptions.py -q
+tyqa -h
 ```
 
-### Development Install
+For broader local validation:
 
 ```bash
-git clone https://github.com/EvoScientist/EvoScientist.git
-cd EvoScientist
-uv sync --dev
+python -m pytest tests/test_prompts.py tests/test_skill_descriptions.py tests/test_quantum_application_validation.py -q
 ```
 
-enable pre-commit hooks:
-```bash
-uv run pre-commit install
-```
-
-<details>
-<summary> Using conda</summary>
+### Update an existing source checkout
 
 ```bash
-conda create -n EvoSci python=3.11 -y
-conda activate EvoSci
-pip install -e ".[dev]"
+git pull
+conda activate tyqa
+python -m pip install -e ".[dev]"
 ```
 
-</details>
+### Optional channel dependencies
 
-<details>
-<summary> Using PyPi</summary>
+Messaging channel integrations require extra dependencies. Install only what you need from the source checkout:
 
 ```bash
-pip install EvoScientist          # quick install
-pip install -e ".[dev]"           # development install
+python -m pip install -e ".[telegram]"     # Telegram
+python -m pip install -e ".[discord]"      # Discord
+python -m pip install -e ".[slack]"        # Slack
+python -m pip install -e ".[wechat]"       # WeChat
+python -m pip install -e ".[qq]"           # QQ
+python -m pip install -e ".[feishu]"       # Feishu
+python -m pip install -e ".[all-channels]" # everything
 ```
-
-</details>
-
-<details>
-<summary> Optional: Channel dependencies</summary>
-
-Messaging channel integrations require extra dependencies. Install only what you need:
-
-```bash
-uv pip install "EvoScientist[telegram]"     # Telegram
-uv pip install "EvoScientist[discord]"      # Discord
-uv pip install "EvoScientist[slack]"        # Slack
-uv pip install "EvoScientist[wechat]"       # WeChat
-uv pip install "EvoScientist[qq]"           # QQ
-uv pip install "EvoScientist[feishu]"       # Feishu
-uv pip install "EvoScientist[all-channels]" # everything
-```
-
-</details>
-
-<details>
-<summary> Upgrade to the latest code base </summary>
-
-```bash
-git pull && uv sync --dev
-```
-
-</details>
 
 ### 🐳 Docker
 
-A pre-built image is published to [GitHub Container Registry](https://github.com/EvoScientist/EvoScientist/pkgs/container/evoscientist) with everything `evosci onboard` would otherwise install for you:
+There is currently **no published, user-ready TYQA Docker image**. The Dockerfile is kept for local packaging checks and controlled deployments. Build the image from this checkout when you need a containerized run:
 
-- Python 3.11, EvoScientist, and the cross-platform messaging channels (i.e., `EvoScientist[all-channels]`)
-- **`uv`** — used by the MCP registry to install Python MCP servers on demand
-- **Node.js 24 LTS + `npx`** — required by the majority of MCP servers
+```bash
+docker build -t tyqa:local .
+```
 
-The **iMessage** channel isn't usable from the container — it requires the `imsg` CLI talking to macOS's Messages.app, which is host-OS-specific. Run the agent directly on macOS if you need iMessage.
-
-Running the agent in a container also **sandboxes the agent's shell access** — file edits and shell commands stay confined to volumes you explicitly mount.
+Then run the locally built image:
 
 ```bash
 docker run -it --rm \
   --env-file .env \
   -v "$(pwd)/workspace:/workspace" \
-  -v evosci-data:/home/evosci/.evoscientist \
-  ghcr.io/evoscientist/evoscientist:latest
+  -v tyqa-data:/home/tyqa/.tyqa \
+  tyqa:local
 ```
 
 What the mounts are for:
@@ -218,44 +203,26 @@ What the mounts are for:
 | --- | --- |
 | `--env-file .env` | API keys (`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, …) |
 | `./workspace:/workspace` | The agent's working directory |
-| `evosci-data:/home/evosci/.evoscientist` | Persistent app state: sessions DB, global skills, memories, and `config.yaml`/`mcp.yaml` |
+| `tyqa-data:/home/tyqa/.tyqa` | Persistent app state: sessions DB, global skills, memories, and `config.yaml`/`mcp.yaml` |
 
 > [!IMPORTANT]
-> The image runs as a non-root user (`evosci`, UID `1000`). For the `./workspace` bind mount, the host directory must be writable by that UID. If your host user ID differs, either `chown -R 1000:1000 ./workspace` once, or pass `--user "$(id -u):$(id -g)"` on every `docker run` so the container takes on your UID.
+> The image runs as a non-root user (`tyqa`, UID `1000`). For the `./workspace` bind mount, the host directory must be writable by that UID. If your host user ID differs, either `chown -R 1000:1000 ./workspace` once, or pass `--user "$(id -u):$(id -g)"` on every `docker run` so the container takes on your UID.
+>
+> The **iMessage** channel is not usable from the container because it needs the `imsg` CLI to communicate with macOS Messages.app. Run TYQA directly on macOS if you need iMessage.
 
-Or use `docker compose` (a starter [`docker-compose.yml`](./docker-compose.yml) is included):
-
-```bash
-docker compose run --rm evoscientist
-```
-
-To build the image locally instead of pulling:
+Or use `docker compose` after building from the local Dockerfile:
 
 ```bash
-docker build -t evoscientist:dev .
+docker compose build
+docker compose run --rm tyqa
 ```
 
 > [!NOTE]
-> Not bundled — install on demand by deriving from the image:
+> Optional extras are not bundled in the local image. Add them only when needed:
 > - **`stt`** (speech-to-text via `faster-whisper`) and **`oauth`** (`ccproxy-api`)
-> - **TinyTeX / LaTeX** (`pdflatex`, `latexmk`) for paper-writing skills
+> - **TinyTeX / LaTeX** (`pdflatex`, `latexmk`) for delivery-writing skills
 >
-> ```dockerfile
-> FROM ghcr.io/evoscientist/evoscientist:latest
->
-> # Python extras
-> USER root
-> RUN uv pip install --python /opt/venv/bin/python "EvoScientist[stt,oauth]"
-> USER evosci
->
-> # TinyTeX
-> # The official install method is `curl | sh`; if you'd rather not
-> # pipe an unpinned remote script into a shell, fetch a specific TinyTeX
-> # release tarball from https://github.com/rstudio/tinytex-releases, verify
-> # its checksum, and extract to /home/evosci/.TinyTeX instead.
-> RUN curl -sL https://yihui.org/tinytex/install-bin-unix.sh | sh \
->  && /home/evosci/.TinyTeX/bin/*/tlmgr install latexmk
-> ```
+> Prefer adding Python extras directly in the project Dockerfile's `uv sync` step so the image is built from the same source checkout. For LaTeX, install a pinned TinyTeX or system TeX package in a derived image only when delivery-writing workflows require it.
 
 <p align="right"><a href="#top">🔝Back to top</a></p>
 
@@ -264,14 +231,14 @@ docker build -t evoscientist:dev .
 The easiest way to configure API keys is the interactive wizard:
 
 ```bash
-EvoSci onboard
+tyqa onboard
 ```
 
 > [!TIP]
 > It walks you through provider selection, key validation, model choice, and workspace mode.
 > Supports OAuth sign-in for CLI coding agent subscribers — no API key needed.
 
-![onboard](https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/EvoScientist_onboard.png)
+![onboard](https://raw.githubusercontent.com/zhw-li/QuantumAppAgent/main/.github/assets/tyqa_onboard.png)
 
 <details>
 <summary> 📟 Manual configuration via environment variables </summary>
@@ -291,7 +258,7 @@ export NVIDIA_API_KEY="nvapi-..."   # NIM    — build.nvidia.com
 export TAVILY_API_KEY="tvly-..."    # app.tavily.com
 ```
 
-Or use `EvoSci config set` to persist keys in `~/.config/evoscientist/config.yaml`.
+Or use `tyqa config set` to persist keys in `~/.config/tyqa/config.yaml`.
 
 Alternatively, copy the example `.env` file for project-level configuration:
 
@@ -308,30 +275,30 @@ cp .env.example .env  # then fill in your keys
 ## ⚡ Quick Start
 
 ```bash
-EvoSci  # or EvoScientist — interactive mode (TUI by default)
+tyqa  # or TYQA — interactive mode (TUI by default)
 ```
 
-![demo](https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/EvoScientist_cli.png)
+![demo](https://raw.githubusercontent.com/zhw-li/QuantumAppAgent/main/.github/assets/tyqa_cli.png)
 
-> Run `EvoSci -h` for all CLI options.
+> Run `tyqa -h` for all CLI options.
 
-![cli help](https://raw.githubusercontent.com/EvoScientist/EvoScientist/main/.github/assets/EvoScientist_cli_help.png)
+![cli help](https://raw.githubusercontent.com/zhw-li/QuantumAppAgent/main/.github/assets/tyqa_cli_help.png)
 
 > [!TIP]
-> Prefer a browser? Run `EvoSci --ui webui` for the web workspace UI. Need to copy long outputs? Use `--ui cli` for classic mode where native terminal copy works freely. On macOS, [iTerm2](https://iterm2.com/) users can also hold `⌥ Option` while dragging to select, then `⌘+C`.
+> Prefer a browser? Run `tyqa --ui webui` for the web workspace UI. Need to copy long outputs? Use `--ui cli` for classic mode where native terminal copy works freely. On macOS, [iTerm2](https://iterm2.com/) users can also hold `⌥ Option` while dragging to select, then `⌘+C`.
 
 <details>
 <summary>Common examples</summary>
 
 ```bash
-EvoSci                            # interactive mode (TUI by default)
-EvoSci -p "your question"        # single-shot mode
-EvoSci --workdir /path/to/project # open in a specific directory
-EvoSci -m run                     # isolated per-session workspace
-EvoSci --ui cli                   # classic CLI (lightweight)
-EvoSci --ui webui                 # browser workspace UI (needs Node/npx)
-EvoSci serve                      # headless mode — channels only, no interactive prompt
-EvoSci deploy                     # standalone LangGraph server for external UIs / SDK clients
+tyqa                            # interactive mode (TUI by default)
+tyqa -p "your question"        # single-shot mode
+tyqa --workdir /path/to/project # open in a specific directory
+tyqa -m run                     # isolated per-session workspace
+tyqa --ui cli                   # classic CLI (lightweight)
+tyqa --ui webui                 # browser workspace UI (needs Node/npx)
+tyqa serve                      # headless mode — channels only, no interactive prompt
+tyqa deploy                     # standalone LangGraph server for external UIs / SDK clients
 ```
 
 </details>
@@ -339,12 +306,12 @@ EvoSci deploy                     # standalone LangGraph server for external UIs
 <details>
 <summary>Desktop WebUI</summary>
 
-Set the UI backend to `webui` and a fresh `EvoSci` session launches a deploy-style LangGraph server **and** the [`@evoscientist/webui`](https://www.npmjs.com/package/@evoscientist/webui) front-end in one terminal — no second process to manage:
+Set the UI backend to `webui` and a fresh `tyqa` session launches a deploy-style LangGraph server **and** the [`@evoscientist/webui`](https://www.npmjs.com/package/@evoscientist/webui) front-end in one terminal — no second process to manage:
 
 ```bash
-EvoSci config set ui_backend webui   # persist; or one-off with `EvoSci --ui webui`
-EvoSci                               # opens http://localhost:4716
-EvoSci config set webui_port 4800    # change the front-end port (must differ from the langgraph dev port)
+tyqa config set ui_backend webui   # persist; or one-off with `tyqa --ui webui`
+tyqa                               # opens http://localhost:4716
+tyqa config set webui_port 4800    # change the front-end port (must differ from the langgraph dev port)
 ```
 
 Requires **Node.js 24 LTS** (for `npx`); the first launch downloads `@evoscientist/webui` and needs network. Note: the WebUI does not show your CLI/TUI chat history, and `-p` / `--resume` fall back to the classic CLI.
@@ -358,14 +325,14 @@ By default, shell commands (`execute` tool) require human approval before runnin
 
 ```bash
 # Per-session: auto-approve via CLI flag
-EvoSci --auto-approve
-EvoSci -p "query" --auto-approve
+tyqa --auto-approve
+tyqa -p "query" --auto-approve
 
 # Persistent: set in config (applies to all future sessions)
-EvoSci config set auto_approve true
+tyqa config set auto_approve true
 
 # Or allow only specific command prefixes
-EvoSci config set shell_allow_list "python,pip,pytest,ruff,git"
+tyqa config set shell_allow_list "python,pip,pytest,ruff,git"
 ```
 
 During a session you can also reply **3** (Approve all) at any approval prompt to auto-approve for the rest of that session.
@@ -374,8 +341,8 @@ During a session you can also reply **3** (Approve all) at any approval prompt t
 > **Dangerous mode** lifts the workspace sandbox entirely — the agent can read, write, and delete files **anywhere on the real filesystem** (privileged commands like `sudo`/`rm -rf /` are still blocked). It implies `--auto-approve` (no prompts). Use only when you fully trust the task.
 >
 > ```bash
-> EvoSci --dangerous                       # per-session
-> EvoSci config set dangerous_mode true    # persistent
+> tyqa --dangerous                       # per-session
+> tyqa config set dangerous_mode true    # persistent
 > ```
 
 </details>
@@ -387,10 +354,10 @@ The agent can proactively ask you questions when it needs clarification (e.g., d
 
 ```bash
 # Persistent: set in config
-EvoSci config set enable_ask_user false
+tyqa config set enable_ask_user false
 
 # Re-enable
-EvoSci config set enable_ask_user true
+tyqa config set enable_ask_user true
 ```
 
 </details>
@@ -420,14 +387,14 @@ EvoSci config set enable_ask_user true
 <summary>Script Inference</summary>
 
 ```python
-from EvoScientist import EvoScientist_agent
+from tyqa import tyqa_agent
 from langchain_core.messages import HumanMessage
-from EvoScientist.utils import format_messages
+from tyqa.utils import format_messages
 
 thread = {"configurable": {"thread_id": "1"}}
 last_len = 0
 
-for state in EvoScientist_agent.stream(
+for state in tyqa_agent.stream(
     {"messages": [HumanMessage(content="Hi?")]},
     config=thread,
     stream_mode="values",
@@ -445,7 +412,7 @@ for state in EvoScientist_agent.stream(
 ## 🍪 Examples & Recipes
 
 - **Quantum applications** — see [`quantum_app_example/`](./quantum_app_example) for the five end-to-end QAOA / VQE / QRC showcases above.
-- **Other examples & recipes** — a curated collection of usage patterns and deployment recipes: 👉 [browse all](https://github.com/EvoScientist/EvoScientist/tree/main/docs#-examples--recipes)
+- **Other examples & recipes** — a curated collection of usage patterns and deployment recipes: 👉 [browse all](https://github.com/zhw-li/QuantumAppAgent/tree/main/docs#-examples--recipes)
 
 <p align="right"><a href="#top">🔝Back to top</a></p>
 
@@ -455,14 +422,14 @@ Add external tools via [MCP](https://modelcontextprotocol.io/) servers with a si
 
 ```bash
 # Usage
-EvoSci mcp add <name> <command> [-- args...]
+tyqa mcp add <name> <command> [-- args...]
 
 # Example
-EvoSci mcp add sequential-thinking npx -- -y @modelcontextprotocol/server-sequential-thinking
+tyqa mcp add sequential-thinking npx -- -y @modelcontextprotocol/server-sequential-thinking
 ```
 
 > [!TIP]
-> For command options, config fields, tool routing, wildcard filtering, and troubleshooting, see the **[MCP Integration Guide](https://github.com/EvoScientist/EvoScientist/tree/main/EvoScientist/mcp#model-context-protocol-integration)**.
+> For command options, config fields, tool routing, wildcard filtering, and troubleshooting, see the **[MCP Integration Guide](https://github.com/zhw-li/QuantumAppAgent/tree/main/tyqa/mcp#model-context-protocol-integration)**.
 
 <p align="right"><a href="#top">🔝Back to top</a></p>
 
@@ -472,10 +439,10 @@ Connect messaging platforms so they share the same agent session as the CLI:
 
 ```bash
 # Usage
-EvoSci channel setup <channel>
+tyqa channel setup <channel>
 
 # Example
-EvoSci channel setup telegram
+tyqa channel setup telegram
 ```
 
 Multiple channels can run concurrently — comma-separate names in the config:
@@ -487,7 +454,7 @@ channel_enabled: "telegram,slack,feishu,qq"
 The channel can also be started interactively with `/channel` in the CLI session.
 
 > [!TIP]
-> For per-channel setup guides, capability matrix, architecture details, and troubleshooting, see the **[Channel Integration Guide](https://github.com/EvoScientist/EvoScientist/tree/main/EvoScientist/channels#channels)**.
+> For per-channel setup guides, capability matrix, architecture details, and troubleshooting, see the **[Channel Integration Guide](https://github.com/zhw-li/QuantumAppAgent/tree/main/tyqa/channels#channels)**.
 
 <p align="right"><a href="#top">🔝Back to top</a></p>
 
@@ -504,7 +471,7 @@ Done:
 - [x] 📺 Desktop WebUI with workspace panels
 
 Coming next:
-- [ ] 🏷️ Full-stack rename to `tyqa` (package, CLI, config directory, env vars)
+- [ ] 🏷️ Finish release cleanup after the `tyqa` migration (compatibility aliases, config migration, published artifacts)
 - [ ] ⚙️ Real quantum-hardware backends (beyond the cqlib simulator)
 - [ ] 🧩 More quantum application examples across domains
 - [ ] 📊 Benchmark suite for quantum-application workflows
@@ -522,7 +489,7 @@ We welcome contributions from developers, researchers, and AI coding agents. Our
 
 TYQA is built on outstanding open-source works:
 
-- [**EvoScientist**](https://github.com/EvoScientist/EvoScientist) — The self-evolving multi-agent harness this project extends.
+- [**EvoScientist**](https://arxiv.org/abs/2603.08127) — The original self-evolving multi-agent AI scientist framework that inspired and seeded this project.
 - [**cqlib**](https://github.com/cqlib-quantum/cqlib) — The quantum SDK powering the algorithm layer (circuits, simulators, QCIS).
 - [**LangChain**](https://github.com/langchain-ai/langchain) / [**DeepAgents**](https://github.com/langchain-ai/deepagents) / [**LangGraph**](https://github.com/langchain-ai/langgraph) — The agent framework stack.
 

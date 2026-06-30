@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 from typing import Any
 from unittest.mock import MagicMock
 
-from EvoScientist.stream.events import stream_agent_events
+from tyqa.stream.events import stream_agent_events
 from tests.conftest import run_async
 
 

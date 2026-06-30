@@ -1,4 +1,4 @@
-"""Tests for ``EvoScientist.subagents._factory.build_async_subagent_graph``.
+"""Tests for ``tyqa.subagents._factory.build_async_subagent_graph``.
 
 Pins the integration contract that the factory must request middleware
 in async-safe mode (``for_async_subagent=True``). Without this, a future
@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock, patch
 
-from EvoScientist.config import MemoryObservationWriter
+from tyqa.config import MemoryObservationWriter
 
 
 def _single_middleware(subagent: dict, class_name: str):
@@ -21,12 +21,12 @@ def _single_middleware(subagent: dict, class_name: str):
 
 
 def _assert_subagent_memory_middleware(subagent: dict, *, source_agent: str) -> None:
-    from EvoScientist.middleware.memory_lifecycle import MemoryLifecycleRole
+    from tyqa.middleware.memory_lifecycle import MemoryLifecycleRole
 
-    memory_middleware = _single_middleware(subagent, "EvoMemoryMiddleware")
+    memory_middleware = _single_middleware(subagent, "TYQAMemoryMiddleware")
     lifecycle_middleware = _single_middleware(
         subagent,
-        "EvoMemoryLifecycleMiddleware",
+        "TYQAMemoryLifecycleMiddleware",
     )
 
     assert [tool.name for tool in memory_middleware.tools] == ["record_observation"]
@@ -36,13 +36,13 @@ def _assert_subagent_memory_middleware(subagent: dict, *, source_agent: str) -> 
 
 
 @patch("deepagents.create_deep_agent")
-@patch("EvoScientist.EvoScientist._load_mcp_tools_cached", return_value={})
-@patch("EvoScientist.EvoScientist._get_default_middleware", return_value=[])
-@patch("EvoScientist.EvoScientist._get_default_backend")
-@patch("EvoScientist.EvoScientist._ensure_chat_model")
-@patch("EvoScientist.utils.load_subagents")
-@patch("EvoScientist.config.apply_config_to_env")
-@patch("EvoScientist.config.get_effective_config")
+@patch("tyqa.agent_graph._load_mcp_tools_cached", return_value={})
+@patch("tyqa.agent_graph._get_default_middleware", return_value=[])
+@patch("tyqa.agent_graph._get_default_backend")
+@patch("tyqa.agent_graph._ensure_chat_model")
+@patch("tyqa.utils.load_subagents")
+@patch("tyqa.config.apply_config_to_env")
+@patch("tyqa.config.get_effective_config")
 def test_factory_requests_async_safe_middleware(
     mock_get_cfg,
     mock_apply_env,
@@ -82,7 +82,7 @@ def test_factory_requests_async_safe_middleware(
     # chainable so the factory's terminal ``.with_config(...)`` doesn't blow up.
     mock_create.return_value.with_config.return_value = MagicMock()
 
-    from EvoScientist.subagents._factory import build_async_subagent_graph
+    from tyqa.subagents._factory import build_async_subagent_graph
 
     build_async_subagent_graph("writing-agent")
 
@@ -103,11 +103,11 @@ def test_factory_requests_async_safe_middleware(
     )
 
 
-@patch("EvoScientist.EvoScientist._ensure_chat_model")
+@patch("tyqa.agent_graph._ensure_chat_model")
 def test_inject_subagent_adds_memory_middleware(mock_model, tmp_path):
     mock_model.return_value = MagicMock(profile={"max_input_tokens": 200_000})
 
-    from EvoScientist.EvoScientist import _inject_subagent_middleware
+    from tyqa.agent_graph import _inject_subagent_middleware
 
     workspace = tmp_path / "workspace"
     workspace.mkdir()
@@ -118,8 +118,8 @@ def test_inject_subagent_adds_memory_middleware(mock_model, tmp_path):
     _assert_subagent_memory_middleware(subs[0], source_agent="test-agent")
 
 
-@patch("EvoScientist.EvoScientist._ensure_chat_model")
-@patch("EvoScientist.EvoScientist._ensure_config")
+@patch("tyqa.agent_graph._ensure_chat_model")
+@patch("tyqa.agent_graph._ensure_config")
 def test_inject_subagent_omits_memory_middleware_when_memory_disabled(
     mock_config, mock_model, tmp_path
 ):
@@ -133,7 +133,7 @@ def test_inject_subagent_omits_memory_middleware_when_memory_disabled(
     cfg.auxiliary_provider = ""
     mock_config.return_value = cfg
 
-    from EvoScientist.EvoScientist import _inject_subagent_middleware
+    from tyqa.agent_graph import _inject_subagent_middleware
 
     workspace = tmp_path / "workspace"
     workspace.mkdir()
@@ -144,12 +144,12 @@ def test_inject_subagent_omits_memory_middleware_when_memory_disabled(
     assert not [
         m
         for m in subs[0]["middleware"]
-        if type(m).__name__ in {"EvoMemoryMiddleware", "EvoMemoryLifecycleMiddleware"}
+        if type(m).__name__ in {"TYQAMemoryMiddleware", "TYQAMemoryLifecycleMiddleware"}
     ]
 
 
-@patch("EvoScientist.EvoScientist._ensure_chat_model")
-@patch("EvoScientist.EvoScientist._ensure_config")
+@patch("tyqa.agent_graph._ensure_chat_model")
+@patch("tyqa.agent_graph._ensure_config")
 def test_inject_subagent_worker_only_observation_writer_keeps_live_tool_off(
     mock_config, mock_model, tmp_path
 ):
@@ -163,8 +163,8 @@ def test_inject_subagent_worker_only_observation_writer_keeps_live_tool_off(
     cfg.auxiliary_provider = ""
     mock_config.return_value = cfg
 
-    from EvoScientist.EvoScientist import _inject_subagent_middleware
-    from EvoScientist.middleware.memory_lifecycle import MemoryLifecycleRole
+    from tyqa.agent_graph import _inject_subagent_middleware
+    from tyqa.middleware.memory_lifecycle import MemoryLifecycleRole
 
     workspace = tmp_path / "workspace"
     workspace.mkdir()
@@ -172,21 +172,21 @@ def test_inject_subagent_worker_only_observation_writer_keeps_live_tool_off(
 
     _inject_subagent_middleware(subs, workspace_dir=workspace)
 
-    memory_middleware = _single_middleware(subs[0], "EvoMemoryMiddleware")
+    memory_middleware = _single_middleware(subs[0], "TYQAMemoryMiddleware")
     lifecycle_middleware = _single_middleware(
         subs[0],
-        "EvoMemoryLifecycleMiddleware",
+        "TYQAMemoryLifecycleMiddleware",
     )
     assert memory_middleware.tools == []
     assert lifecycle_middleware._role == MemoryLifecycleRole.SUBAGENT
 
 
 @patch(
-    "EvoScientist.middleware.create_tool_selector_middleware",
+    "tyqa.middleware.create_tool_selector_middleware",
     return_value=[MagicMock()],
 )
-@patch("EvoScientist.EvoScientist._ensure_chat_model")
-@patch("EvoScientist.EvoScientist._ensure_config")
+@patch("tyqa.agent_graph._ensure_chat_model")
+@patch("tyqa.agent_graph._ensure_config")
 def test_all_observation_writer_skips_turn_worker_without_profile_memory(
     mock_config, mock_chat, mock_tool_selector
 ):
@@ -204,16 +204,16 @@ def test_all_observation_writer_skips_turn_worker_without_profile_memory(
     mock_config.return_value = cfg
     mock_chat.return_value = MagicMock(profile={"max_input_tokens": 200_000})
 
-    from EvoScientist.EvoScientist import _get_default_middleware
+    from tyqa.agent_graph import _get_default_middleware
 
     middleware = _get_default_middleware()
     memory_middleware = next(
-        m for m in middleware if type(m).__name__ == "EvoMemoryMiddleware"
+        m for m in middleware if type(m).__name__ == "TYQAMemoryMiddleware"
     )
 
     assert [tool.name for tool in memory_middleware.tools] == ["record_observation"]
     assert not any(
-        type(m).__name__ == "EvoMemoryLifecycleMiddleware" for m in middleware
+        type(m).__name__ == "TYQAMemoryLifecycleMiddleware" for m in middleware
     )
 
 
@@ -224,7 +224,7 @@ def test_configured_system_prompt_matches_live_observation_tool():
     cfg.memory_observation_writer = MemoryObservationWriter.WORKER
     cfg.memory_workers_enabled = True
 
-    from EvoScientist.EvoScientist import _configured_system_prompt
+    from tyqa.agent_graph import _configured_system_prompt
 
     prompt = _configured_system_prompt(cfg)
 
@@ -244,11 +244,11 @@ def test_configured_system_prompt_matches_live_observation_tool():
 
 
 @patch(
-    "EvoScientist.middleware.create_tool_selector_middleware",
+    "tyqa.middleware.create_tool_selector_middleware",
     return_value=[MagicMock()],
 )
-@patch("EvoScientist.EvoScientist._ensure_chat_model")
-@patch("EvoScientist.EvoScientist._ensure_config")
+@patch("tyqa.agent_graph._ensure_chat_model")
+@patch("tyqa.agent_graph._ensure_config")
 def test_async_subagent_mode_filters_ask_user(
     mock_config, mock_chat, mock_tool_selector
 ):
@@ -274,8 +274,8 @@ def test_async_subagent_mode_filters_ask_user(
     mock_config.return_value = cfg
     mock_chat.return_value = MagicMock(profile={"max_input_tokens": 200_000})
 
-    from EvoScientist.EvoScientist import _get_default_middleware
-    from EvoScientist.middleware.ask_user import AskUserMiddleware
+    from tyqa.agent_graph import _get_default_middleware
+    from tyqa.middleware.ask_user import AskUserMiddleware
 
     # CLI / in-process path includes AskUserMiddleware …
     cli_mw = _get_default_middleware()
