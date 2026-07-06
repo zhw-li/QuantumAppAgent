@@ -1,17 +1,9 @@
 <div align="center">
-    <picture>
-      <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/zhw-li/QuantumAppAgent/main/.github/assets/logo-dark.svg">
-      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/zhw-li/QuantumAppAgent/main/.github/assets/logo-light.svg">
-      <img alt="TYQA Logo" src="https://raw.githubusercontent.com/zhw-li/QuantumAppAgent/main/.github/assets/logo-dark.svg" width="80%">
-    </picture>
+    <img alt="TYQA Logo" src=".github/assets/logo-light.png" width="320">
 </div>
 
 <div align="center">
-<a href="https://github.com/zhw-li/QuantumAppAgent/blob/main/LICENSE"><picture>
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/zhw-li/QuantumAppAgent/main/.github/assets/badge-license-light.svg">
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/zhw-li/QuantumAppAgent/main/.github/assets/badge-license-dark.svg">
-  <img alt="License Apache 2.0" src="https://raw.githubusercontent.com/zhw-li/QuantumAppAgent/main/.github/assets/badge-license-light.svg" height="28">
-</picture></a>
+<a href="./LICENSE">Apache-2.0 License</a>
 </div>
 
 ---
@@ -80,36 +72,48 @@ showcase-slides
 
 Not every project needs every phase — the starting point matches what you already have. The stage gates and skill-routing rules live in [`tyqa/skills/application-pipeline/SKILL.md`](./tyqa/skills/application-pipeline/SKILL.md); the built-in quantum-algorithm skills are documented under [`tyqa/skills/`](./tyqa/skills).
 
-### Skill Name Migration
+### Built-in Lifecycle Skills
 
-The built-in lifecycle skills were renamed from research-writing names to quantum-application delivery names. There are no compatibility aliases; update local references to the new IDs.
+The built-in lifecycle skills define TYQA's quantum-application delivery phases and reusable agent capabilities.
 
-| Old skill ID | New skill ID |
-| --- | --- |
-| `research-ideation` | `application-intake` |
-| `paper-navigator` | `evidence-navigator` |
-| `research-survey` | `solution-landscape` |
-| `paper-planning` | `delivery-planning` |
-| `experiment-pipeline` | `application-pipeline` |
-| `experiment-craft` | `application-debugging` |
-| `experiment-iterative-coder` | `implementation-iteration` |
-| `paper-writing` | `delivery-writing` |
-| `paper-review` | `delivery-review` |
-| `paper-rebuttal` | `stakeholder-response` |
-| `academic-slides` | `showcase-slides` |
-| `evo-memory` | `application-memory` |
+| skill ID |
+| --- |
+| `application-intake` |
+| `evidence-navigator` |
+| `solution-landscape` |
+| `delivery-planning` |
+| `application-pipeline` |
+| `application-debugging` |
+| `implementation-iteration` |
+| `delivery-writing` |
+| `delivery-review` |
+| `stakeholder-response` |
+| `showcase-slides` |
+| `application-memory` |
 
 ## 📖 Table of Contents
 
+- [✨ Features](#-features)
+- [🧪 Quantum Application Examples](#-quantum-application-examples)
+- [🏗️ Framework Architecture](#️-framework-architecture)
+  - [Built-in Lifecycle Skills](#built-in-lifecycle-skills)
+- [📖 Table of Contents](#-table-of-contents)
 - [📦 Installation](#-installation)
+  - [Recommended: source checkout + conda](#recommended-source-checkout--conda)
+  - [Alternative: standard venv](#alternative-standard-venv)
+  - [Verify the install](#verify-the-install)
+  - [Update an existing source checkout](#update-an-existing-source-checkout)
+  - [Optional channel dependencies](#optional-channel-dependencies)
+  - [🐳 Docker](#-docker)
 - [🔑 Configuration](#-configuration)
 - [⚡ Quick Start](#-quick-start)
-- [🍪 Examples & Recipes](#-examples--recipes)
+- [🍪 Examples \& Recipes](#-examples--recipes)
 - [🔌 MCP Integration](#-mcp-integration)
 - [📱 Channels](#-channels)
-- [🎯 Roadmap](#-ᯓ-roadmap)
+- [🎯 ᯓ➤ Roadmap](#-ᯓ-roadmap)
 - [🤝 Contributing](#-contributing)
 - [📚 Acknowledgments](#-acknowledgments)
+- [📜 License](#-license)
 
 ## 📦 Installation
 
@@ -238,8 +242,6 @@ tyqa onboard
 > It walks you through provider selection, key validation, model choice, and workspace mode.
 > Supports OAuth sign-in for CLI coding agent subscribers — no API key needed.
 
-![onboard](https://raw.githubusercontent.com/zhw-li/QuantumAppAgent/main/.github/assets/tyqa_onboard.png)
-
 <details>
 <summary> 📟 Manual configuration via environment variables </summary>
 
@@ -278,11 +280,11 @@ cp .env.example .env  # then fill in your keys
 tyqa  # or TYQA — interactive mode (TUI by default)
 ```
 
-![demo](https://raw.githubusercontent.com/zhw-li/QuantumAppAgent/main/.github/assets/tyqa_cli.png)
+![demo](.github/assets/tyqa_cli.png)
 
 > Run `tyqa -h` for all CLI options.
 
-![cli help](https://raw.githubusercontent.com/zhw-li/QuantumAppAgent/main/.github/assets/tyqa_cli_help.png)
+![cli help](.github/assets/tyqa_cli_help.png)
 
 > [!TIP]
 > Prefer a browser? Run `tyqa --ui webui` for the web workspace UI. Need to copy long outputs? Use `--ui cli` for classic mode where native terminal copy works freely. On macOS, [iTerm2](https://iterm2.com/) users can also hold `⌥ Option` while dragging to select, then `⌘+C`.
@@ -412,7 +414,7 @@ for state in tyqa_agent.stream(
 ## 🍪 Examples & Recipes
 
 - **Quantum applications** — see [`quantum_app_example/`](./quantum_app_example) for the five end-to-end QAOA / VQE / QRC showcases above.
-- **Other examples & recipes** — a curated collection of usage patterns and deployment recipes: 👉 [browse all](https://github.com/zhw-li/QuantumAppAgent/tree/main/docs#-examples--recipes)
+- **Other examples & recipes** — a curated collection of usage patterns and deployment recipes: 👉 [browse all](docs/README.md)
 
 <p align="right"><a href="#top">🔝Back to top</a></p>
 

@@ -1,17 +1,9 @@
 <div align="center">
-    <picture>
-      <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/zhw-li/QuantumAppAgent/main/.github/assets/logo-dark.svg">
-      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/zhw-li/QuantumAppAgent/main/.github/assets/logo-light.svg">
-      <img alt="TYQA Logo" src=".github/assets/TYQA.png" width="80%">
-    </picture>
+    <img alt="TYQA Logo" src=".github/assets/logo-light.png" width="320">
 </div>
 
 <div align="center">
-<a href="https://github.com/zhw-li/QuantumAppAgent/blob/main/LICENSE"><picture>
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/zhw-li/QuantumAppAgent/main/.github/assets/badge-license-light.svg">
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/zhw-li/QuantumAppAgent/main/.github/assets/badge-license-dark.svg">
-  <img alt="License Apache 2.0" src="https://raw.githubusercontent.com/zhw-li/QuantumAppAgent/main/.github/assets/badge-license-light.svg" height="28">
-</picture></a>
+<a href="./LICENSE">Apache-2.0 License</a>
 </div>
 
 ---
@@ -81,7 +73,7 @@ showcase-slides
 
 并非每个项目都需要走完全部阶段——起点取决于你已有的内容。阶段门禁与技能路由规则详见 [`tyqa/skills/application-pipeline/SKILL.md`](./tyqa/skills/application-pipeline/SKILL.md)；内置量子算法技能文档位于 [`tyqa/skills/`](./tyqa/skills)。
 
-### Skill
+### 内置生命周期 Skill
 
 内置生命周期 skill。
 
@@ -105,7 +97,7 @@ showcase-slides
 - [✨ 特性](#-特性)
 - [🧪 量子应用示例](#-量子应用示例)
 - [🏗️ 框架架构](#️-框架架构)
-  - [Skill](#skill)
+  - [内置生命周期 Skill](#内置生命周期-skill)
 - [📖 目录](#-目录)
 - [📦 安装](#-安装)
   - [推荐方式：源码 checkout + conda](#推荐方式源码-checkout--conda)
@@ -251,8 +243,6 @@ tyqa onboard
 > 向导将引导你完成供应商选择、密钥验证、模型选择和工作区模式设置。
 > 支持 CLI 编程智能体订阅用户通过 OAuth 直连——无需 API Key。
 
-![onboard](https://raw.githubusercontent.com/zhw-li/QuantumAppAgent/main/.github/assets/tyqa_onboard.png)
-
 <details>
 <summary> 📟 通过环境变量手动配置</summary>
 
@@ -291,11 +281,11 @@ cp .env.example .env  # 填入你的密钥
 tyqa  # 或 TYQA — 交互模式（默认 TUI）
 ```
 
-![demo](https://raw.githubusercontent.com/zhw-li/QuantumAppAgent/main/.github/assets/tyqa_cli.png)
+![demo](.github/assets/tyqa_cli.png)
 
 > 运行 `tyqa -h` 查看全部 CLI 选项。
 
-![cli help](https://raw.githubusercontent.com/zhw-li/QuantumAppAgent/main/.github/assets/tyqa_cli_help.png)
+![cli help](.github/assets/tyqa_cli_help.png)
 
 > [!TIP]
 > 想用浏览器？运行 `tyqa --ui webui` 打开 Web 工作区界面。需要复制长输出？使用 `--ui cli` 切换到经典模式，即可使用终端原生复制。macOS [iTerm2](https://iterm2.com/) 用户也可以按住 `⌥ Option` 拖选文字，再 `⌘+C` 复制。

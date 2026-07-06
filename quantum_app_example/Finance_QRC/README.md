@@ -121,7 +121,7 @@ Finance_QRC/
 
 ## 标准产物（7 件套）
 
-本应用遵循 EvoScientist `experiment-pipeline` 标准，产物齐全：
+本应用遵循 TYQA `experiment-pipeline` 标准，产物齐全：
 
 | 产物 | 路径 | 说明 |
 |------|------|------|
