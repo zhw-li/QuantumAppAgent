@@ -38,6 +38,7 @@ bridge/package-lock.json
 .langgraph_api/
 .bg_processes/
 workspace/
+paper/
 skills/
 !tyqa/skills/
 !tyqa/skills/**
