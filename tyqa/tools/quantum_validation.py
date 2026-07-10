@@ -8,6 +8,7 @@ import sys
 import importlib.util
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 from langchain_core.tools import tool
 
@@ -221,7 +222,7 @@ def _extract_api_paths(text: str) -> set[str]:
     paths: set[str] = set()
     for match in re.finditer(r"['\"](/api/[A-Za-z0-9_./{}:-]+)['\"]", text):
         paths.add(_normalize_endpoint_path(match.group(1)))
-    for match in re.finditer(r"(?<![\w])(/api/[A-Za-z0-9_./{}:-]+)", text):
+    for match in re.finditer(r"(?<![\w@])(/api/[A-Za-z0-9_./{}:-]+)", text):
         paths.add(_normalize_endpoint_path(match.group(1)))
 
     api_base_match = re.search(r"API_BASE\s*=\s*['\"](/api[^'\"]*)['\"]", text)
@@ -253,6 +254,29 @@ def _extract_external_resource_urls(text: str) -> set[str]:
     return urls
 
 
+def _extract_http_urls(text: str) -> set[str]:
+    return {
+        match.group(1).rstrip(".,);")
+        for match in re.finditer(r"\b(https?://[^\s'\"<>`)]+)", text)
+    }
+
+
+def _extract_hardcoded_frontend_urls(text: str) -> set[str]:
+    return _extract_http_urls(text)
+
+
+def _extract_forbidden_local_urls(text: str, *, allowed_urls: set[str] | None = None) -> set[str]:
+    allowed_urls = {url.rstrip("/") for url in (allowed_urls or set()) if isinstance(url, str)}
+    urls: set[str] = set()
+    for url in _extract_http_urls(text):
+        if url.rstrip("/") in allowed_urls:
+            continue
+        host = (urlparse(url).hostname or "").lower()
+        if host in {"localhost", "127.0.0.1", "0.0.0.0"}:
+            urls.add(url)
+    return urls
+
+
 def _extract_local_urls(text: str) -> set[str]:
     urls = set()
     for match in re.finditer(r"(?<![\w])(/(?:api|static)/[A-Za-z0-9_./{}:-]+)", text):
@@ -271,6 +295,23 @@ def _extract_hex_colors(text: str) -> set[str]:
 
 def _contains_emoji(text: str) -> bool:
     return re.search(r"[\U0001F300-\U0001FAFF]", text) is not None
+
+
+def _contains_cjk(text: str) -> bool:
+    return re.search(r"[\u4e00-\u9fff]", text) is not None
+
+
+def _remove_html_comments(text: str) -> str:
+    return re.sub(r"<!--.*?-->", "", text, flags=re.S)
+
+
+def _remove_js_comments(text: str) -> str:
+    text = re.sub(r"/\*.*?\*/", "", text, flags=re.S)
+    return re.sub(r"^\s*//.*$", "", text, flags=re.M)
+
+
+def _active_source_text(text: str) -> str:
+    return _remove_js_comments(_remove_html_comments(text))
 
 
 def _stable_equal(left: Any, right: Any) -> bool:
@@ -341,6 +382,68 @@ def _profile_layers(profile: str) -> tuple[str, ...]:
     return PROFILE_LAYERS.get(profile, PROFILE_LAYERS["full_delivery"])
 
 
+def _network_contract(manifest: dict[str, Any] | None) -> dict[str, Any]:
+    return _as_dict(_nested_get(manifest, "network"))
+
+
+def _validate_network_contract(
+    manifest: dict[str, Any] | None,
+    profile: str,
+    checks: list[dict[str, Any]],
+    blockers: list[str],
+) -> None:
+    layers = _profile_layers(profile)
+    required = "local_demo" in layers
+    network = _network_contract(manifest)
+    invalid: list[str] = []
+    if not network:
+        if required:
+            invalid.append("network")
+    else:
+        mode = network.get("mode")
+        bind_host = network.get("bind_host")
+        bind_port = network.get("bind_port")
+        public_scheme = network.get("public_scheme")
+        public_host = network.get("public_host")
+        public_port = network.get("public_port")
+        public_base_url = network.get("public_base_url")
+        api_base = network.get("api_base")
+        frontend_serving = network.get("frontend_serving")
+
+        if mode != "single_origin":
+            invalid.append("network.mode")
+        if not isinstance(bind_host, str) or not bind_host.strip():
+            invalid.append("network.bind_host")
+        if not isinstance(bind_port, int) or isinstance(bind_port, bool) or not 1 <= bind_port <= 65535:
+            invalid.append("network.bind_port")
+        if public_scheme not in {"http", "https"}:
+            invalid.append("network.public_scheme")
+        if not isinstance(public_host, str) or not public_host.strip():
+            invalid.append("network.public_host")
+        if not isinstance(public_port, int) or isinstance(public_port, bool) or not 1 <= public_port <= 65535:
+            invalid.append("network.public_port")
+        if not isinstance(api_base, str) or not api_base.startswith("/api"):
+            invalid.append("network.api_base")
+        if frontend_serving != "backend_static":
+            invalid.append("network.frontend_serving")
+        if isinstance(public_base_url, str):
+            expected = f"{public_scheme}://{public_host}:{public_port}"
+            if public_base_url.rstrip("/") != expected:
+                invalid.append("network.public_base_url")
+        else:
+            invalid.append("network.public_base_url")
+
+    checks.append(
+        {
+            "name": "network.single_origin_contract",
+            "status": "passed" if not invalid else "blocked",
+            "missing_or_invalid": invalid,
+        }
+    )
+    if invalid:
+        _add_blocker(blockers, "network", "generated app network contract is invalid: " + ", ".join(invalid))
+
+
 def _validate_application_manifest(
     app_path: Path,
     manifest: dict[str, Any] | None,
@@ -381,9 +484,17 @@ def _validate_application_manifest(
         if not _is_present(manifest.get("local_demo")):
             missing.append("local_demo")
         else:
-            for field in ("backend_entrypoint", "entrypoint", "endpoints", "static_assets"):
+            for field in ("backend_entrypoint", "entrypoint", "endpoints"):
                 if not _is_present(_nested_get(manifest, "local_demo", field)):
                     missing.append(f"local_demo.{field}")
+            static_assets = _nested_get(manifest, "local_demo", "static_assets")
+            if static_assets is None or not isinstance(static_assets, list):
+                missing.append("local_demo.static_assets")
+            for field in ("ui_profile", "language"):
+                if not _is_present(_nested_get(manifest, "local_demo", field)):
+                    missing.append(f"local_demo.{field}")
+        if not _is_present(manifest.get("network")):
+            missing.append("network")
     if "qccp_web" in layers:
         if not _is_present(manifest.get("qccp_web")):
             missing.append("qccp_web")
@@ -540,9 +651,83 @@ def _local_demo_source_text(app_path: Path, manifest: dict[str, Any] | None) -> 
         parts.append(_read_text(entrypoint))
     for asset in _local_demo_assets(manifest):
         asset_path = _resolve_app_ref(app_path, asset.get("path"))
-        if asset_path and asset_path.is_file() and asset_path.suffix.lower() == ".js":
+        if asset_path and asset_path.is_file() and asset_path.suffix.lower() in {".css", ".js"}:
             parts.append(_read_text(asset_path))
     return "\n".join(parts)
+
+
+def _backend_uses_configured_bind(source: str) -> bool:
+    if "uvicorn.run" not in source:
+        return True
+    return (
+        "APP_BIND_HOST" in source
+        and "APP_BIND_PORT" in source
+        and not re.search(r"port\s*=\s*(?:8080|8000|5000)\b", source)
+    )
+
+
+def _validate_local_demo_ui_profile(
+    app_path: Path,
+    manifest: dict[str, Any] | None,
+    checks: list[dict[str, Any]],
+    blockers: list[str],
+) -> None:
+    invalid: list[str] = []
+    local_demo = _as_dict(_nested_get(manifest, "local_demo"))
+    ui_profile = local_demo.get("ui_profile")
+    language = local_demo.get("language")
+    text = _local_demo_source_text(app_path, manifest)
+    active_text = _active_source_text(text)
+
+    if ui_profile != "qccp-ui-standalone":
+        invalid.append("local_demo.ui_profile")
+    if language != "zh-CN":
+        invalid.append("local_demo.language")
+
+    html_lang = re.search(r"<html[^>]*\blang=['\"]([^'\"]+)['\"]", active_text, re.I)
+    if html_lang and html_lang.group(1).lower() in {"en", "en-us"}:
+        invalid.append(f"local_demo.ui.lang:{html_lang.group(1)}")
+    if not _contains_cjk(active_text):
+        invalid.append("local_demo.ui.language:zh-CN")
+
+    for phrase in (
+        "Run Baseline",
+        "Run VQE",
+        "Compare Results",
+        "Compare Baseline",
+        "Quantum Application",
+    ):
+        if phrase in active_text:
+            invalid.append(f"local_demo.ui.english_copy:{phrase}")
+
+    if _contains_emoji(active_text):
+        invalid.append("local_demo.ui:emoji")
+    if re.search(r"linear-gradient|radial-gradient", active_text, re.I):
+        invalid.append("local_demo.ui:gradient")
+
+    colors = _extract_hex_colors(active_text)
+    if colors and not colors.intersection(ALLOWED_QCCP_HEX_COLORS):
+        invalid.append("local_demo.ui.tokens")
+    unexpected_colors = sorted(colors - ALLOWED_QCCP_HEX_COLORS)
+    invalid.extend(f"local_demo.ui.color:{color}" for color in unexpected_colors)
+    for radius in re.findall(r"border-radius\s*:\s*(\d+)px", active_text):
+        if int(radius) not in {4, 6, 8}:
+            invalid.append(f"local_demo.ui.radius:{radius}px")
+
+    checks.append(
+        {
+            "name": "local_demo.ui_profile",
+            "status": "passed" if not invalid else "blocked",
+            "missing_or_invalid": invalid,
+        }
+    )
+    if invalid:
+        _add_blocker(
+            blockers,
+            "local_demo",
+            "local demo UI profile violates qccp-ui standalone spec: "
+            + ", ".join(invalid),
+        )
 
 
 def _load_fastapi_test_client(app_path: Path, manifest: dict[str, Any] | None) -> tuple[Any | None, str | None]:
@@ -586,6 +771,7 @@ def _validate_local_demo(
     layer = "local_demo"
     _validate_backend_contract(app_path, manifest, checks, blockers, layer=layer)
     _validate_static_assets(app_path, manifest, checks, blockers, layer=layer)
+    _validate_local_demo_ui_profile(app_path, manifest, checks, blockers)
 
     invalid: list[str] = []
     text = _local_demo_source_text(app_path, manifest)
@@ -600,6 +786,14 @@ def _validate_local_demo(
     frontend_api_paths = _extract_api_paths(text)
     drift = sorted(frontend_api_paths - endpoint_paths)
     invalid.extend(f"local_demo.api_path:{path}" for path in drift)
+    hardcoded_urls = sorted(_extract_hardcoded_frontend_urls(text))
+    invalid.extend(f"local_demo.hardcoded_url:{url}" for url in hardcoded_urls)
+
+    backend_entrypoint = _resolve_app_ref(app_path, _nested_get(manifest, "local_demo", "backend_entrypoint"))
+    if backend_entrypoint and backend_entrypoint.is_file():
+        backend_source = _read_text(backend_entrypoint)
+        if not _backend_uses_configured_bind(backend_source):
+            invalid.append("local_demo.backend_bind:env")
 
     client, load_error = _load_fastapi_test_client(app_path, manifest)
     if load_error:
@@ -652,7 +846,13 @@ def _qccp_source_text(app_path: Path, manifest: dict[str, Any] | None) -> tuple[
     if not sfc_path or not sfc_path.is_file():
         return "", sfc_path
     text = _read_text(sfc_path)
+    component_dir = sfc_path.parent / "components"
+    if component_dir.is_dir():
+        for component_path in sorted(component_dir.rglob("*.vue")):
+            text += "\n" + _read_text(component_path)
     api_path = _resolve_app_ref(app_path, _nested_get(manifest, "qccp_web", "api_module"))
+    if not api_path:
+        api_path = _resolve_app_ref(app_path, _nested_get(manifest, "qccp_web", "api_module_path"))
     if not api_path:
         api_path = _resolve_app_ref(app_path, _nested_get(manifest, "frontend", "qccp", "api_module"))
     if api_path and api_path.is_file():
@@ -678,6 +878,7 @@ def _validate_qccp_frontend(
     if not sfc_path or not sfc_path.is_file():
         invalid.append("qccp_web.sfc:file")
     else:
+        active_text = _active_source_text(text)
         if "<script setup" not in text:
             invalid.append("qccp_web.sfc:script_setup")
         if not re.search(r"<style[^>]*scoped[^>]*lang=['\"]scss['\"]|<style[^>]*lang=['\"]scss['\"][^>]*scoped", text):
@@ -700,6 +901,15 @@ def _validate_qccp_frontend(
         drift = sorted(frontend_paths - backend_paths)
         if drift:
             invalid.extend(f"qccp_web.api_path:{path}" for path in drift)
+        hardcoded_urls = sorted(_extract_hardcoded_frontend_urls(text))
+        invalid.extend(f"qccp_web.hardcoded_url:{url}" for url in hardcoded_urls)
+        if re.search(r"\bqcis\b", active_text, re.I):
+            uses_qcis_graph = (
+                re.search(r"import\s+QcisGraph\b", active_text) is not None
+                and re.search(r"<QcisGraph\b", active_text) is not None
+            )
+            if not uses_qcis_graph:
+                invalid.append("qccp_web.qcis_graph")
         if "echarts" in text.lower():
             if not re.search(r"import\s+(?:\*\s+as\s+)?echarts|from ['\"]echarts['\"]", text):
                 invalid.append("qccp_web.echarts:import")
@@ -729,13 +939,17 @@ def _validate_qccp_ui_evidence(
     if not sfc_path or not sfc_path.is_file():
         invalid.append("qccp_web.sfc:file")
     else:
-        if _contains_emoji(text):
+        active_text = _active_source_text(text)
+        if _contains_emoji(active_text):
             invalid.append("qccp_web.ui:emoji")
-        if re.search(r"linear-gradient|radial-gradient", text, re.I):
+        if re.search(r"linear-gradient|radial-gradient", active_text, re.I):
             invalid.append("qccp_web.ui:gradient")
-        unexpected_colors = sorted(_extract_hex_colors(text) - ALLOWED_QCCP_HEX_COLORS)
+        colors = _extract_hex_colors(active_text)
+        if not colors.intersection(ALLOWED_QCCP_HEX_COLORS) and "var(--" not in active_text:
+            invalid.append("qccp_web.ui.tokens")
+        unexpected_colors = sorted(colors - ALLOWED_QCCP_HEX_COLORS)
         invalid.extend(f"qccp_web.ui.color:{color}" for color in unexpected_colors)
-        for radius in re.findall(r"border-radius\s*:\s*(\d+)px", text):
+        for radius in re.findall(r"border-radius\s*:\s*(\d+)px", active_text):
             if int(radius) not in {4, 6, 8}:
                 invalid.append(f"qccp_web.ui.radius:{radius}px")
 
@@ -758,6 +972,8 @@ def _validate_docs_consistency(
 ) -> None:
     invalid: list[str] = []
     backend_paths = _endpoint_set(manifest)
+    public_base_url = _network_contract(manifest).get("public_base_url")
+    public_base_seen = False
     static_paths = {
         _normalize_endpoint_path(asset["url"])
         for asset in _local_demo_assets(manifest)
@@ -771,6 +987,13 @@ def _validate_docs_consistency(
         if not path.is_file():
             continue
         text = _read_text(path)
+        if isinstance(public_base_url, str) and public_base_url in text:
+            public_base_seen = True
+        if "network.public_base_url" in text or "public_base_url" in text:
+            public_base_seen = True
+        allowed_urls = {public_base_url} if isinstance(public_base_url, str) else set()
+        forbidden_local_urls = sorted(_extract_forbidden_local_urls(text, allowed_urls=allowed_urls))
+        invalid.extend(f"{name}.local_url:{url}" for url in forbidden_local_urls)
         drift = sorted(_extract_api_paths(text) - backend_paths)
         invalid.extend(f"{name}.endpoint:{api_path}" for api_path in drift)
         static_drift = sorted(
@@ -780,6 +1003,17 @@ def _validate_docs_consistency(
         invalid.extend(f"{name}.static:{static_path}" for static_path in static_drift)
         if name == "INTEGRATE.md" and isinstance(qccp_route, str) and qccp_route not in text:
             invalid.append("INTEGRATE.md.route")
+        if name == "INTEGRATE.md" and "QcisGraph" in text:
+            qccp_source, _ = _qccp_source_text(app_path, manifest)
+            active_qccp_source = _active_source_text(qccp_source)
+            if not (
+                re.search(r"import\s+QcisGraph\b", active_qccp_source)
+                and re.search(r"<QcisGraph\b", active_qccp_source)
+            ):
+                invalid.append("INTEGRATE.md.component:QcisGraph")
+    if "local_demo" in _profile_layers(_delivery_profile(manifest, require_packaging=True)):
+        if isinstance(public_base_url, str) and not public_base_seen:
+            invalid.append("docs.public_base_url")
 
     checks.append(
         {
@@ -919,6 +1153,7 @@ def validate_quantum_application_artifacts(
         checks,
         blockers,
     )
+    _validate_network_contract(manifest, profile, checks, blockers)
 
     _validate_report_schema("baseline_report", baseline, checks, blockers, layer="algorithm")
     _validate_report_schema("quantum_report", quantum, checks, blockers, layer="algorithm")

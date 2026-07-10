@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import logging
 import os
+import re
 from dataclasses import asdict, dataclass, fields
 from enum import StrEnum
 from pathlib import Path
@@ -160,6 +161,17 @@ class TYQAConfig:
     # pairing with the langgraph dev port that it connects to. The backend keeps
     # its own port (langgraph_dev_port); this is just the browser server.
     webui_port: int = 4716
+
+    # Generated quantum application service settings. These are for artifacts
+    # produced by TYQA (local FastAPI demos/full delivery), not for TYQA's own
+    # WebUI or langgraph dev server.
+    generated_app_network_mode: str = "single_origin"
+    generated_app_bind_host: str = "0.0.0.0"
+    generated_app_bind_port: int = 8080
+    generated_app_public_scheme: str = "http"
+    generated_app_public_host: str = "10.9.1.8"
+    generated_app_public_port: int = 8080
+    generated_app_api_base: str = "/api"
 
     # Whether langgraph dev persists its runtime state to .langgraph_api/ next
     # to the subprocess cwd. True (default) keeps async-task, scheduler, and
@@ -397,6 +409,35 @@ class TYQAConfig:
         if self.dangerous_mode:
             self.auto_approve = True
 
+        for port_field in ("generated_app_bind_port", "generated_app_public_port"):
+            port = getattr(self, port_field)
+            if not isinstance(port, int) or isinstance(port, bool) or not 1 <= port <= 65535:
+                logging.getLogger(__name__).warning(
+                    "Invalid %s %r; falling back to 8080.", port_field, port
+                )
+                setattr(self, port_field, 8080)
+
+        if self.generated_app_network_mode != "single_origin":
+            logging.getLogger(__name__).warning(
+                "Invalid generated_app_network_mode %r; falling back to single_origin.",
+                self.generated_app_network_mode,
+            )
+            self.generated_app_network_mode = "single_origin"
+        if self.generated_app_public_scheme not in {"http", "https"}:
+            logging.getLogger(__name__).warning(
+                "Invalid generated_app_public_scheme %r; falling back to http.",
+                self.generated_app_public_scheme,
+            )
+            self.generated_app_public_scheme = "http"
+        if not str(self.generated_app_bind_host).strip():
+            self.generated_app_bind_host = "0.0.0.0"
+        if not str(self.generated_app_public_host).strip():
+            self.generated_app_public_host = "10.9.1.8"
+        api_base = str(self.generated_app_api_base or "/api").strip()
+        if not api_base.startswith("/"):
+            api_base = "/" + api_base
+        self.generated_app_api_base = re.sub(r"/+", "/", api_base).rstrip("/") or "/api"
+
         try:
             writer = MemoryObservationWriter(
                 str(self.memory_observation_writer).strip().lower()
@@ -577,7 +618,11 @@ def set_config_value(key: str, value: Any) -> bool:
 
     # __post_init__ only clamps on load, so validate here too. Reject bool before coercion
     # (_coerce_value(True, int) would turn it into 1 and slip past).
-    if key == "sandbox_execute_timeout" and isinstance(value, bool):
+    if key in {
+        "sandbox_execute_timeout",
+        "generated_app_bind_port",
+        "generated_app_public_port",
+    } and isinstance(value, bool):
         return False
 
     try:
@@ -587,6 +632,23 @@ def set_config_value(key: str, value: Any) -> bool:
 
     if key == "sandbox_execute_timeout" and value <= 0:
         return False
+    if key in {"generated_app_bind_port", "generated_app_public_port"} and not (
+        1 <= value <= 65535
+    ):
+        return False
+    if key == "generated_app_network_mode" and value != "single_origin":
+        return False
+    if key == "generated_app_public_scheme" and value not in {"http", "https"}:
+        return False
+    if key in {"generated_app_bind_host", "generated_app_public_host"} and not str(
+        value
+    ).strip():
+        return False
+    if key == "generated_app_api_base":
+        value = str(value).strip()
+        if not value.startswith("/"):
+            return False
+        value = re.sub(r"/+", "/", value).rstrip("/") or "/api"
     if key == "memory_observation_writer":
         try:
             value = MemoryObservationWriter(str(value).strip().lower())
@@ -605,6 +667,24 @@ def list_config() -> dict[str, Any]:
         Dictionary of all configuration key-value pairs.
     """
     return _config_to_dict(load_config())
+
+
+def generated_app_network_contract(config: TYQAConfig) -> dict[str, Any]:
+    """Return the network contract used for generated application artifacts."""
+    return {
+        "mode": config.generated_app_network_mode,
+        "bind_host": config.generated_app_bind_host,
+        "bind_port": config.generated_app_bind_port,
+        "public_scheme": config.generated_app_public_scheme,
+        "public_host": config.generated_app_public_host,
+        "public_port": config.generated_app_public_port,
+        "public_base_url": (
+            f"{config.generated_app_public_scheme}://"
+            f"{config.generated_app_public_host}:{config.generated_app_public_port}"
+        ),
+        "api_base": config.generated_app_api_base,
+        "frontend_serving": "backend_static",
+    }
 
 
 # =============================================================================
@@ -655,6 +735,13 @@ _ENV_MAPPINGS = {
     "enable_async_subagents": "TYQA_ENABLE_ASYNC_SUBAGENTS",
     "langgraph_dev_port": "TYQA_LANGGRAPH_DEV_PORT",
     "webui_port": "TYQA_WEBUI_PORT",
+    "generated_app_network_mode": "TYQA_GENERATED_APP_NETWORK_MODE",
+    "generated_app_bind_host": "TYQA_GENERATED_APP_BIND_HOST",
+    "generated_app_bind_port": "TYQA_GENERATED_APP_BIND_PORT",
+    "generated_app_public_scheme": "TYQA_GENERATED_APP_PUBLIC_SCHEME",
+    "generated_app_public_host": "TYQA_GENERATED_APP_PUBLIC_HOST",
+    "generated_app_public_port": "TYQA_GENERATED_APP_PUBLIC_PORT",
+    "generated_app_api_base": "TYQA_GENERATED_APP_API_BASE",
     "code_interpreter_timeout": "TYQA_CODE_INTERPRETER_TIMEOUT",
     "code_interpreter_max_result_chars": "TYQA_CODE_INTERPRETER_MAX_RESULT_CHARS",
     "sandbox_execute_timeout": "TYQA_SANDBOX_EXECUTE_TIMEOUT",
@@ -787,3 +874,24 @@ def apply_config_to_env(config: TYQAConfig) -> None:
         "TYQA_USE_RESPONSES_API"
     ):
         os.environ["TYQA_USE_RESPONSES_API"] = config.use_responses_api
+    app_env = {
+        "TYQA_GENERATED_APP_NETWORK_MODE": config.generated_app_network_mode,
+        "TYQA_GENERATED_APP_BIND_HOST": config.generated_app_bind_host,
+        "TYQA_GENERATED_APP_BIND_PORT": str(config.generated_app_bind_port),
+        "TYQA_GENERATED_APP_PUBLIC_SCHEME": config.generated_app_public_scheme,
+        "TYQA_GENERATED_APP_PUBLIC_HOST": config.generated_app_public_host,
+        "TYQA_GENERATED_APP_PUBLIC_PORT": str(config.generated_app_public_port),
+        "TYQA_GENERATED_APP_API_BASE": config.generated_app_api_base,
+        "APP_BIND_HOST": config.generated_app_bind_host,
+        "APP_BIND_PORT": str(config.generated_app_bind_port),
+        "APP_PUBLIC_SCHEME": config.generated_app_public_scheme,
+        "APP_PUBLIC_HOST": config.generated_app_public_host,
+        "APP_PUBLIC_PORT": str(config.generated_app_public_port),
+        "APP_PUBLIC_BASE_URL": generated_app_network_contract(config)[
+            "public_base_url"
+        ],
+        "APP_API_BASE": config.generated_app_api_base,
+    }
+    for key, value in app_env.items():
+        if value and not os.environ.get(key):
+            os.environ[key] = value

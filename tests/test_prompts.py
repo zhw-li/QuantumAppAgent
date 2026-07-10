@@ -44,6 +44,14 @@ class TestGetSystemPrompt:
         result = get_system_prompt()
         assert "Sub-Agent Delegation" in result
 
+    def test_accepts_generated_app_network_context(self):
+        result = get_system_prompt(
+            generated_app_network_context="# Generated Application Network Contract\n- public_base_url: `http://10.9.1.8:8080`"
+        )
+
+        assert "Generated Application Network Contract" in result
+        assert "http://10.9.1.8:8080" in result
+
     def test_quantum_application_workflow_replaces_research_addendum(self):
         result = get_system_prompt()
         assert "Research Lifecycle" not in result
@@ -56,6 +64,7 @@ class TestGetSystemPrompt:
             "success signals",
             "verification_report.md",
             "application_manifest.json",
+            "network",
             "delivery_profile",
             "cqlib-sdk",
             "qccp-frontend",

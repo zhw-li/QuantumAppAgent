@@ -12,6 +12,7 @@ from tyqa.config import (
     MemoryObservationTarget,
     MemoryObservationWriter,
     apply_config_to_env,
+    generated_app_network_contract,
     get_config_dir,
     get_config_path,
     get_config_value,
@@ -29,21 +30,36 @@ from tyqa.config import (
 
 
 @pytest.fixture(autouse=True)
-def _restore_dangerous_env():
-    """Snapshot/restore TYQA_DANGEROUS_MODE around every test.
+def _restore_direct_env_writes():
+    """Snapshot/restore env vars written directly by apply_config_to_env.
 
-    apply_config_to_env writes this var via direct ``os.environ`` assignment, and
-    monkeypatch's ``delenv`` of an originally-absent key records no undo — so
-    without this, a test that turns dangerous mode on would leak the env var into
-    later tests (an order-dependent landmine, e.g. under pytest-randomly).
+    monkeypatch cannot undo keys written through direct ``os.environ`` assignment.
     """
     _sentinel = object()
-    _prev = os.environ.get("TYQA_DANGEROUS_MODE", _sentinel)
+    keys = [
+        "TYQA_DANGEROUS_MODE",
+        "TYQA_GENERATED_APP_NETWORK_MODE",
+        "TYQA_GENERATED_APP_BIND_HOST",
+        "TYQA_GENERATED_APP_BIND_PORT",
+        "TYQA_GENERATED_APP_PUBLIC_SCHEME",
+        "TYQA_GENERATED_APP_PUBLIC_HOST",
+        "TYQA_GENERATED_APP_PUBLIC_PORT",
+        "TYQA_GENERATED_APP_API_BASE",
+        "APP_BIND_HOST",
+        "APP_BIND_PORT",
+        "APP_PUBLIC_SCHEME",
+        "APP_PUBLIC_HOST",
+        "APP_PUBLIC_PORT",
+        "APP_PUBLIC_BASE_URL",
+        "APP_API_BASE",
+    ]
+    previous = {key: os.environ.get(key, _sentinel) for key in keys}
     yield
-    if _prev is _sentinel:
-        os.environ.pop("TYQA_DANGEROUS_MODE", None)
-    else:
-        os.environ["TYQA_DANGEROUS_MODE"] = _prev
+    for key, value in previous.items():
+        if value is _sentinel:
+            os.environ.pop(key, None)
+        else:
+            os.environ[key] = value
 
 
 @pytest.fixture
@@ -72,6 +88,20 @@ def temp_config_dir(tmp_path, monkeypatch):
         "TYQA_AUXILIARY_PROVIDER",
         "TYQA_OPENROUTER_ANTHROPIC_PROMPT_CACHE",
         "TYQA_DANGEROUS_MODE",
+        "TYQA_GENERATED_APP_NETWORK_MODE",
+        "TYQA_GENERATED_APP_BIND_HOST",
+        "TYQA_GENERATED_APP_BIND_PORT",
+        "TYQA_GENERATED_APP_PUBLIC_SCHEME",
+        "TYQA_GENERATED_APP_PUBLIC_HOST",
+        "TYQA_GENERATED_APP_PUBLIC_PORT",
+        "TYQA_GENERATED_APP_API_BASE",
+        "APP_BIND_HOST",
+        "APP_BIND_PORT",
+        "APP_PUBLIC_SCHEME",
+        "APP_PUBLIC_HOST",
+        "APP_PUBLIC_PORT",
+        "APP_PUBLIC_BASE_URL",
+        "APP_API_BASE",
     ]:
         monkeypatch.delenv(key, raising=False)
     return config_dir
@@ -95,6 +125,20 @@ def clean_env(monkeypatch):
         "TYQA_AUXILIARY_PROVIDER",
         "TYQA_OPENROUTER_ANTHROPIC_PROMPT_CACHE",
         "TYQA_DANGEROUS_MODE",
+        "TYQA_GENERATED_APP_NETWORK_MODE",
+        "TYQA_GENERATED_APP_BIND_HOST",
+        "TYQA_GENERATED_APP_BIND_PORT",
+        "TYQA_GENERATED_APP_PUBLIC_SCHEME",
+        "TYQA_GENERATED_APP_PUBLIC_HOST",
+        "TYQA_GENERATED_APP_PUBLIC_PORT",
+        "TYQA_GENERATED_APP_API_BASE",
+        "APP_BIND_HOST",
+        "APP_BIND_PORT",
+        "APP_PUBLIC_SCHEME",
+        "APP_PUBLIC_HOST",
+        "APP_PUBLIC_PORT",
+        "APP_PUBLIC_BASE_URL",
+        "APP_API_BASE",
     ]:
         monkeypatch.delenv(key, raising=False)
 
@@ -129,6 +173,13 @@ class TestTYQAConfig:
         assert config.channel_debug_tracing is False
         assert config.imessage_enabled is False
         assert config.imessage_allowed_senders == ""
+        assert config.generated_app_network_mode == "single_origin"
+        assert config.generated_app_bind_host == "0.0.0.0"
+        assert config.generated_app_bind_port == 8080
+        assert config.generated_app_public_scheme == "http"
+        assert config.generated_app_public_host == "10.9.1.8"
+        assert config.generated_app_public_port == 8080
+        assert config.generated_app_api_base == "/api"
 
     def test_auth_mode_default(self):
         """Test that anthropic_auth_mode defaults to api_key."""
@@ -163,6 +214,64 @@ class TestTYQAConfig:
         assert config.provider == "openai"
         assert config.model == "gpt-4o"
         assert config.default_mode == "run"
+
+    def test_generated_app_network_contract_defaults(self):
+        config = TYQAConfig()
+
+        assert generated_app_network_contract(config) == {
+            "mode": "single_origin",
+            "bind_host": "0.0.0.0",
+            "bind_port": 8080,
+            "public_scheme": "http",
+            "public_host": "10.9.1.8",
+            "public_port": 8080,
+            "public_base_url": "http://10.9.1.8:8080",
+            "api_base": "/api",
+            "frontend_serving": "backend_static",
+        }
+
+    def test_generated_app_network_config_get_set(self, temp_config_dir, clean_env):
+        save_config(TYQAConfig())
+
+        assert set_config_value("generated_app_public_host", "10.9.1.9") is True
+        assert set_config_value("generated_app_public_port", "8082") is True
+        assert set_config_value("generated_app_api_base", "/quantum-api") is True
+        assert get_config_value("generated_app_public_host") == "10.9.1.9"
+        assert get_config_value("generated_app_public_port") == 8082
+        assert get_config_value("generated_app_api_base") == "/quantum-api"
+
+    def test_generated_app_network_config_rejects_invalid_values(
+        self, temp_config_dir, clean_env
+    ):
+        save_config(TYQAConfig())
+
+        assert set_config_value("generated_app_bind_port", "0") is False
+        assert set_config_value("generated_app_public_port", "70000") is False
+        assert set_config_value("generated_app_public_scheme", "ftp") is False
+        assert set_config_value("generated_app_network_mode", "split_origin") is False
+        assert set_config_value("generated_app_api_base", "api") is False
+
+    def test_generated_app_network_env_overrides_file(
+        self, temp_config_dir, monkeypatch
+    ):
+        save_config(TYQAConfig(generated_app_public_host="10.9.1.8"))
+        monkeypatch.setenv("TYQA_GENERATED_APP_PUBLIC_HOST", "10.9.1.99")
+        monkeypatch.setenv("TYQA_GENERATED_APP_PUBLIC_PORT", "8090")
+
+        config = get_effective_config()
+
+        assert config.generated_app_public_host == "10.9.1.99"
+        assert config.generated_app_public_port == 8090
+
+    def test_generated_app_network_applied_to_env(self, clean_env):
+        config = TYQAConfig(generated_app_public_host="10.9.1.88")
+
+        apply_config_to_env(config)
+
+        assert os.environ["TYQA_GENERATED_APP_PUBLIC_HOST"] == "10.9.1.88"
+        assert os.environ["APP_BIND_HOST"] == "0.0.0.0"
+        assert os.environ["APP_BIND_PORT"] == "8080"
+        assert os.environ["APP_PUBLIC_BASE_URL"] == "http://10.9.1.88:8080"
 
     def test_dangerous_mode_default(self):
         """dangerous_mode defaults off and does not force auto_approve."""

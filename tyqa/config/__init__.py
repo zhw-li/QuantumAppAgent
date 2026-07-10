@@ -14,6 +14,7 @@ from .settings import (
     MemoryObservationTarget,
     MemoryObservationWriter,
     apply_config_to_env,
+    generated_app_network_contract,
     get_config_dir,
     get_config_path,
     get_config_value,
@@ -31,6 +32,7 @@ __all__ = [
     "MemoryObservationTarget",
     "MemoryObservationWriter",
     "apply_config_to_env",
+    "generated_app_network_contract",
     # settings
     "get_config_dir",
     "get_config_path",

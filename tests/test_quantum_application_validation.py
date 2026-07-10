@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 from tyqa.tools.quantum_validation import (
@@ -73,14 +74,68 @@ def params():
 
 
 app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR / "static")), name="static")
+
+
+if __name__ == "__main__":
+    import os
+    import uvicorn
+
+    uvicorn.run(
+        app,
+        host=os.getenv("APP_BIND_HOST", "0.0.0.0"),
+        port=int(os.getenv("APP_BIND_PORT", "8080")),
+    )
 """.strip(),
         encoding="utf-8",
     )
     (tmp_path / "frontend" / "index.html").write_text(
-        """<link rel="stylesheet" href="/static/style.css"><script src="/static/app.js"></script>""",
+        """
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>VQLS本地演示</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/app.js"></script>
+</head>
+<body>
+  <main class="demo-page">
+    <section class="demo-card">
+      <h1>VQLS本地演示</h1>
+      <p>天衍云量子应用本地验证页面</p>
+      <button>运行求解</button>
+    </section>
+  </main>
+</body>
+</html>
+""".strip(),
         encoding="utf-8",
     )
-    (tmp_path / "frontend" / "static" / "style.css").write_text("body{}", encoding="utf-8")
+    (tmp_path / "frontend" / "static" / "style.css").write_text(
+        """
+body {
+  margin: 0;
+  color: #020814;
+  background: #F4F7FC;
+  font-family: "Alibaba PuHuiTi 3.0", Arial, sans-serif;
+}
+.demo-page {
+  padding: 60px 140px 140px;
+}
+.demo-card {
+  background: #FFFFFF;
+  border: 1px solid #DCE0EB;
+  border-radius: 8px;
+  padding: 30px;
+}
+button {
+  background: #1664FF;
+  color: #FFFFFF;
+  border-radius: 4px;
+}
+""".strip(),
+        encoding="utf-8",
+    )
     (tmp_path / "frontend" / "static" / "app.js").write_text("console.log('ok')", encoding="utf-8")
     sfc = tmp_path / "qccp" / "src" / "views" / "solution" / "vqlsSolver" / "index.vue"
     sfc.write_text(
@@ -96,6 +151,7 @@ app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR / "static")), name="
 import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import * as echarts from 'echarts'
+import { solve as solveApi } from '@/api/vqlsSolver/index'
 
 const { t } = useI18n()
 const chartRef = ref(null)
@@ -149,10 +205,15 @@ onBeforeUnmount(() => {
         "export const solve = (request) => request({ url: '/solve', method: 'post' })\n",
         encoding="utf-8",
     )
-    (tmp_path / "verification_report.md").write_text("verified /api/solve", encoding="utf-8")
-    (tmp_path / "README.md").write_text("demo endpoint /api/solve", encoding="utf-8")
+    public_base_url = "http://10.9.1.8:8080"
+    (tmp_path / "verification_report.md").write_text(
+        f"verified {public_base_url} /api/solve", encoding="utf-8"
+    )
+    (tmp_path / "README.md").write_text(
+        f"open {public_base_url}; demo endpoint /api/solve", encoding="utf-8"
+    )
     (tmp_path / "INTEGRATE.md").write_text(
-        "qccp route /solution/vqlsSolver uses /api/solve and /api/params",
+        f"open {public_base_url}; qccp route /solution/vqlsSolver uses /api/solve and /api/params",
         encoding="utf-8",
     )
     _write_json(
@@ -163,6 +224,17 @@ onBeforeUnmount(() => {
                 "name": "Fixture VQLS",
                 "task": "classification",
                 "primary_metric": "accuracy",
+            },
+            "network": {
+                "mode": "single_origin",
+                "bind_host": "0.0.0.0",
+                "bind_port": 8080,
+                "public_scheme": "http",
+                "public_host": "10.9.1.8",
+                "public_port": 8080,
+                "public_base_url": public_base_url,
+                "api_base": "/api",
+                "frontend_serving": "backend_static",
             },
             "artifacts": {
                 "requirements.json": "requirements.json",
@@ -177,6 +249,8 @@ onBeforeUnmount(() => {
                 "backend_entrypoint": "backend/main.py",
                 "app_symbol": "app",
                 "entrypoint": "frontend/index.html",
+                "ui_profile": "qccp-ui-standalone",
+                "language": "zh-CN",
                 "endpoints": [
                     {
                         "path": "/api/solve",
@@ -365,6 +439,104 @@ def test_local_fastapi_demo_profile_blocks_cdn_dependencies(tmp_path):
     assert any("[local_demo]" in blocker and "external_resource" in blocker for blocker in result["blockers"])
 
 
+def test_local_fastapi_demo_profile_requires_network_contract(tmp_path):
+    _complete_app(tmp_path)
+    manifest_path = tmp_path / "application_manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["delivery_profile"] = "local_fastapi_demo"
+    manifest.pop("network")
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+    result = validate_quantum_application_artifacts(str(tmp_path))
+
+    assert result["status"] == "blocked"
+    assert any("[network]" in blocker and "network" in blocker for blocker in result["blockers"])
+
+
+def test_local_fastapi_demo_profile_blocks_hardcoded_frontend_url(tmp_path):
+    _complete_app(tmp_path)
+    manifest_path = tmp_path / "application_manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["delivery_profile"] = "local_fastapi_demo"
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    app_js = tmp_path / "frontend" / "static" / "app.js"
+    app_js.write_text(
+        "fetch('http://localhost:8080/api/solve', { method: 'POST' })",
+        encoding="utf-8",
+    )
+
+    result = validate_quantum_application_artifacts(str(tmp_path))
+
+    assert result["status"] == "blocked"
+    assert any("hardcoded_url:http://localhost:8080/api/solve" in blocker for blocker in result["blockers"])
+
+
+def test_local_fastapi_demo_profile_requires_env_driven_backend_bind(tmp_path):
+    _complete_app(tmp_path)
+    backend = tmp_path / "backend" / "main.py"
+    backend.write_text(
+        backend.read_text(encoding="utf-8").replace(
+            'port=int(os.getenv("APP_BIND_PORT", "8080"))',
+            "port=8080",
+        ),
+        encoding="utf-8",
+    )
+
+    result = validate_quantum_application_artifacts(str(tmp_path))
+
+    assert result["status"] == "blocked"
+    assert any("local_demo.backend_bind:env" in blocker for blocker in result["blockers"])
+
+
+def test_local_fastapi_demo_allows_self_contained_html_without_static_assets(tmp_path):
+    _complete_app(tmp_path)
+    manifest_path = tmp_path / "application_manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["delivery_profile"] = "local_fastapi_demo"
+    manifest["local_demo"]["static_assets"] = []
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    index = tmp_path / "frontend" / "index.html"
+    index.write_text(
+        """
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <style>
+    body { color: #020814; background: #F4F7FC; }
+    .card { background: #FFFFFF; border-radius: 8px; }
+  </style>
+</head>
+<body><main class="card">天衍云量子应用本地演示</main></body>
+</html>
+""".strip(),
+        encoding="utf-8",
+    )
+
+    result = validate_quantum_application_artifacts(str(tmp_path))
+
+    assert result["status"] == "passed"
+
+
+def test_local_fastapi_demo_profile_blocks_generic_english_ui(tmp_path):
+    _complete_app(tmp_path)
+    index = tmp_path / "frontend" / "index.html"
+    index.write_text(
+        """
+<!DOCTYPE html>
+<html lang="en">
+<head><link rel="stylesheet" href="/static/style.css"></head>
+<body><button>Run Baseline</button><section>Quantum Application</section></body>
+</html>
+""".strip(),
+        encoding="utf-8",
+    )
+
+    result = validate_quantum_application_artifacts(str(tmp_path))
+
+    assert result["status"] == "blocked"
+    assert any("local demo UI profile" in blocker and "english_copy:Run Baseline" in blocker for blocker in result["blockers"])
+
+
 def test_qccp_web_page_profile_blocks_missing_i18n(tmp_path):
     _complete_app(tmp_path)
     manifest_path = tmp_path / "application_manifest.json"
@@ -484,6 +656,38 @@ def test_qccp_ui_token_violation_blocks(tmp_path):
     assert any("qccp UI" in blocker and "#123456" in blocker for blocker in result["blockers"])
 
 
+def test_qccp_ui_requires_token_or_variable_evidence(tmp_path):
+    _complete_app(tmp_path)
+    sfc = tmp_path / "qccp" / "src" / "views" / "solution" / "vqlsSolver" / "index.vue"
+    sfc.write_text(
+        re.sub(
+            r"#(?:020814|FFFFFF|F4F7FC)",
+            "inherit",
+            sfc.read_text(encoding="utf-8"),
+            flags=re.I,
+        ),
+        encoding="utf-8",
+    )
+
+    result = validate_quantum_application_artifacts(str(tmp_path))
+
+    assert result["status"] == "blocked"
+    assert any("qccp UI" in blocker and "qccp_web.ui.tokens" in blocker for blocker in result["blockers"])
+
+
+def test_qccp_qcis_claim_requires_real_component_use(tmp_path):
+    _complete_app(tmp_path)
+    (tmp_path / "INTEGRATE.md").write_text(
+        "open http://10.9.1.8:8080; qccp route /solution/vqlsSolver uses /api/solve; 页面使用 QcisGraph",
+        encoding="utf-8",
+    )
+
+    result = validate_quantum_application_artifacts(str(tmp_path))
+
+    assert result["status"] == "blocked"
+    assert any("INTEGRATE.md.component:QcisGraph" in blocker for blocker in result["blockers"])
+
+
 def test_documented_endpoint_drift_blocks(tmp_path):
     _complete_app(tmp_path)
     (tmp_path / "INTEGRATE.md").write_text(
@@ -495,3 +699,34 @@ def test_documented_endpoint_drift_blocks(tmp_path):
 
     assert result["status"] == "blocked"
     assert any("documentation" in blocker and "/api/vqls/solve" in blocker for blocker in result["blockers"])
+
+
+def test_documented_localhost_url_blocks(tmp_path):
+    _complete_app(tmp_path)
+    (tmp_path / "README.md").write_text(
+        "open http://localhost:8080; demo endpoint /api/solve",
+        encoding="utf-8",
+    )
+
+    result = validate_quantum_application_artifacts(str(tmp_path))
+
+    assert result["status"] == "blocked"
+    assert any("documentation" in blocker and "README.md.local_url" in blocker for blocker in result["blockers"])
+
+
+def test_documented_configured_127_public_url_is_allowed(tmp_path):
+    _complete_app(tmp_path)
+    manifest_path = tmp_path / "application_manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["network"]["public_host"] = "127.0.0.1"
+    manifest["network"]["public_base_url"] = "http://127.0.0.1:8080"
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    for name in ("README.md", "INTEGRATE.md", "verification_report.md"):
+        (tmp_path / name).write_text(
+            f"open http://127.0.0.1:8080; qccp route /solution/vqlsSolver uses /api/solve and /api/params",
+            encoding="utf-8",
+        )
+
+    result = validate_quantum_application_artifacts(str(tmp_path))
+
+    assert result["status"] == "passed"

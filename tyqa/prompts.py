@@ -115,7 +115,7 @@ def _build_intake_scope(*, enable_observation_memory: bool) -> str:
 _EXPERIMENT_WORKFLOW_EXECUTION = """## Step 2: Plan (Recommended Structure)
 - Create quantum application stages with success signals (flexible, not rigid).
 - Identify resource/data dependencies, baseline requirements, quantum algorithm route, backend assumptions, and cloud showcase constraints.
-- Create or update `application_manifest.json` as the application-level contract. It records `delivery_profile`, actual artifact paths, `algorithm`, `local_demo`, `qccp_web`, `docs`, verification commands, and limitations.
+- Create or update `application_manifest.json` as the application-level contract. It records `delivery_profile`, actual artifact paths, `algorithm`, generated app `network`, `local_demo`, `qccp_web`, `docs`, verification commands, and limitations.
 - Use `write_todos` to track the execution plan and updates.
 - If delegating planning to planner-agent, start your message with: `MODE: PLAN`.
 - If a stage matches an existing skill, note the skill name in the plan and read its `SKILL.md` before implementation.
@@ -149,8 +149,9 @@ Before delegating code tasks to code-agent, ask the user which code generation m
 - Use `execute` for shell commands when running local validation, training, build, or packaging checks (see Shell Execution Guidelines).
 - When a task matches an existing skill, read its `SKILL.md` and follow it rather than reinventing the workflow.
 - Route algorithm work through `cqlib-sdk` plus the relevant `cqlib-qaoa`, `cqlib-vqe`, `cqlib-qml`, or `cqlib-hybrid` skill.
-- Route local FastAPI demo and backend/API contract work through `qccp-service`; it owns the `local_fastapi_demo` profile.
+- Route local FastAPI demo and backend/API contract work through `qccp-service`; it owns the `local_fastapi_demo` profile, and the standalone local demo UI must apply the `qccp-ui` visual profile.
 - Route qccp-web pages through `qccp-ui` then `qccp-frontend`; they own the `qccp_web_page` profile and must consume backend/API paths from `application_manifest.json`.
+- For generated local/full-delivery applications, preserve a single-origin network contract: frontend and backend are served by one backend process on the configured generated-app port; frontend code calls relative API paths under the configured `api_base` and never hardcodes unconfigured localhost/IP addresses or full backend domains. Handoff docs may show `network.public_base_url` exactly as configured, including 127.0.0.1 when the user configured it.
 - Default ordinary quantum app services to the Python FastAPI path; use the Java qccp-service path only when the active repo, files, or user request explicitly target Java/Spring Cloud qccp-service integration.
 - Use `application-pipeline` for stage gate conditions and iteration decisions when the work spans baseline, quantum method, application packaging, and verification.
 - Do not run real TianYan/GuoDun hardware jobs without explicit user authorization and externalized credentials.
@@ -447,6 +448,7 @@ def get_system_prompt(
     enable_observation_writes: bool = True,
     dangerous: bool = False,
     cwd: str | None = None,
+    generated_app_network_context: str | None = None,
 ) -> str:
     """Generate the complete static system prompt.
 
@@ -486,6 +488,7 @@ def get_system_prompt(
     sections = [
         TYQA_IDENTITY,
         workflow,
+        generated_app_network_context or "",
         REPORT_TEMPLATE,
         WRITING_GUIDELINES,
         shell_guidelines,
