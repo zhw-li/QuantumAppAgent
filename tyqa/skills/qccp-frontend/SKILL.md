@@ -112,7 +112,7 @@ import { getPageData } from '@/api/<pageKey>/index.js';
 
 Do not import unknown shared components. Header is already rendered globally and must not be imported.
 
-Use `QcisGraph` only when the page requirement or API/local data includes a QCIS circuit string. Treat it as optional and render nothing when no QCIS value exists. Do not copy the component source from this skill's `assets/` folder into `project-files`; qccp-web already owns the component source.
+Use `QcisGraph` only when the page requirement or API/local data includes a QCIS circuit string. Treat it as optional and render nothing when no QCIS value exists. Do not copy the component source from this skill's `assets/` folder into `project-files`; qccp-web already owns the component source. If `INTEGRATE.md` says the page uses `QcisGraph`, the SFC must actively import and render `<QcisGraph ...>`; comments or fallback `<pre>` blocks do not satisfy that claim.
 
 ## API and chart reliability
 

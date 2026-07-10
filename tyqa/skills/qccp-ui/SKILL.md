@@ -12,12 +12,15 @@ metadata:
 
 This skill defines the visual discipline for TianYan Quantum Computing Cloud Platform-style pages in the `qccp_web_page` delivery profile. For qccp-web implementation, use this as the visual reference before `qccp-frontend`; qccp-web uses Vue SFC + scoped SCSS + Element Plus, not Tailwind.
 
+The same visual profile also applies to standalone local FastAPI HTML demos in `local_fastapi_demo` and `full_delivery`. In that case, use the tokens, layout, language, and component discipline below, but keep the demo standalone and do not require qccp-web runtime imports, routes, stores, or global components.
+
 ## When to Use
 
 - User needs qccp/cloud showcase visual rules before generating Vue page artifacts.
 - User asks for colors, typography, spacing, radius, component states, bilingual layout fit, or visual consistency review.
 - User is preparing a quantum application page and needs design constraints before `qccp-frontend`.
 - `application-pipeline` Stage 3 needs visual consistency evidence for application packaging.
+- `qccp-service` is generating a local FastAPI HTML demo that must look like a qccp/TianYan showcase while remaining standalone.
 
 ## When NOT to Use
 
@@ -35,6 +38,7 @@ This skill defines the visual discipline for TianYan Quantum Computing Cloud Pla
 5. Do not use emoji anywhere in UI copy, labels, placeholders, comments intended for UI display, or generated assets.
 6. Page layout should be mainly vertical: top banner, then stacked content sections. Avoid a primary left-right split layout unless explicitly required.
 7. Keep Chinese/English text length differences in mind; layouts must not break when switched to English.
+8. For standalone local demos, use Chinese-first visible text, relative API calls, and page-local CSS/JS only. Do not use generic English demo copy such as "Run Baseline" or "Compare Results".
 
 ## Locked layout values
 
@@ -131,6 +135,7 @@ Tags:
 - Primary layout built as a left-right marketing split when a vertical structure works.
 - Random web images or invented asset URLs.
 - Hardcoded one-language UI text in bilingual qccp pages.
+- Generic English standalone demo labels when the requested or default delivery target is Chinese-first.
 
 ## Output checklist
 
@@ -142,6 +147,7 @@ Tags:
 - [ ] Radius uses 4px, 6px, or 8px according to component type.
 - [ ] Components are reused rather than hand-styled repeatedly.
 - [ ] Chinese and English text both fit without overlap.
+- [ ] Standalone local demos record `local_demo.ui_profile = "qccp-ui-standalone"` and `local_demo.language = "zh-CN"` in `application_manifest.json`.
 
 When `application_manifest.json` is in scope, record or request a `qccp_web` UI evidence entry that identifies the SFC path, token/color/radius/font checks, bilingual-fit status, and any visual limitations. This is evidence for validation, not final delivery approval.
 

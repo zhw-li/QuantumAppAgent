@@ -66,7 +66,7 @@ INTEGRATE.md
 
 Each stage saves artifacts in the user-specified or current project artifact location selected by the caller. Do not assume a default directory; record the actual paths used.
 
-`application_manifest.json` is the application-level contract. It records `delivery_profile`, actual artifact paths, `algorithm`, `local_demo`, `qccp_web`, `docs`, verification commands, and limitations. Create it in planning and update it after each stage.
+`application_manifest.json` is the application-level contract. It records `delivery_profile`, actual artifact paths, `algorithm`, generated-app `network`, `local_demo`, `qccp_web`, `docs`, verification commands, and limitations. Create it in planning and update it after each stage.
 
 Allowed `delivery_profile` values:
 
@@ -137,11 +137,12 @@ Skill routing:
 Process:
 
 1. Read `application_manifest.json` and define the selected profile workflow.
-2. For `local_fastapi_demo`, use `qccp-service` to build the FastAPI backend, local HTML demo, endpoint contract, and static asset contract.
+2. For `local_fastapi_demo`, use `qccp-service` to build the FastAPI backend, local HTML demo, endpoint contract, static asset contract, and single-origin network contract; apply `qccp-ui` as the standalone local-demo visual profile.
 3. For `qccp_web_page`, use `qccp-ui` and `qccp-frontend` to build Vue SFC, scoped SCSS, Element Plus, i18n, route snippet, and API paths consumed from the manifest contract.
-4. Keep local FastAPI demo frontend separate from qccp-web SFC artifacts.
-5. Keep simulator, cloud, and real-hardware execution assumptions explicit.
-6. Update `INTEGRATE.md` with copy destinations, route, endpoint contract, profile-specific verification status, and commands.
+4. For `local_fastapi_demo` and `full_delivery`, require `application_manifest.json.network.mode = single_origin`: one backend process serves `/`, `/static/*`, and `/api/*` on the configured generated-app bind port, while handoff docs use `network.public_base_url` exactly as configured.
+5. Keep local FastAPI demo frontend separate from qccp-web SFC artifacts.
+6. Keep simulator, cloud, and real-hardware execution assumptions explicit.
+7. Update `INTEGRATE.md` with copy destinations, route, endpoint contract, profile-specific verification status, generated-app public URL, and commands.
 
 ## Stage 4: Verification & Handoff
 

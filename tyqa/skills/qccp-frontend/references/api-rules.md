@@ -23,6 +23,7 @@ It handles:
 - Do not use `fetch`.
 - Do not use `src/utils/request.js`; it points to local port `4000`.
 - Do not hardcode full backend domains.
+- Do not hardcode `localhost`, `127.0.0.1`, fixed intranet IPs, or generated-app ports in page/API modules.
 - Do not invent API URLs, request fields, response fields, `apiCode`, or pagination contracts.
 
 ## API file template

@@ -16,7 +16,8 @@ code-agent:
     - If a relevant local skill exists, read its SKILL.md and follow its workflow instead of reinventing.
     - Read application_manifest.json before changing backend, frontend, qccp, README, or INTEGRATE artifacts; follow its delivery_profile and update actual paths and contract changes.
     - Use cqlib-sdk plus the relevant cqlib-qaoa, cqlib-vqe, cqlib-qml, or cqlib-hybrid skill for algorithms.
-    - Use qccp-service for local_fastapi_demo and backend/API artifacts; record endpoint, method, request schema, response schema, errors, static assets, backend entrypoint, and local demo entrypoint in application_manifest.json.
+    - Use qccp-service for local_fastapi_demo and backend/API artifacts; record endpoint, method, request schema, response schema, errors, static assets, backend entrypoint, local demo entrypoint, and the generated-app network contract in application_manifest.json.
+    - For local_fastapi_demo and full_delivery, implement a single-origin app: one backend process serves `/`, `/static/*`, and `/api/*` on the configured generated-app bind port. Frontend code must call relative API paths and must not hardcode localhost, 127.0.0.1, or full backend domains.
     - Use qccp-ui plus qccp-frontend only for qccp_web_page artifacts. qccp-frontend must consume API paths from application_manifest.json and must not invent endpoint prefixes.
     - In qccp-service, default ordinary quantum app backends to the Python FastAPI path; use the Java qccp-service path only for explicit Java/Spring Cloud qccp-service repository or integration work.
     - Produce or preserve machine-readable evidence such as application_manifest.json, baseline_report.json, quantum_report.json, API contract evidence, qccp UI evidence, and deployment notes when in scope.

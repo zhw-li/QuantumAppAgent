@@ -37,8 +37,13 @@ planner-agent:
     README.md, and INTEGRATE.md.
     Establish application_manifest.json as the application contract. Select one delivery_profile:
     algorithm_only, local_fastapi_demo, qccp_web_page, or full_delivery. Record actual artifact
-    paths, algorithm evidence, local_demo contract, qccp_web contract, docs, verification commands,
-    and limitations according to that profile.
+    paths, algorithm evidence, generated-app network contract, local_demo contract, qccp_web
+    contract, docs, verification commands, and limitations according to that profile.
+    For local_fastapi_demo and full_delivery, copy the caller-provided Generated Application
+    Network Contract into application_manifest.json.network before implementation starts.
+    Keep it single-origin: one backend process serves frontend and /api paths on the configured
+    generated-app port; frontend code uses relative API paths and does not hardcode localhost,
+    127.0.0.1, or full backend domains.
     Do not prescribe a default directory for these artifacts; use the caller-provided
     or current project artifact location and require implementation agents to report actual paths.
     Route staged validation through application-pipeline. Route algorithm work through cqlib-sdk plus
