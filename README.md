@@ -39,15 +39,11 @@ It combines planning, research, coding, debugging, analysis, and delivery agents
 
 ## 🧪 Quantum Application Examples
 
-Legacy quantum application demos live under [`quantum_app_example/`](./quantum_app_example). They are useful reference artifacts for classical baselines, quantum methods, verification reports, and TianYan-cloud showcase pages, but they predate the current `application_manifest.json` validator contract and should not be treated as current release-compliant application packages until manifests are added.
+Current release-tracked quantum application examples live under [`quantum_app_example/`](./quantum_app_example). Each example is expected to include an `application_manifest.json`, algorithm reports, a local FastAPI demo, and qccp-web showcase artifacts.
 
 | Example | Quantum method | Classical baseline | Primary metric |
 | --- | --- | --- | --- |
-| [`Finance_QAOA`](./quantum_app_example/Finance_QAOA) | QAOA portfolio selection | Markowitz mean-variance + brute force | `cost_gap_percent` |
-| [`MaxCut_QAOA`](./quantum_app_example/MaxCut_QAOA) | QAOA graph partitioning | brute-force enumeration | `cost_gap_percent` |
-| [`UC_QAOA`](./quantum_app_example/UC_QAOA) | QAOA unit commitment (power systems) | brute-force search | `optimality_gap_percent` |
-| [`H2_VQE`](./quantum_app_example/H2_VQE) | VQE H₂ ground-state energy | exact diagonalization | energy error vs chemical accuracy (1.6 mHa) |
-| [`Finance_QRC`](./quantum_app_example/Finance_QRC) | Quantum reservoir computing (stock prediction) | Echo State Network | RMSE |
+| [`vqe_h2`](./quantum_app_example/vqe_h2) | VQE H₂ ground-state energy (STO-3G) | Hartree-Fock + exact diagonalization reference | energy error vs chemical accuracy (1.6 mHa) |
 
 ## 🏗️ Framework Architecture
 
@@ -321,6 +317,24 @@ Requires **Node.js 24 LTS** (for `npx`); the first launch downloads `@evoscienti
 </details>
 
 <details>
+<summary>Generated App Network</summary>
+
+TYQA's own WebUI keeps separate `langgraph_dev_port` and `webui_port` settings. Generated quantum application demos use a different contract: the frontend and backend are served by one FastAPI process, frontend code calls relative `/api/...` paths, and handoff docs use the configured public URL.
+
+```bash
+tyqa config set generated_app_public_host 10.9.1.8
+tyqa config set generated_app_public_port 8080
+tyqa config set generated_app_bind_host 0.0.0.0
+tyqa config set generated_app_bind_port 8080
+```
+
+Use `generated_app_public_host` / `generated_app_public_port` for the address users open in a browser. Use `generated_app_bind_host` / `generated_app_bind_port` for the address the generated FastAPI process binds inside the runtime. For a local-only demo, `generated_app_public_host 127.0.0.1` is valid; generated frontend source should still avoid hardcoded full local URLs and call relative API paths.
+
+Generated `local_fastapi_demo` and `full_delivery` outputs copy these values into `application_manifest.json.network`. The local FastAPI demo must also follow the delivery contract: one process on the configured port, `APP_BIND_HOST` / `APP_BIND_PORT` driven startup, Chinese-first visible UI, `qccp-ui-standalone` visual profile, and qccp-style token colors/radius/spacing. Self-contained HTML demos may set `static_assets` to an empty list; demos with external assets must list real files in the manifest.
+
+</details>
+
+<details>
 <summary>Action Approval</summary>
 
 By default, shell commands (`execute` tool) require human approval before running. To skip approval prompts:
@@ -413,7 +427,7 @@ for state in tyqa_agent.stream(
 
 ## 🍪 Examples & Recipes
 
-- **Quantum applications** — see [`quantum_app_example/`](./quantum_app_example) for the five end-to-end QAOA / VQE / QRC showcases above.
+- **Quantum applications** — see [`quantum_app_example/vqe_h2`](./quantum_app_example/vqe_h2) for the current release-tracked VQE H₂ application package.
 - **Other examples & recipes** — a curated collection of usage patterns and deployment recipes: 👉 [browse all](docs/README.md)
 
 <p align="right"><a href="#top">🔝Back to top</a></p>
@@ -467,7 +481,7 @@ Done:
 - [x] ⚛️ cqlib quantum-algorithm skill stack (QAOA / VQE / QML / hybrid)
 - [x] ☁️ TianYan cloud showcase generation (qccp-web SFC + backend service)
 - [x] 🔬 Six-phase quantum-application pipeline with stage gates
-- [x] 🧪 Five end-to-end quantum application examples
+- [x] 🧪 Release-tracked VQE H₂ quantum application example
 - [x] 🧠 Self-evolving memory across sessions
 - [x] 👋 Human-on-the-loop action approval & agent-initiated clarification
 - [x] 📺 Desktop WebUI with workspace panels

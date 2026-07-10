@@ -1,0 +1,37 @@
+{
+  "task": "vqe_molecular_energy",
+  "application": "VQE H2 Ground-State Energy",
+  "data": {
+    "description": "H2 molecule minimal basis (STO-3G) Hamiltonian at equilibrium bond distance 0.735 Å",
+    "source": "standard reference (Bravyi-Kitaev transformed, parity-mapped to 2 qubits)",
+    "split": "N/A — single-instance computation"
+  },
+  "primary_metric": {
+    "name": "energy_error",
+    "unit": "mHartree",
+    "direction": "lower_is_better",
+    "threshold": 1.6
+  },
+  "baseline": {
+    "method": "exact_diagonalization",
+    "description": "numpy.linalg.eigh on the 4x4 Hamiltonian matrix",
+    "expected_energy": -1.137275,
+    "unit": "Hartree"
+  },
+  "quantum_method": {
+    "algorithm": "VQE",
+    "ansatz": "hardware_efficient",
+    "optimizer": "scipy.optimize.minimize (COBYLA)",
+    "backend": "cqlib.StatevectorSimulator",
+    "qubits": 2,
+    "layers": 2
+  },
+  "delivery_profile": "full_delivery",
+  "hardware_boundary": "simulator_only",
+  "seeds": [42, 123, 456],
+  "limitations": [
+    "Simulator-only results; no real-hardware noise or shot noise",
+    "H2 minimal basis only; results may differ for larger active spaces",
+    "Chemical accuracy threshold is 1.6 mHartree by convention"
+  ]
+}

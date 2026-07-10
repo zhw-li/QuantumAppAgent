@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VQE H2 分子基态能量计算</title>
+<style>
+  /* qccp-ui-standalone tokens */
+  :root {
+    --primary: #1664FF;
+    --primaryDeep: #4F9DF7;
+    --linkBlue: #1F84FC;
+    --danger: #FB4214;
+    --cyan: #00C7E7;
+    --textTitle: #020814;
+    --textSub: #41464F;
+    --textBody: #939AAB;
+    --pageBg: #F4F7FC;
+    --cardBg: #FFFFFF;
+    --cardBgBlue: #F3F7FF;
+    --borderLine: #DCE0EB;
+    --extend2: #BB79E1;
+    --extend3: #A58DF8;
+    --extend4: #4A86FF;
+    --radiusBtn: 4px;
+    --radiusTag: 6px;
+    --radiusModal: 8px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--pageBg);
+    color: var(--textTitle);
+    line-height: 1.6;
+  }
+  .container { max-width: 900px; margin: 0 auto; padding: 32px 24px; }
+  h1 {
+    font-size: 40px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 4px;
+  }
+  .subtitle { color: var(--textSub); font-size: 16px; margin-bottom: 28px; }
+  .card {
+    background: var(--cardBg);
+    border: 1px solid var(--borderLine);
+    border-radius: var(--radiusModal);
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .card h2 {
+    font-size: 24px;
+    font-weight: 400;
+    color: var(--textTitle);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--borderLine);
+  }
+  .row { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; margin-bottom: 14px; }
+  .field { display: flex; flex-direction: column; }
+  .field label { font-size: 14px; font-weight: 400; color: var(--textBody); margin-bottom: 4px; }
+  .field input {
+    padding: 8px 12px;
+    border: 1px solid var(--borderLine);
+    border-radius: var(--radiusTag);
+    font-size: 16px;
+    width: 100px;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .field input:focus { border-color: var(--primary); }
+  button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 20px;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--radiusBtn);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .2s;
+  }
+  button:hover { background: var(--primaryDeep); }
+  button:disabled { background: var(--textBody); cursor: not-allowed; }
+  .spinner {
+    display: inline-block;
+    width: 14px; height: 14px;
+    border: 2px solid #fff;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin .6s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .result-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin-top: 14px;
+  }
+  .metric {
+    background: var(--cardBgBlue);
+    border: 1px solid var(--borderLine);
+    border-radius: var(--radiusModal);
+    padding: 12px 14px;
+  }
+  .metric .label { font-size: 14px; color: var(--textBody); font-weight: 400; letter-spacing: 0.04em; }
+  .metric .value { font-size: 20px; font-weight: 700; color: var(--textTitle); margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .metric .value.good { color: var(--primary); }
+  .metric .value.warn { color: var(--danger); }
+  .qcis-block {
+    margin-top: 14px;
+    background: var(--textTitle);
+    color: var(--textBody);
+    border-radius: var(--radiusModal);
+    padding: 14px 18px;
+    font-family: "SF Mono", "Fira Code", "Consolas", monospace;
+    font-size: 14px;
+    line-height: 1.55;
+    overflow-x: auto;
+    max-height: 220px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .qcis-label { font-size: 14px; color: var(--textBody); margin-top: 14px; font-weight: 400; }
+  table.compare {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 14px;
+    font-size: 16px;
+  }
+  table.compare th, table.compare td {
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--borderLine);
+  }
+  table.compare th { color: var(--textBody); font-weight: 400; font-size: 14px; letter-spacing: 0.03em; }
+  table.compare td { font-variant-numeric: tabular-nums; }
+  .error-msg { color: var(--danger); font-size: 14px; margin-top: 10px; }
+  canvas { margin-top: 14px; border: 1px solid var(--borderLine); border-radius: var(--radiusModal); background: var(--cardBg); }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>VQE H2 分子基态能量计算</h1>
+  <p class="subtitle">变分量子特征求解器 (Variational Quantum Eigensolver) 计算 H2 分子基态能量 (STO-3G 基组)</p>
+
+  <!-- 经典基线 -->
+  <div class="card">
+    <h2>经典基线</h2>
+    <button id="btn-baseline" onclick="runBaseline()">计算基线</button>
+    <div id="baseline-results"></div>
+  </div>
+
+  <!-- VQE 量子算法 -->
+  <div class="card">
+    <h2>VQE 量子算法</h2>
+    <div class="row">
+      <div class="field">
+        <label for="vqe-seed">随机种子</label>
+        <input id="vqe-seed" type="number" value="42">
+      </div>
+      <div class="field">
+        <label for="vqe-layers">层数</label>
+        <input id="vqe-layers" type="number" value="2" min="1" max="8">
+      </div>
+      <button id="btn-vqe" onclick="runVqe()">运行 VQE</button>
+    </div>
+    <div id="vqe-results"></div>
+  </div>
+
+  <!-- 结果对比 -->
+  <div class="card">
+    <h2>结果对比</h2>
+    <button id="btn-compare" onclick="runCompare()">基线与 VQE 对比</button>
+    <div id="compare-results"></div>
+  </div>
+</div>
+
+<script>
+function setLoading(btnId, on) {
+  const btn = document.getElementById(btnId);
+  btn.disabled = on;
+  if (on) {
+    btn._origText = btn.textContent;
+    btn.innerHTML = '<span class="spinner"></span> 计算中...';
+  } else {
+    btn.textContent = btn._origText || btn.textContent;
+  }
+}
+
+function fmt(n, digits) {
+  if (n == null) return '—';
+  return Number(n).toFixed(digits);
+}
+
+async function apiCall(url) {
+  const resp = await fetch(url);
+  if (!resp.ok) {
+    const data = await resp.json().catch(() => ({}));
+    throw new Error(data.error || '请求失败');
+  }
+  return resp.json();
+}
+
+function showError(containerId, msg) {
+  document.getElementById(containerId).innerHTML = '<p class="error-msg">' + msg + '</p>';
+}
+
+/* ---- Baseline ---- */
+async function runBaseline() {
+  setLoading('btn-baseline', true);
+  const el = document.getElementById('baseline-results');
+  el.innerHTML = '';
+  try {
+    const d = await apiCall('/api/baseline');
+    el.innerHTML = `
+      <div class="result-grid">
+        <div class="metric"><div class="label">HF 能量 (Hartree)</div><div class="value">${fmt(d.hf_energy_hartree, 10)}</div></div>
+        <div class="metric"><div class="label">精确能量 (Hartree)</div><div class="value">${fmt(d.exact_energy_hartree, 10)}</div></div>
+        <div class="metric"><div class="label">HF 误差 (mHartree)</div><div class="value ${d.hf_error_mhartree < 1 ? 'good' : 'warn'}">${fmt(d.hf_error_mhartree, 4)}</div></div>
+      </div>`;
+  } catch (e) { showError('baseline-results', e.message); }
+  setLoading('btn-baseline', false);
+}
+
+/* ---- VQE ---- */
+async function runVqe() {
+  setLoading('btn-vqe', true);
+  const el = document.getElementById('vqe-results');
+  el.innerHTML = '';
+  const seed = document.getElementById('vqe-seed').value;
+  const layers = document.getElementById('vqe-layers').value;
+  try {
+    const d = await apiCall('/api/vqe?seed=' + encodeURIComponent(seed) + '&layers=' + encodeURIComponent(layers));
+    el.innerHTML = `
+      <div class="result-grid">
+        <div class="metric"><div class="label">VQE 能量 (Hartree)</div><div class="value">${fmt(d.energy_hartree, 10)}</div></div>
+        <div class="metric"><div class="label">精确能量 (Hartree)</div><div class="value">${fmt(d.exact_energy_hartree, 10)}</div></div>
+        <div class="metric"><div class="label">能量误差 (mHartree)</div><div class="value ${d.energy_error_mhartree < 1.6 ? 'good' : 'warn'}">${fmt(d.energy_error_mhartree, 4)}</div></div>
+        <div class="metric"><div class="label">电路深度</div><div class="value">${d.circuit_depth}</div></div>
+      </div>
+      <div class="qcis-label">QCIS 量子电路</div>
+      <div class="qcis-block">${escHtml(d.qcis)}</div>
+      <div class="qcis-label">收敛曲线</div>
+      <canvas id="conv-canvas" width="540" height="220"></canvas>`;
+    drawConvergence(d.convergence);
+  } catch (e) { showError('vqe-results', e.message); }
+  setLoading('btn-vqe', false);
+}
+
+function escHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function drawConvergence(trace) {
+  const canvas = document.getElementById('conv-canvas');
+  if (!canvas || !trace || trace.length < 2) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const pad = { t: 20, r: 20, b: 34, l: 70 };
+  const pw = W - pad.l - pad.r, ph = H - pad.t - pad.b;
+
+  ctx.clearRect(0, 0, W, H);
+
+  const energies = trace.map(t => t.energy);
+  const iters = trace.map(t => t.iteration);
+  let eMin = Math.min(...energies), eMax = Math.max(...energies);
+  const ePad = (eMax - eMin) * 0.1 || 0.001;
+  eMin -= ePad; eMax += ePad;
+  const iMin = iters[0], iMax = iters[iters.length - 1] || 1;
+
+  function x(it) { return pad.l + ((it - iMin) / (iMax - iMin)) * pw; }
+  function y(en) { return pad.t + (1 - (en - eMin) / (eMax - eMin)) * ph; }
+
+  // Axes
+  ctx.strokeStyle = '#DCE0EB';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, H - pad.b); ctx.lineTo(W - pad.r, H - pad.b); ctx.stroke();
+
+  // Y ticks
+  ctx.fillStyle = '#939AAB'; ctx.font = '11px sans-serif'; ctx.textAlign = 'right';
+  for (let i = 0; i <= 4; i++) {
+    const v = eMin + (eMax - eMin) * i / 4;
+    const yy = y(v);
+    ctx.fillText(v.toFixed(4), pad.l - 6, yy + 4);
+    ctx.strokeStyle = '#DCE0EB'; ctx.beginPath(); ctx.moveTo(pad.l, yy); ctx.lineTo(W - pad.r, yy); ctx.stroke();
+  }
+
+  // X label
+  ctx.fillStyle = '#939AAB'; ctx.textAlign = 'center'; ctx.font = '11px sans-serif';
+  ctx.fillText('\u8FED\u4EE3\u6B21\u6570', W / 2, H - 4);
+
+  // Line
+  ctx.strokeStyle = '#1664FF'; ctx.lineWidth = 2;
+  ctx.beginPath();
+  for (let i = 0; i < trace.length; i++) {
+    const px = x(iters[i]), py = y(energies[i]);
+    i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+  }
+  ctx.stroke();
+
+  // Dots
+  ctx.fillStyle = '#1664FF';
+  for (let i = 0; i < trace.length; i++) {
+    ctx.beginPath(); ctx.arc(x(iters[i]), y(energies[i]), 2, 0, Math.PI * 2); ctx.fill();
+  }
+}
+
+/* ---- Compare ---- */
+async function runCompare() {
+  setLoading('btn-compare', true);
+  const el = document.getElementById('compare-results');
+  el.innerHTML = '';
+  try {
+    const d = await apiCall('/api/compare');
+    const b = d.baseline, v = d.vqe;
+    el.innerHTML = `
+      <table class="compare">
+        <thead>
+          <tr><th>指标</th><th>基线 (Hartree-Fock)</th><th>VQE</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>方法</td><td>${b.method}</td><td>${v.method}</td></tr>
+          <tr><td>能量 (Hartree)</td><td>${fmt(b.energy_hartree, 10)}</td><td>${fmt(v.energy_hartree, 10)}</td></tr>
+          <tr><td>精确能量 (Hartree)</td><td>${fmt(b.exact_energy_hartree, 10)}</td><td>${fmt(v.exact_energy_hartree, 10)}</td></tr>
+          <tr><td>误差 (mHartree)</td><td>${fmt(b.error_mhartree, 4)}</td><td class="value good">${fmt(v.error_mhartree, 4)}</td></tr>
+          <tr><td>电路深度</td><td>\u2014</td><td>${v.circuit_depth}</td></tr>
+        </tbody>
+      </table>
+      <div class="result-grid" style="margin-top:14px">
+        <div class="metric"><div class="label">VQE 相对 HF 的提升</div><div class="value good">${fmt(d.improvement_mhartree, 4)} mHartree</div></div>
+      </div>`;
+  } catch (e) { showError('compare-results', e.message); }
+  setLoading('btn-compare', false);
+}
+</script>
+</body>
+</html>

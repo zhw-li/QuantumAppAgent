@@ -40,15 +40,11 @@
 
 ## 🧪 量子应用示例
 
-历史量子应用 demo 位于 [`quantum_app_example/`](./quantum_app_example)。这些示例可作为经典基线、量子方法、验证报告和天衍云展示页面的参考产物，但它们早于当前 `application_manifest.json` validator 合同；在补齐 manifest 前，不应视为符合当前发布框架的应用包。
+当前发布跟踪的量子应用示例位于 [`quantum_app_example/`](./quantum_app_example)。每个示例都应包含 `application_manifest.json`、算法报告、本地 FastAPI demo 和 qccp-web 展示产物。
 
 | 示例 | 量子方法 | 经典基线 | 主要指标 |
 | --- | --- | --- | --- |
-| [`Finance_QAOA`](./quantum_app_example/Finance_QAOA) | QAOA 组合投资优化 | Markowitz 均值-方差 + 暴力搜索 | `cost_gap_percent` |
-| [`MaxCut_QAOA`](./quantum_app_example/MaxCut_QAOA) | QAOA 图划分 | 暴力枚举 | `cost_gap_percent` |
-| [`UC_QAOA`](./quantum_app_example/UC_QAOA) | QAOA 机组调度（电力系统） | 暴力搜索 | `optimality_gap_percent` |
-| [`H2_VQE`](./quantum_app_example/H2_VQE) | VQE 氢分子基态能量 | 精确对角化 | 能量误差 vs 化学精度（1.6 mHa） |
-| [`Finance_QRC`](./quantum_app_example/Finance_QRC) | 量子储层计算（股票预测） | Echo State Network | RMSE |
+| [`vqe_h2`](./quantum_app_example/vqe_h2) | VQE 氢分子基态能量（STO-3G） | Hartree-Fock + 精确对角化参考 | 能量误差 vs 化学精度（1.6 mHa） |
 
 ## 🏗️ 框架架构
 
@@ -322,6 +318,24 @@ tyqa config set webui_port 4800    # 修改前端端口（须与 langgraph dev �
 </details>
 
 <details>
+<summary>生成应用网络配置</summary>
+
+TYQA 自身 WebUI 仍使用独立的 `langgraph_dev_port` 和 `webui_port`。多智能体生成的量子应用 demo 使用另一套合同：前端和后端由同一个 FastAPI 进程提供服务，前端源码只调用相对 `/api/...` 路径，交付文档使用配置好的对外访问地址。
+
+```bash
+tyqa config set generated_app_public_host 10.9.1.8
+tyqa config set generated_app_public_port 8080
+tyqa config set generated_app_bind_host 0.0.0.0
+tyqa config set generated_app_bind_port 8080
+```
+
+`generated_app_public_host` / `generated_app_public_port` 是用户在浏览器里访问的地址；`generated_app_bind_host` / `generated_app_bind_port` 是生成出来的 FastAPI 进程在运行环境内部监听的地址。本地演示可以配置为 `generated_app_public_host 127.0.0.1`，但生成的前端源码仍应避免硬编码完整本地 URL，只调用相对 API 路径。
+
+`local_fastapi_demo` 和 `full_delivery` 输出会把这些值写入 `application_manifest.json.network`。本地 FastAPI demo 还必须满足交付合同：单进程同端口启动，启动逻辑由 `APP_BIND_HOST` / `APP_BIND_PORT` 驱动，界面文本中文优先，视觉配置为 `qccp-ui-standalone`，并使用 qccp 风格的 token 色彩、圆角与间距。单文件自包含 HTML 可以把 `static_assets` 设为空列表；如果存在外部静态资源，必须在 manifest 中列出真实文件。
+
+</details>
+
+<details>
 <summary>操作审批</summary>
 
 默认情况下，Shell 命令（`execute` 工具）执行前需要人工审批。跳过审批提示的方式：
@@ -414,7 +428,7 @@ for state in tyqa_agent.stream(
 
 ## 🍪 示例与实践
 
-- **量子应用** — 见 [`quantum_app_example/`](./quantum_app_example)，包含上文 5 个端到端的 QAOA / VQE / QRC 展示示例。
+- **量子应用** — 见 [`quantum_app_example/vqe_h2`](./quantum_app_example/vqe_h2)，这是当前发布跟踪的 VQE H₂ 应用包。
 - **其他示例与实践** — 官方示例、进阶用法和部署配方合集：👉 [浏览全部 →](docs/README.md)
 
 <p align="right"><a href="#top">🔝回到顶部</a></p>
@@ -468,7 +482,7 @@ channel_enabled: "telegram,slack,feishu,qq"
 - [x] ⚛️ cqlib 量子算法技能栈（QAOA / VQE / QML / 混合）
 - [x] ☁️ 天衍云展示生成（qccp-web SFC + 后端服务）
 - [x] 🔬 带阶段门禁的六阶段量子应用流水线
-- [x] 🧪 五个端到端量子应用示例
+- [x] 🧪 发布跟踪的 VQE H₂ 量子应用示例
 - [x] 🧠 跨会话自进化记忆
 - [x] 👋 Human-on-the-loop 操作审批与智能体主动澄清
 - [x] 📺 带工作区面板的桌面 WebUI

@@ -1,0 +1,120 @@
+{
+  "application": "VQE H2 Ground-State Energy",
+  "delivery_profile": "full_delivery",
+  "algorithm": {
+    "type": "VQE",
+    "molecule": "H2",
+    "basis": "STO-3G",
+    "qubits": 2,
+    "ansatz": "hardware_efficient",
+    "layers": 2,
+    "optimizer": "COBYLA",
+    "backend": "cqlib.StatevectorSimulator"
+  },
+  "network": {
+    "mode": "single_origin",
+    "bind_host": "0.0.0.0",
+    "bind_port": 8080,
+    "public_scheme": "http",
+    "public_host": "127.0.0.1",
+    "public_port": 8080,
+    "public_base_url": "http://127.0.0.1:8080",
+    "api_base": "/api",
+    "frontend_serving": "backend_static"
+  },
+  "artifacts": {
+    "application_brief": "application_brief.md",
+    "requirements.json": "requirements.json",
+    "solution_plan": "solution_plan.md",
+    "algorithm_route": "algorithm_route.md",
+    "validation_plan": "validation_plan.md",
+    "baseline_report.json": "baseline_report.json",
+    "quantum_report.json": "quantum_report.json",
+    "README.md": "README.md",
+    "INTEGRATE.md": "INTEGRATE.md",
+    "verification_report.md": "verification_report.md"
+  },
+  "local_demo": {
+    "entrypoint": "app/static/index.html",
+    "backend_entrypoint": "app/main.py",
+    "frontend": "app/static/index.html",
+    "static_assets": [],
+    "start_command": "cd /code/cqlib_app/vqe_h2 && python -m app.main",
+    "backend_bind": "env:APP_BIND_HOST+APP_BIND_PORT",
+    "ui_profile": "qccp-ui-standalone",
+    "language": "zh-CN",
+    "ui": {
+      "language": "zh-CN",
+      "english_copy": "Run VQE"
+    },
+    "endpoints": [
+      {
+        "path": "/health",
+        "method": "GET",
+        "description": "Health check",
+        "request_schema": {"type": "object", "properties": {}},
+        "response_schema": {"status": "string"},
+        "errors": [{"code": 503, "description": "Service unavailable"}]
+      },
+      {
+        "path": "/api/info",
+        "method": "GET",
+        "description": "Application metadata",
+        "request_schema": {"type": "object", "properties": {}},
+        "response_schema": {"name": "string", "molecule": "string", "basis": "string", "bond_distance_angstrom": "number", "qubits": "int", "ansatz": "string", "default_layers": "int", "optimizer": "string", "backend": "string"},
+        "errors": [{"code": 500, "description": "Internal server error"}]
+      },
+      {
+        "path": "/api/baseline",
+        "method": "GET",
+        "description": "Classical baseline results",
+        "request_schema": {"type": "object", "properties": {}},
+        "response_schema": {"hf_energy_hartree": "number", "exact_energy_hartree": "number", "hf_error_mhartree": "number"},
+        "errors": [{"code": 500, "description": "Computation error"}]
+      },
+      {
+        "path": "/api/vqe",
+        "method": "GET",
+        "params": {"seed": "int (default=42)", "layers": "int (default=2)"},
+        "description": "VQE quantum algorithm results",
+        "request_schema": {"seed": "int", "layers": "int"},
+        "response_schema": {"energy_hartree": "number", "exact_energy_hartree": "number", "energy_error_mhartree": "number", "circuit_depth": "int", "qcis": "string", "convergence": "array", "seed": "int", "layers": "int"},
+        "errors": [{"code": 500, "description": "VQE optimization failed"}]
+      },
+      {
+        "path": "/api/compare",
+        "method": "GET",
+        "description": "Baseline vs VQE comparison",
+        "request_schema": {"type": "object", "properties": {}},
+        "response_schema": {"baseline": "object", "vqe": "object", "improvement_mhartree": "number"},
+        "errors": [{"code": 500, "description": "Computation error"}]
+      }
+    ]
+  },
+  "qccp_web": {
+    "pageKey": "vqeH2",
+    "module": "solution",
+    "route": "/solution/vqe-h2",
+    "sfc": "qccp_page/project-files/src/views/solution/vqeH2/index.vue",
+    "api_module_path": "qccp_page/project-files/src/api/vqeH2/index.js",
+    "i18n_path": "qccp_page/locales",
+    "api_paths": ["/api/info", "/api/baseline", "/api/vqe", "/api/compare"],
+    "verification_command": "npm run build"
+  },
+  "docs": {
+    "readme": "README.md",
+    "integrate": "INTEGRATE.md",
+    "verification_report": "verification_report.md"
+  },
+  "verification": {
+    "commands": [
+      "cd /code/cqlib_app/vqe_h2 && python -m algorithms.baseline",
+      "cd /code/cqlib_app/vqe_h2 && python -m algorithms.vqe"
+    ]
+  },
+  "limitations": [
+    "Simulator-only; no real-hardware evidence",
+    "H2 minimal basis (STO-3G) only",
+    "Chemical accuracy is a convention-based threshold"
+  ]
+}
