@@ -1,37 +1,35 @@
 {
-  "task": "vqe_molecular_energy",
-  "application": "VQE H2 Ground-State Energy",
-  "data": {
-    "description": "H2 molecule minimal basis (STO-3G) Hamiltonian at equilibrium bond distance 0.735 Å",
-    "source": "standard reference (Bravyi-Kitaev transformed, parity-mapped to 2 qubits)",
-    "split": "N/A — single-instance computation"
+  "task": "vqe_h2_ground_state",
+  "application": "H2 Ground-State Energy with VQE",
+  "instance": {
+    "molecule": "H2",
+    "basis": "STO-3G",
+    "bond_distance_angstrom": 0.735,
+    "qubits": 2,
+    "hamiltonian": "fixed two-qubit electronic Hamiltonian",
+    "hf_bitstring": "01",
+    "bitstring_convention": "|q1 q0>; qubit 0 is the least-significant bit"
   },
+  "energy_convention": {
+    "electronic_energy": "expectation value of the two-qubit electronic Hamiltonian",
+    "nuclear_repulsion_energy_hartree": 0.7199689944489797,
+    "total_energy": "electronic energy plus nuclear repulsion"
+  },
+  "baseline": "Hartree-Fock determinant",
+  "oracle": "exact diagonalization of the same 4x4 Hamiltonian",
   "primary_metric": {
-    "name": "energy_error",
-    "unit": "mHartree",
+    "name": "absolute_energy_error_mhartree",
     "direction": "lower_is_better",
     "threshold": 1.6
   },
-  "baseline": {
-    "method": "exact_diagonalization",
-    "description": "numpy.linalg.eigh on the 4x4 Hamiltonian matrix",
-    "expected_energy": -1.137275,
-    "unit": "Hartree"
-  },
   "quantum_method": {
     "algorithm": "VQE",
-    "ansatz": "hardware_efficient",
-    "optimizer": "scipy.optimize.minimize (COBYLA)",
-    "backend": "cqlib.StatevectorSimulator",
-    "qubits": 2,
-    "layers": 2
+    "ansatz": "particle_conserving_h2_subspace",
+    "parameters": 1,
+    "optimizer": "COBYLA",
+    "backend": "cqlib.StatevectorSimulator"
   },
-  "delivery_profile": "full_delivery",
-  "hardware_boundary": "simulator_only",
-  "seeds": [42, 123, 456],
-  "limitations": [
-    "Simulator-only results; no real-hardware noise or shot noise",
-    "H2 minimal basis only; results may differ for larger active spaces",
-    "Chemical accuracy threshold is 1.6 mHartree by convention"
-  ]
+  "initialization_seeds": [42, 123, 456],
+  "hardware_boundary": "exact_statevector_simulator_only",
+  "claim_boundary": "workflow validation for a fixed instance; no quantum-advantage or hardware claim"
 }

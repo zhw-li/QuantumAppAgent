@@ -3,7 +3,7 @@
     "pageTitle": "VQE分子基态能量计算",
     "algoIntro": {
       "title": "VQE分子基态能量计算",
-      "description": "变分量子本征求解器（VQE）是一种混合量子-经典算法，用于求解分子的基态能量。本应用以氢分子（H2）为例，在STO-3G基组下构建分子哈密顿量，通过硬件高效拟设线路和COBYLA优化器寻找基态能量。通过与经典Hartree-Fock基线对比，展示VQE在化学精度内求解分子能量的能力。",
+      "description": "本验证应用计算键长0.735埃处固定的H2两比特哈密顿量，采用单参数粒子数守恒拟设和COBYLA优化器，并在统一能量口径下与Hartree-Fock及精确对角化结果比较。",
       "tagVqe": "VQE",
       "tagH2": "H2",
       "tagSto3g": "STO-3G"
@@ -11,8 +11,8 @@
     "baseline": {
       "title": "经典基线",
       "runBaseline": "获取基线结果",
-      "hfEnergy": "Hartree-Fock能量",
-      "exactEnergy": "精确对角化能量",
+      "hfEnergy": "Hartree-Fock总能量",
+      "exactEnergy": "精确总能量",
       "hfError": "HF误差",
       "unitHartree": "Hartree",
       "unitMHartree": "mHartree",
@@ -26,11 +26,10 @@
     },
     "vqe": {
       "title": "VQE量子算法",
-      "seed": "随机种子",
-      "layers": "线路层数",
+      "seed": "初始参数种子",
       "runVqe": "运行VQE",
-      "vqeEnergy": "VQE能量",
-      "exactEnergy": "精确能量",
+      "vqeEnergy": "VQE总能量",
+      "exactEnergy": "VQE电子能",
       "energyError": "能量误差",
       "circuitDepth": "线路深度",
       "chemicalAccuracy": "化学精度",
@@ -63,7 +62,7 @@
       "notAchieved": "未达标",
       "notApplicable": "不适用",
       "winner": "更优",
-      "vqeWins": "VQE方法在化学精度内求解，显著优于Hartree-Fock基线",
+      "vqeWins": "在该固定仿真实例中，VQE结果与精确参考值之差低于1.6 mHartree化学精度阈值",
       "loading": "正在加载对比数据...",
       "loadFailed": "加载对比数据失败",
       "retry": "重试",
@@ -78,11 +77,11 @@
       "optimizer": "优化器",
       "backend": "后端",
       "qubits": "量子比特数",
-      "layers": "线路层数",
+      "parameters": "变分参数数",
       "moleculeValue": "H2",
       "basisValue": "STO-3G",
       "bondLengthValue": "0.735 A",
-      "ansatzValue": "硬件高效拟设",
+      "ansatzValue": "H2粒子数守恒子空间拟设",
       "optimizerValue": "COBYLA",
       "backendValue": "cqlib StatevectorSimulator"
     }

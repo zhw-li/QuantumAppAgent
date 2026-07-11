@@ -47,8 +47,8 @@
               <span class="method-value">2</span>
             </div>
             <div class="method-item">
-              <span class="method-label">{{ t('vqeH2.method.layers') }}</span>
-              <span class="method-value">2</span>
+              <span class="method-label">{{ t('vqeH2.method.parameters') }}</span>
+              <span class="method-value">1</span>
             </div>
           </div>
         </div>

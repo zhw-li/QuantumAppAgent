@@ -1,21 +1,29 @@
 {
-  "task": "vqe_molecular_energy",
-  "data": "H2 STO-3G at 0.735 \u00c5",
-  "primary_metric": "energy_error",
+  "task": "vqe_h2_ground_state",
+  "data": "H2 STO-3G at 0.735 angstrom; fixed two-qubit Hamiltonian",
+  "primary_metric": "absolute_energy_error_mhartree",
   "higher_is_better": false,
-  "value": 793.62168,
-  "energy_hartree": -1.0636533500290943,
-  "exact_energy_hartree": -1.8572750302023797,
-  "hf_energy_hartree": -1.0636533500290943,
-  "hf_error_mhartree": 793.62168,
+  "value": 20.307038999,
+  "energy_hartree": -1.1169989967540048,
+  "exact_energy_hartree": -1.1373060357534,
+  "hf_electronic_energy_hartree": -1.8369679912029844,
+  "hf_total_energy_hartree": -1.1169989967540048,
+  "exact_electronic_energy_hartree": -1.8572750302023795,
+  "exact_total_energy_hartree": -1.1373060357534,
+  "nuclear_repulsion_energy_hartree": 0.7199689944489797,
+  "hf_error_mhartree": 20.30703899939512,
+  "hf_bitstring": "01",
+  "bitstring_convention": "|q1 q0>; qubit 0 is the least-significant bit",
   "command": "python -m algorithms.baseline",
   "artifact_paths": [
     "baseline_report.json"
   ],
-  "backend": "Hartree-Fock (numpy.linalg.eigh for exact reference)",
+  "backend": "numpy.linalg.eigvalsh exact diagonalization",
   "qubits": 2,
+  "bond_distance_angstrom": 0.735,
   "limitations": [
-    "Hartree-Fock is a mean-field approximation that ignores electron correlation",
-    "Exact diagonalization is used only for reference, not as the baseline metric"
+    "The two-qubit Hamiltonian is a fixed, precomputed minimal-basis instance",
+    "Exact diagonalization is practical for this demonstration-scale system",
+    "The result is a simulator/reference check, not evidence of quantum advantage"
   ]
 }

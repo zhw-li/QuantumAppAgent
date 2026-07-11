@@ -1,12 +1,10 @@
-"""VQE algorithm for H2 ground-state energy using cqlib.
+"""Cqlib VQE for the fixed two-qubit H2 electronic Hamiltonian."""
 
-Implements a hardware-efficient ansatz with RY-RZ-CX layers,
-Pauli expectation estimation via basis rotation and measurement,
-and COBYLA classical optimization.
-"""
+from __future__ import annotations
 
+from dataclasses import dataclass
 import json
-import os
+from pathlib import Path
 
 import numpy as np
 from scipy.optimize import minimize
@@ -14,231 +12,252 @@ from scipy.optimize import minimize
 from cqlib import Circuit, Parameter
 from cqlib.simulator import StatevectorSimulator
 
-from algorithms.hamiltonian import H2_HAMILTONIAN
-from algorithms.baseline import get_exact_energy
+from algorithms.baseline import compute_reference
+from algorithms.hamiltonian import (
+    BOND_DISTANCE_ANGSTROM,
+    H2_HAMILTONIAN,
+    N_QUBITS,
+    electronic_to_total_energy,
+)
 
-N_QUBITS = 2
-DEFAULT_LAYERS = 2
+PARAMETER_NAME = "theta"
 OPTIMIZER = "COBYLA"
-MAXITER = 500
-TOL = 1e-6
-SEEDS = [42, 123, 456]
+MAXITER = 200
+TOL = 1e-10
+REPORT_SEEDS = [42, 123, 456]
 
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-QUANTUM_REPORT_PATH = os.path.join(BASE_DIR, "quantum_report.json")
-CONVERGENCE_PATH = os.path.join(BASE_DIR, "convergence.json")
+BASE_DIR = Path(__file__).resolve().parent.parent
+QUANTUM_REPORT_PATH = BASE_DIR / "quantum_report.json"
+CONVERGENCE_PATH = BASE_DIR / "convergence.json"
 
 
-# ---------------------------------------------------------------------------
-# Ansatz
-# ---------------------------------------------------------------------------
+@dataclass(frozen=True)
+class VQEResult:
+    seed: int
+    initial_theta: float
+    optimal_theta: float
+    electronic_energy_hartree: float
+    total_energy_hartree: float
+    energy_error_mhartree: float
+    correlation_energy_recovered_percent: float
+    evaluations: int
+    optimizer_success: bool
+    optimizer_message: str
+    convergence: list[tuple[int, float]]
 
-def build_ansatz(n_qubits=N_QUBITS, layers=DEFAULT_LAYERS):
-    """Build a hardware-efficient ansatz: RY-RZ-CX per layer.
+    @property
+    def optimal_parameters(self) -> dict[str, float]:
+        return {PARAMETER_NAME: self.optimal_theta}
 
-    Returns:
-        circuit: cqlib Circuit with parameterized gates.
-        param_names: list of parameter name strings in order.
+
+def build_ansatz() -> tuple[Circuit, list[str]]:
+    """Prepare ``cos(theta/2)|01> + sin(theta/2)|10>``.
+
+    The fixed X gate prepares the Hartree-Fock determinant ``|01>`` in Cqlib's
+    ``|q1 q0>`` convention.  The RY-CX pair spans the two-dimensional sector
+    coupled by the reduced H2 Hamiltonian with one variational parameter.
     """
-    param_names = []
-    for layer in range(layers):
-        for q in range(n_qubits):
-            param_names.append(f"ry_l{layer}_q{q}")
-        for q in range(n_qubits):
-            param_names.append(f"rz_l{layer}_q{q}")
-
-    circuit = Circuit(n_qubits, parameters=param_names)
-
-    idx = 0
-    for layer in range(layers):
-        # RY on each qubit
-        for q in range(n_qubits):
-            circuit.ry(q, Parameter(param_names[idx]))
-            idx += 1
-        # RZ on each qubit
-        for q in range(n_qubits):
-            circuit.rz(q, Parameter(param_names[idx]))
-            idx += 1
-        # CX ladder
-        for q in range(n_qubits - 1):
-            circuit.cx(q, q + 1)
-
-    return circuit, param_names
+    circuit = Circuit(N_QUBITS, parameters=[PARAMETER_NAME])
+    circuit.x(0)
+    circuit.ry(1, Parameter(PARAMETER_NAME))
+    circuit.cx(1, 0)
+    return circuit, [PARAMETER_NAME]
 
 
-# ---------------------------------------------------------------------------
-# Measurement helpers
-# ---------------------------------------------------------------------------
-
-def add_basis_rotations(circuit, pauli_list):
-    """Add basis rotation gates before measurement for a Pauli term.
-
-    X -> H, Y -> RX(π/2), Z -> no rotation.
-    """
-    circ = circuit.copy()
-    for qubit, op in pauli_list:
-        if op == "X":
-            circ.h(qubit)
-        elif op == "Y":
-            circ.rx(qubit, np.pi / 2)
-        # Z needs no rotation
-    return circ
+def add_basis_rotations(circuit: Circuit, pauli_list: list[tuple[int, str]]) -> Circuit:
+    """Rotate a Pauli measurement into the computational basis."""
+    rotated = circuit.copy()
+    for qubit, operator in pauli_list:
+        if operator == "X":
+            rotated.h(qubit)
+        elif operator == "Y":
+            rotated.rx(qubit, np.pi / 2)
+        elif operator != "Z":
+            raise ValueError(f"unsupported Pauli operator: {operator}")
+    return rotated
 
 
-def compute_pauli_expectation(bound_circuit, pauli_list):
-    """Compute <ψ|P|ψ> for a Pauli string P via sampling.
-
-    Uses basis rotation + measure_all() with StatevectorSimulator.
-    Bitstring convention: bits[-1 - qubit_index] maps qubit_index.
-    """
+def compute_pauli_expectation(
+    bound_circuit: Circuit,
+    pauli_list: list[tuple[int, str]],
+) -> float:
+    """Evaluate a Pauli expectation exactly with Cqlib's statevector backend."""
     if not pauli_list:
-        # Identity term
         return 1.0
 
     rotated = add_basis_rotations(bound_circuit, pauli_list)
     rotated.measure_all()
-
-    sim = StatevectorSimulator(circuit=rotated)
-    probs = sim.measure()
+    probabilities = StatevectorSimulator(circuit=rotated).measure()
 
     expectation = 0.0
-    for bitstring, prob in probs.items():
-        # Compute parity of the measured bits at the pauli qubit positions
-        parity = sum(int(bitstring[-1 - q]) for q, _ in pauli_list)
-        expectation += ((-1) ** parity) * prob
-
-    return expectation
+    for bitstring, probability in probabilities.items():
+        parity = sum(int(bitstring[-1 - qubit]) for qubit, _ in pauli_list)
+        expectation += ((-1) ** parity) * float(probability)
+    return float(expectation)
 
 
-# ---------------------------------------------------------------------------
-# Energy evaluation
-# ---------------------------------------------------------------------------
+def compute_energy(
+    circuit: Circuit,
+    parameter_values: dict[str, float],
+    hamiltonian=H2_HAMILTONIAN,
+) -> float:
+    """Evaluate the electronic energy for a bound variational circuit."""
+    bound = circuit.assign_parameters(parameter_values)
+    return float(
+        sum(
+            coefficient * compute_pauli_expectation(bound, pauli_list)
+            for coefficient, pauli_list in hamiltonian
+        )
+    )
 
-def compute_energy(circuit, param_dict, hamiltonian):
-    """Compute VQE energy = Σ coeff * <P> for all Hamiltonian terms."""
-    bound = circuit.assign_parameters(param_dict)
-    energy = 0.0
-    for coeff, pauli_list in hamiltonian:
-        energy += coeff * compute_pauli_expectation(bound, pauli_list)
-    return energy
 
+def run_vqe(seed: int = 42) -> VQEResult:
+    """Run one reproducible one-parameter VQE optimization."""
+    if not isinstance(seed, int) or seed < 0:
+        raise ValueError("seed must be a non-negative integer")
 
-# ---------------------------------------------------------------------------
-# Optimization
-# ---------------------------------------------------------------------------
+    reference = compute_reference()
+    circuit, _ = build_ansatz()
+    rng = np.random.default_rng(seed)
+    initial_theta = float(rng.uniform(-0.25, 0.25))
+    convergence: list[tuple[int, float]] = []
 
-def run_vqe(seed, layers=DEFAULT_LAYERS):
-    """Run a single VQE optimization with the given random seed.
+    def cost_fn(parameters: np.ndarray) -> float:
+        energy = compute_energy(circuit, {PARAMETER_NAME: float(parameters[0])})
+        convergence.append((len(convergence), energy))
+        return energy
 
-    Returns:
-        result_energy: optimized energy (float)
-        convergence: list of (iteration, energy) pairs
-    """
-    np.random.seed(seed)
-    circuit, param_names = build_ansatz(layers=layers)
-    n_params = len(param_names)
-    initial_params = np.zeros(n_params)
-
-    convergence = []
-    iteration = [0]
-
-    def cost_fn(params):
-        param_dict = dict(zip(param_names, params))
-        e = compute_energy(circuit, param_dict, H2_HAMILTONIAN)
-        convergence.append((iteration[0], float(e)))
-        iteration[0] += 1
-        return e
-
-    result = minimize(
+    optimizer_result = minimize(
         cost_fn,
-        initial_params,
+        np.array([initial_theta], dtype=float),
         method=OPTIMIZER,
         options={"maxiter": MAXITER, "tol": TOL},
     )
 
-    # Final energy from the optimizer result
-    final_params = result.x
-    param_dict = dict(zip(param_names, final_params))
-    final_energy = compute_energy(circuit, param_dict, H2_HAMILTONIAN)
+    optimal_theta = float(optimizer_result.x[0])
+    electronic_energy = compute_energy(circuit, {PARAMETER_NAME: optimal_theta})
+    error_mhartree = abs(electronic_energy - reference.exact_electronic_energy_hartree) * 1000.0
+    correlation_energy = (
+        reference.hf_electronic_energy_hartree
+        - reference.exact_electronic_energy_hartree
+    )
+    recovered = (
+        reference.hf_electronic_energy_hartree - electronic_energy
+    ) / correlation_energy * 100.0
 
-    return float(final_energy), convergence
+    return VQEResult(
+        seed=seed,
+        initial_theta=initial_theta,
+        optimal_theta=optimal_theta,
+        electronic_energy_hartree=electronic_energy,
+        total_energy_hartree=electronic_to_total_energy(electronic_energy),
+        energy_error_mhartree=error_mhartree,
+        correlation_energy_recovered_percent=float(np.clip(recovered, 0.0, 100.0)),
+        evaluations=int(optimizer_result.nfev),
+        optimizer_success=bool(optimizer_result.success),
+        optimizer_message=str(optimizer_result.message),
+        convergence=convergence,
+    )
 
 
-# ---------------------------------------------------------------------------
-# Main
-# ---------------------------------------------------------------------------
+def main() -> None:
+    reference = compute_reference()
+    results = [run_vqe(seed) for seed in REPORT_SEEDS]
 
-def main():
-    exact_energy = get_exact_energy()
-    print("=" * 60)
-    print("H2 Ground-State Energy — VQE Quantum Algorithm")
-    print("=" * 60)
-    print(f"  Exact energy  : {exact_energy:.10f} Hartree")
-    print(f"  Ansatz        : hardware_efficient ({DEFAULT_LAYERS} layers)")
-    print(f"  Optimizer     : {OPTIMIZER} (maxiter={MAXITER}, tol={TOL})")
-    print(f"  Seeds         : {SEEDS}")
-    print("-" * 60)
+    print("=" * 72)
+    print("H2 STO-3G at 0.735 angstrom -- Cqlib VQE")
+    print("=" * 72)
+    print(f"  Exact electronic energy  : {reference.exact_electronic_energy_hartree:.12f} Ha")
+    print(f"  Exact total energy       : {reference.exact_total_energy_hartree:.12f} Ha")
+    print("  Ansatz                   : one-parameter |01>/<10> subspace")
+    print(f"  Optimizer                : {OPTIMIZER} (maxiter={MAXITER}, tol={TOL})")
+    print("-" * 72)
+    for result in results:
+        print(
+            f"  Seed {result.seed:>3d}: E_total={result.total_energy_hartree:.12f} Ha, "
+            f"error={result.energy_error_mhartree:.6e} mHa, evals={result.evaluations}"
+        )
 
-    energies = []
-    all_convergence = {}
-
-    for seed in SEEDS:
-        energy, convergence = run_vqe(seed)
-        energies.append(energy)
-        all_convergence[str(seed)] = convergence
-        error_mhartree = (energy - exact_energy) * 1000
-        print(f"  Seed {seed:>3d}: energy = {energy:.10f} Ha, "
-              f"error = {error_mhartree:.4f} mHa")
-
-    mean_energy = float(np.mean(energies))
-    std_energy = float(np.std(energies))
-    mean_error = float((mean_energy - exact_energy) * 1000)
-    std_error = float(np.std([(e - exact_energy) * 1000 for e in energies]))
-
-    # Circuit info
+    electronic_energies = np.array([result.electronic_energy_hartree for result in results])
+    total_energies = np.array([result.total_energy_hartree for result in results])
+    errors = np.array([result.energy_error_mhartree for result in results])
+    recovered = np.array([result.correlation_energy_recovered_percent for result in results])
     circuit, _ = build_ansatz()
-    circuit_depth = circuit.depth()
 
-    print("-" * 60)
-    print(f"  Mean VQE energy : {mean_energy:.10f} Hartree")
-    print(f"  Mean error      : {mean_error:.4f} mHartree")
-    print(f"  Std error       : {std_error:.4f} mHartree")
-    print(f"  Circuit depth   : {circuit_depth}")
-    print("=" * 60)
+    print("-" * 72)
+    print(f"  Mean total energy        : {np.mean(total_energies):.12f} Ha")
+    print(f"  Mean absolute error      : {np.mean(errors):.6e} mHa")
+    print(f"  Max absolute error       : {np.max(errors):.6e} mHa")
+    print(f"  Circuit depth            : {circuit.depth()}")
+    print("=" * 72)
 
-    # Save quantum_report.json
+    per_seed = [
+        {
+            "seed": result.seed,
+            "initial_theta": result.initial_theta,
+            "optimal_theta": result.optimal_theta,
+            "electronic_energy_hartree": result.electronic_energy_hartree,
+            "total_energy_hartree": result.total_energy_hartree,
+            "energy_error_mhartree": result.energy_error_mhartree,
+            "correlation_energy_recovered_percent": result.correlation_energy_recovered_percent,
+            "evaluations": result.evaluations,
+            "optimizer_success": result.optimizer_success,
+        }
+        for result in results
+    ]
     quantum_report = {
-        "task": "vqe_molecular_energy",
-        "data": "H2 STO-3G at 0.735 Å",
-        "primary_metric": "energy_error",
+        "task": "vqe_h2_ground_state",
+        "data": "H2 STO-3G at 0.735 angstrom; fixed two-qubit Hamiltonian",
+        "primary_metric": "absolute_energy_error_mhartree",
         "higher_is_better": False,
-        "value": round(mean_error, 6),
-        "energy_hartree": round(mean_energy, 10),
-        "exact_energy_hartree": round(exact_energy, 10),
-        "energy_error_mhartree": round(mean_error, 6),
-        "energy_error_std_mhartree": round(std_error, 6),
-        "seeds": SEEDS,
+        "value": round(float(np.mean(errors)), 12),
+        "energy_hartree": float(np.mean(total_energies)),
+        "exact_energy_hartree": reference.exact_total_energy_hartree,
+        "electronic_energy_hartree": float(np.mean(electronic_energies)),
+        "total_energy_hartree": float(np.mean(total_energies)),
+        "exact_electronic_energy_hartree": reference.exact_electronic_energy_hartree,
+        "exact_total_energy_hartree": reference.exact_total_energy_hartree,
+        "nuclear_repulsion_energy_hartree": reference.nuclear_repulsion_energy_hartree,
+        "energy_error_mhartree": float(np.mean(errors)),
+        "max_energy_error_mhartree": float(np.max(errors)),
+        "energy_error_std_mhartree": float(np.std(errors)),
+        "correlation_energy_recovered_percent": float(np.mean(recovered)),
+        "seeds": REPORT_SEEDS,
+        "per_seed_results": per_seed,
         "command": "python -m algorithms.vqe",
         "artifact_paths": ["quantum_report.json", "convergence.json"],
         "backend": "cqlib.StatevectorSimulator",
         "qubits": N_QUBITS,
-        "circuit_depth": circuit_depth,
-        "ansatz": "hardware_efficient",
-        "layers": DEFAULT_LAYERS,
+        "circuit_depth": circuit.depth(),
+        "parameters": 1,
+        "ansatz": "particle_conserving_h2_subspace",
         "optimizer": OPTIMIZER,
+        "bond_distance_angstrom": BOND_DISTANCE_ANGSTROM,
         "limitations": [
-            "Simulator-only results",
-            "H2 minimal basis only",
+            "Exact statevector simulation; no sampling or device noise",
+            "Fixed H2/STO-3G two-qubit instance",
+            "The example validates the TYQA workflow and does not establish quantum advantage",
         ],
     }
+    QUANTUM_REPORT_PATH.write_text(
+        json.dumps(quantum_report, indent=2), encoding="utf-8"
+    )
 
-    with open(QUANTUM_REPORT_PATH, "w") as f:
-        json.dump(quantum_report, f, indent=2)
-    print(f"\nQuantum report saved to: {QUANTUM_REPORT_PATH}")
-
-    # Save convergence.json
-    with open(CONVERGENCE_PATH, "w") as f:
-        json.dump(all_convergence, f, indent=2)
+    convergence_report = {
+        str(result.seed): [
+            {
+                "evaluation": evaluation,
+                "electronic_energy_hartree": electronic_energy,
+                "total_energy_hartree": electronic_to_total_energy(electronic_energy),
+            }
+            for evaluation, electronic_energy in result.convergence
+        ]
+        for result in results
+    }
+    CONVERGENCE_PATH.write_text(
+        json.dumps(convergence_report, indent=2), encoding="utf-8"
+    )
+    print(f"Quantum report saved to: {QUANTUM_REPORT_PATH}")
     print(f"Convergence data saved to: {CONVERGENCE_PATH}")
 
 

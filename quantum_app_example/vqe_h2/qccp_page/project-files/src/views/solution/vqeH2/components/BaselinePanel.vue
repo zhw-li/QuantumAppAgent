@@ -31,12 +31,12 @@
           <div class="metrics-grid">
             <div class="metric-item">
               <span class="metric-label">{{ t('vqeH2.baseline.hfEnergy') }}</span>
-              <span class="metric-value">{{ formatEnergy(data.hf_energy_hartree) }}</span>
+              <span class="metric-value">{{ formatEnergy(data.hf_total_energy_hartree) }}</span>
               <span class="metric-unit">{{ t('vqeH2.baseline.unitHartree') }}</span>
             </div>
             <div class="metric-item">
               <span class="metric-label">{{ t('vqeH2.baseline.exactEnergy') }}</span>
-              <span class="metric-value">{{ formatEnergy(data.exact_energy_hartree) }}</span>
+              <span class="metric-value">{{ formatEnergy(data.exact_total_energy_hartree) }}</span>
               <span class="metric-unit">{{ t('vqeH2.baseline.unitHartree') }}</span>
             </div>
             <div class="metric-item">

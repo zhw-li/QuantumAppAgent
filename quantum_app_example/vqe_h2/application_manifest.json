@@ -1,120 +1,228 @@
 {
-  "application": "VQE H2 Ground-State Energy",
-  "delivery_profile": "full_delivery",
-  "algorithm": {
-    "type": "VQE",
-    "molecule": "H2",
-    "basis": "STO-3G",
-    "qubits": 2,
-    "ansatz": "hardware_efficient",
-    "layers": 2,
-    "optimizer": "COBYLA",
-    "backend": "cqlib.StatevectorSimulator"
-  },
-  "network": {
-    "mode": "single_origin",
-    "bind_host": "0.0.0.0",
-    "bind_port": 8080,
-    "public_scheme": "http",
-    "public_host": "127.0.0.1",
-    "public_port": 8080,
-    "public_base_url": "http://127.0.0.1:8080",
-    "api_base": "/api",
-    "frontend_serving": "backend_static"
-  },
-  "artifacts": {
-    "application_brief": "application_brief.md",
-    "requirements.json": "requirements.json",
-    "solution_plan": "solution_plan.md",
-    "algorithm_route": "algorithm_route.md",
-    "validation_plan": "validation_plan.md",
-    "baseline_report.json": "baseline_report.json",
-    "quantum_report.json": "quantum_report.json",
-    "README.md": "README.md",
-    "INTEGRATE.md": "INTEGRATE.md",
-    "verification_report.md": "verification_report.md"
-  },
-  "local_demo": {
-    "entrypoint": "app/static/index.html",
-    "backend_entrypoint": "app/main.py",
-    "frontend": "app/static/index.html",
-    "static_assets": [],
-    "start_command": "cd /code/cqlib_app/vqe_h2 && python -m app.main",
-    "backend_bind": "env:APP_BIND_HOST+APP_BIND_PORT",
-    "ui_profile": "qccp-ui-standalone",
-    "language": "zh-CN",
-    "ui": {
-      "language": "zh-CN",
-      "english_copy": "Run VQE"
+    "application": "H2 Ground-State Energy with VQE",
+    "delivery_profile": "full_delivery",
+    "scientific_scope": {
+        "task": "vqe_h2_ground_state",
+        "molecule": "H2",
+        "basis": "STO-3G",
+        "bond_distance_angstrom": 0.735,
+        "hamiltonian": "fixed two-qubit electronic Hamiltonian",
+        "energy_convention": "molecular total energy equals electronic energy plus nuclear repulsion",
+        "hf_bitstring": "01",
+        "bitstring_convention": "|q1 q0>; qubit 0 is the least-significant bit"
     },
-    "endpoints": [
-      {
-        "path": "/health",
-        "method": "GET",
-        "description": "Health check",
-        "request_schema": {"type": "object", "properties": {}},
-        "response_schema": {"status": "string"},
-        "errors": [{"code": 503, "description": "Service unavailable"}]
-      },
-      {
-        "path": "/api/info",
-        "method": "GET",
-        "description": "Application metadata",
-        "request_schema": {"type": "object", "properties": {}},
-        "response_schema": {"name": "string", "molecule": "string", "basis": "string", "bond_distance_angstrom": "number", "qubits": "int", "ansatz": "string", "default_layers": "int", "optimizer": "string", "backend": "string"},
-        "errors": [{"code": 500, "description": "Internal server error"}]
-      },
-      {
-        "path": "/api/baseline",
-        "method": "GET",
-        "description": "Classical baseline results",
-        "request_schema": {"type": "object", "properties": {}},
-        "response_schema": {"hf_energy_hartree": "number", "exact_energy_hartree": "number", "hf_error_mhartree": "number"},
-        "errors": [{"code": 500, "description": "Computation error"}]
-      },
-      {
-        "path": "/api/vqe",
-        "method": "GET",
-        "params": {"seed": "int (default=42)", "layers": "int (default=2)"},
-        "description": "VQE quantum algorithm results",
-        "request_schema": {"seed": "int", "layers": "int"},
-        "response_schema": {"energy_hartree": "number", "exact_energy_hartree": "number", "energy_error_mhartree": "number", "circuit_depth": "int", "qcis": "string", "convergence": "array", "seed": "int", "layers": "int"},
-        "errors": [{"code": 500, "description": "VQE optimization failed"}]
-      },
-      {
-        "path": "/api/compare",
-        "method": "GET",
-        "description": "Baseline vs VQE comparison",
-        "request_schema": {"type": "object", "properties": {}},
-        "response_schema": {"baseline": "object", "vqe": "object", "improvement_mhartree": "number"},
-        "errors": [{"code": 500, "description": "Computation error"}]
-      }
+    "algorithm": {
+        "type": "VQE",
+        "qubits": 2,
+        "ansatz": "particle_conserving_h2_subspace",
+        "parameters": 1,
+        "optimizer": "COBYLA",
+        "backend": "cqlib.StatevectorSimulator"
+    },
+    "network": {
+        "mode": "single_origin",
+        "bind_host": "0.0.0.0",
+        "bind_port": 8080,
+        "public_scheme": "http",
+        "public_host": "127.0.0.1",
+        "public_port": 8080,
+        "public_base_url": "http://127.0.0.1:8080",
+        "api_base": "/api",
+        "frontend_serving": "backend_static"
+    },
+    "artifacts": {
+        "application_brief": "application_brief.md",
+        "requirements": "requirements.json",
+        "solution_plan": "solution_plan.md",
+        "algorithm_route": "algorithm_route.md",
+        "validation_plan": "validation_plan.md",
+        "baseline_report": "baseline_report.json",
+        "quantum_report": "quantum_report.json",
+        "readme": "README.md",
+        "integrate": "INTEGRATE.md",
+        "verification_report": "verification_report.md",
+        "requirements.json": "requirements.json",
+        "baseline_report.json": "baseline_report.json",
+        "quantum_report.json": "quantum_report.json",
+        "verification_report.md": "verification_report.md",
+        "README.md": "README.md",
+        "INTEGRATE.md": "INTEGRATE.md"
+    },
+    "local_demo": {
+        "backend_entrypoint": "app/main.py",
+        "entrypoint": "app/static/index.html",
+        "frontend": "app/static/index.html",
+        "static_assets": [],
+        "start_command": "python -m app.main",
+        "ui_profile": "qccp-ui-standalone",
+        "language": "zh-CN",
+        "endpoints": [
+            {
+                "path": "/api/info",
+                "method": "GET",
+                "request_schema": {
+                    "type": "object"
+                },
+                "response_schema": {
+                    "type": "object",
+                    "required": [
+                        "molecule",
+                        "energy_convention"
+                    ]
+                },
+                "errors": [
+                    {
+                        "code": 500,
+                        "description": "metadata generation failed"
+                    }
+                ],
+                "response_fields": [
+                    "molecule",
+                    "basis",
+                    "bond_distance_angstrom",
+                    "qubits",
+                    "ansatz",
+                    "parameters",
+                    "optimizer",
+                    "backend",
+                    "energy_convention"
+                ]
+            },
+            {
+                "path": "/api/baseline",
+                "method": "GET",
+                "request_schema": {
+                    "type": "object"
+                },
+                "response_schema": {
+                    "type": "object",
+                    "required": [
+                        "hf_total_energy_hartree",
+                        "exact_total_energy_hartree"
+                    ]
+                },
+                "errors": [
+                    {
+                        "code": 500,
+                        "description": "reference calculation failed"
+                    }
+                ],
+                "response_fields": [
+                    "hf_bitstring",
+                    "hf_electronic_energy_hartree",
+                    "hf_total_energy_hartree",
+                    "exact_electronic_energy_hartree",
+                    "exact_total_energy_hartree",
+                    "nuclear_repulsion_energy_hartree",
+                    "hf_error_mhartree"
+                ]
+            },
+            {
+                "path": "/api/vqe",
+                "method": "GET",
+                "request_schema": {
+                    "type": "object",
+                    "properties": {
+                        "seed": {
+                            "type": "integer"
+                        }
+                    }
+                },
+                "response_schema": {
+                    "type": "object",
+                    "required": [
+                        "total_energy_hartree",
+                        "energy_error_mhartree",
+                        "qcis",
+                        "convergence"
+                    ]
+                },
+                "errors": [
+                    {
+                        "code": 422,
+                        "description": "invalid seed"
+                    },
+                    {
+                        "code": 500,
+                        "description": "VQE calculation failed"
+                    }
+                ],
+                "query": {
+                    "seed": "integer in [0, 4294967295], default 42"
+                },
+                "response_fields": [
+                    "electronic_energy_hartree",
+                    "total_energy_hartree",
+                    "energy_error_mhartree",
+                    "correlation_energy_recovered_percent",
+                    "parameters",
+                    "circuit_depth",
+                    "qcis",
+                    "convergence"
+                ]
+            },
+            {
+                "path": "/api/compare",
+                "method": "GET",
+                "request_schema": {
+                    "type": "object"
+                },
+                "response_schema": {
+                    "type": "object",
+                    "required": [
+                        "baseline",
+                        "vqe"
+                    ]
+                },
+                "errors": [
+                    {
+                        "code": 500,
+                        "description": "comparison calculation failed"
+                    }
+                ],
+                "response_fields": [
+                    "baseline",
+                    "vqe",
+                    "correlation_energy_recovered_percent",
+                    "comparison_scope"
+                ]
+            }
+        ]
+    },
+    "qccp_web": {
+        "pageKey": "vqeH2",
+        "page_key": "vqeH2",
+        "module": "solution",
+        "route": "/solution/vqe-h2",
+        "sfc": "qccp_page/project-files/src/views/solution/vqeH2/index.vue",
+        "api_module": "qccp_page/project-files/src/api/vqeH2/index.js",
+        "locales": "qccp_page/locales",
+        "api_paths": [
+            "/api/info",
+            "/api/baseline",
+            "/api/vqe",
+            "/api/compare"
+        ],
+        "verification_command": "npm run build"
+    },
+    "docs": {
+        "readme": "README.md",
+        "integrate": "INTEGRATE.md",
+        "verification_report": "verification_report.md"
+    },
+    "verification": {
+        "commands": [
+            "python -m algorithms.baseline",
+            "python -m algorithms.vqe",
+            "python -m pytest tests/test_vqe_h2.py -q",
+            "python -m app.main --check"
+        ],
+        "chemical_accuracy_threshold_mhartree": 1.6
+    },
+    "limitations": [
+        "Exact statevector simulation; no shot noise or device noise",
+        "Fixed H2/STO-3G two-qubit instance at 0.735 angstrom",
+        "No cloud-simulator or quantum-hardware result is claimed",
+        "The case validates application engineering and not quantum advantage"
     ]
-  },
-  "qccp_web": {
-    "pageKey": "vqeH2",
-    "module": "solution",
-    "route": "/solution/vqe-h2",
-    "sfc": "qccp_page/project-files/src/views/solution/vqeH2/index.vue",
-    "api_module_path": "qccp_page/project-files/src/api/vqeH2/index.js",
-    "i18n_path": "qccp_page/locales",
-    "api_paths": ["/api/info", "/api/baseline", "/api/vqe", "/api/compare"],
-    "verification_command": "npm run build"
-  },
-  "docs": {
-    "readme": "README.md",
-    "integrate": "INTEGRATE.md",
-    "verification_report": "verification_report.md"
-  },
-  "verification": {
-    "commands": [
-      "cd /code/cqlib_app/vqe_h2 && python -m algorithms.baseline",
-      "cd /code/cqlib_app/vqe_h2 && python -m algorithms.vqe"
-    ]
-  },
-  "limitations": [
-    "Simulator-only; no real-hardware evidence",
-    "H2 minimal basis (STO-3G) only",
-    "Chemical accuracy is a convention-based threshold"
-  ]
 }

@@ -1,47 +1,25 @@
-# VQE H2 Molecular Energy — Application Brief
+# Application Brief: H2 Ground-State Energy with VQE
 
-## Goal
-Build a TianYan quantum cloud showcase application that uses the Variational Quantum Eigensolver (VQE) to compute the ground-state energy of the H2 molecule. The quantum result must match or beat the classical baseline (exact diagonalization) within chemical accuracy (≤1.6 mHartree).
+## Objective
 
-## User Workflow
-1. User selects a bond distance for H2 (or uses the default equilibrium distance 0.735 Å).
-2. System computes the H2 Hamiltonian at that bond distance.
-3. Classical baseline: exact diagonalization of the Hamiltonian matrix → ground-state energy.
-4. Quantum VQE: hardware-efficient ansatz + scipy optimizer on cqlib StatevectorSimulator → ground-state energy.
-5. System displays both results and the energy error comparison.
+Realize and validate a platform-facing quantum application for one fixed H2 ground-state problem. The application must preserve one scientific contract from Hamiltonian definition through Cqlib execution, service responses and user-interface presentation.
 
-## Inputs & Outputs
-- **Input**: Bond distance (Å, float), optional ansatz layers (int, default=2)
-- **Output**: Classical energy (Hartree), Quantum energy (Hartree), Energy error (mHartree), Convergence trace, Circuit diagram (QCIS)
+## Fixed Scientific Instance
 
-## Task Type
-Chemistry / Molecular simulation
+- H2 in the STO-3G basis at 0.735 angstrom;
+- fixed two-qubit electronic Hamiltonian;
+- Cqlib bitstring convention `|q1 q0>` and HF determinant `|01>`;
+- molecular total energy = electronic energy + `0.719968994449 Ha` nuclear repulsion;
+- HF as the classical baseline and exact diagonalization as the oracle.
 
-## Data Status
-Pre-computed H2 minimal basis (STO-3G) Hamiltonian coefficients from standard references. No external dataset needed.
+## User Interaction
 
-## Baseline
-Exact diagonalization of the 2-qubit Hamiltonian matrix using numpy.linalg.eigh. This gives the true ground-state energy for the given Hamiltonian.
+The user may retrieve the reference calculation, run VQE with a chosen initialization seed, inspect the optimized QCIS circuit and convergence trace, and compare HF, VQE and exact energies under the same energy convention.
 
-## Primary Metric
-- **Name**: energy_error (absolute deviation from exact ground-state energy in mHartree)
-- **Direction**: lower_is_better
-- **Threshold**: ≤1.6 mHartree (chemical accuracy)
+## Acceptance Criterion
 
-## Quantum Route
-VQE with hardware-efficient ansatz on cqlib StatevectorSimulator. Algorithm skill: cqlib-sdk + cqlib-vqe.
+The absolute difference between VQE and exact electronic energies must not exceed `1.6 mHa`. Scientific tests must also enforce the variational lower bound, endianness, API schema and report consistency.
 
-## Delivery Target
-full_delivery: algorithm evidence + local FastAPI demo + qccp-web page + documentation
+## Scope Boundary
 
-## Hardware Boundary
-Simulator only (cqlib StatevectorSimulator). No real hardware execution in this delivery.
-
-## Evidence Standard
-Internal PoC / cloud showcase demo — reproducible, comparable, not publication-grade.
-
-## Out of Scope
-- Real hardware execution
-- Larger molecules (LiH, H2O, etc.)
-- Active space selection beyond minimal basis
-- Error mitigation techniques
+The evidence is exact statevector simulation for one fixed instance. It supports workflow validation, not claims about quantum advantage, cloud execution or hardware performance.

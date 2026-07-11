@@ -3,7 +3,7 @@
     "pageTitle": "VQE Molecular Ground-State Energy",
     "algoIntro": {
       "title": "VQE Molecular Ground-State Energy",
-      "description": "The Variational Quantum Eigensolver (VQE) is a hybrid quantum-classical algorithm for finding the ground-state energy of molecules. This application uses the hydrogen molecule (H2) as an example, constructing the molecular Hamiltonian under the STO-3G basis set, and searching for the ground-state energy through a hardware-efficient ansatz circuit with the COBYLA optimizer. By comparing with the classical Hartree-Fock baseline, it demonstrates VQE's ability to solve molecular energies within chemical accuracy.",
+      "description": "This validated reference application evaluates a fixed two-qubit H2 Hamiltonian at 0.735 angstrom. A one-parameter particle-conserving ansatz and COBYLA optimizer are compared with Hartree-Fock and exact diagonalization under one explicit energy convention.",
       "tagVqe": "VQE",
       "tagH2": "H2",
       "tagSto3g": "STO-3G"
@@ -11,8 +11,8 @@
     "baseline": {
       "title": "Classical Baseline",
       "runBaseline": "Fetch Baseline",
-      "hfEnergy": "Hartree-Fock Energy",
-      "exactEnergy": "Exact Diagonalization Energy",
+      "hfEnergy": "Hartree-Fock Total Energy",
+      "exactEnergy": "Exact Total Energy",
       "hfError": "HF Error",
       "unitHartree": "Hartree",
       "unitMHartree": "mHartree",
@@ -26,11 +26,10 @@
     },
     "vqe": {
       "title": "VQE Quantum Algorithm",
-      "seed": "Random Seed",
-      "layers": "Circuit Layers",
+      "seed": "Initialization Seed",
       "runVqe": "Run VQE",
-      "vqeEnergy": "VQE Energy",
-      "exactEnergy": "Exact Energy",
+      "vqeEnergy": "VQE Total Energy",
+      "exactEnergy": "VQE Electronic Energy",
       "energyError": "Energy Error",
       "circuitDepth": "Circuit Depth",
       "chemicalAccuracy": "Chemical Accuracy",
@@ -63,7 +62,7 @@
       "notAchieved": "Not Achieved",
       "notApplicable": "N/A",
       "winner": "Better",
-      "vqeWins": "VQE achieves chemical accuracy, significantly outperforming the Hartree-Fock baseline",
+      "vqeWins": "VQE reaches the exact reference within the 1.6 mHartree chemical-accuracy threshold for this fixed simulator instance",
       "loading": "Loading comparison data...",
       "loadFailed": "Failed to load comparison data",
       "retry": "Retry",
@@ -78,11 +77,11 @@
       "optimizer": "Optimizer",
       "backend": "Backend",
       "qubits": "Qubits",
-      "layers": "Circuit Layers",
+      "parameters": "Variational Parameters",
       "moleculeValue": "H2",
       "basisValue": "STO-3G",
       "bondLengthValue": "0.735 A",
-      "ansatzValue": "Hardware-Efficient Ansatz",
+      "ansatzValue": "Particle-Conserving H2 Subspace",
       "optimizerValue": "COBYLA",
       "backendValue": "cqlib StatevectorSimulator"
     }

@@ -17,17 +17,6 @@
               size="large"
             />
           </div>
-          <div class="control-item">
-            <label class="control-label">{{ t('vqeH2.vqe.layers') }}</label>
-            <el-input-number
-              v-model="layers"
-              :min="1"
-              :max="6"
-              :step="1"
-              controls-position="right"
-              size="large"
-            />
-          </div>
           <el-button
             type="primary"
             size="large"
@@ -62,12 +51,12 @@
           <div class="metrics-grid">
             <div class="metric-item">
               <span class="metric-label">{{ t('vqeH2.vqe.vqeEnergy') }}</span>
-              <span class="metric-value">{{ formatEnergy(data.energy_hartree) }}</span>
+              <span class="metric-value">{{ formatEnergy(data.total_energy_hartree) }}</span>
               <span class="metric-unit">{{ t('vqeH2.vqe.unitHartree') }}</span>
             </div>
             <div class="metric-item">
               <span class="metric-label">{{ t('vqeH2.vqe.exactEnergy') }}</span>
-              <span class="metric-value">{{ formatEnergy(data.exact_energy_hartree) }}</span>
+              <span class="metric-value">{{ formatEnergy(data.electronic_energy_hartree) }}</span>
               <span class="metric-unit">{{ t('vqeH2.vqe.unitHartree') }}</span>
             </div>
             <div class="metric-item">
@@ -143,7 +132,6 @@ import QcisGraph from '@/views/solution/components/graph.vue';
 const { t } = useI18n();
 
 const seed = ref(42);
-const layers = ref(2);
 const loading = ref(false);
 const error = ref(false);
 const data = ref(null);
@@ -157,14 +145,14 @@ const isChemicalAccuracy = computed(() => {
 
 const chartPoints = computed(() => {
   if (convergenceData.value.length === 0) return [];
-  const energies = convergenceData.value.map((p) => p[1]);
+  const energies = convergenceData.value.map((p) => p.total_energy_hartree);
   const minE = Math.min(...energies);
   const maxE = Math.max(...energies);
   const range = maxE - minE || 1;
   return convergenceData.value.map((p) => ({
-    iter: p[0],
-    energy: p[1],
-    height: ((p[1] - minE) / range) * 80 + 10
+    iter: p.evaluation,
+    energy: p.total_energy_hartree,
+    height: ((p.total_energy_hartree - minE) / range) * 80 + 10
   }));
 });
 
@@ -182,7 +170,7 @@ async function runVqe() {
   loading.value = true;
   error.value = false;
   try {
-    const res = await runVqeApi({ seed: seed.value, layers: layers.value });
+    const res = await runVqeApi({ seed: seed.value });
     const result = res.data || res;
     data.value = result;
     if (result.convergence) {

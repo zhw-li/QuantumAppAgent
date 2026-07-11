@@ -1,17 +1,59 @@
 {
-  "task": "vqe_molecular_energy",
-  "data": "H2 STO-3G at 0.735 \u00c5",
-  "primary_metric": "energy_error",
+  "task": "vqe_h2_ground_state",
+  "data": "H2 STO-3G at 0.735 angstrom; fixed two-qubit Hamiltonian",
+  "primary_metric": "absolute_energy_error_mhartree",
   "higher_is_better": false,
-  "value": 0.0,
-  "energy_hartree": -1.8572750302,
-  "exact_energy_hartree": -1.8572750302,
-  "energy_error_mhartree": 0.0,
-  "energy_error_std_mhartree": 0.0,
+  "value": 1e-12,
+  "energy_hartree": -1.1373060357534006,
+  "exact_energy_hartree": -1.1373060357534,
+  "electronic_energy_hartree": -1.8572750302023804,
+  "total_energy_hartree": -1.1373060357534006,
+  "exact_electronic_energy_hartree": -1.8572750302023795,
+  "exact_total_energy_hartree": -1.1373060357534,
+  "nuclear_repulsion_energy_hartree": 0.7199689944489797,
+  "energy_error_mhartree": 8.141635513917814e-13,
+  "max_energy_error_mhartree": 8.881784197001252e-13,
+  "energy_error_std_mhartree": 1.0467283057891834e-13,
+  "correlation_energy_recovered_percent": 100.0,
   "seeds": [
     42,
     123,
     456
+  ],
+  "per_seed_results": [
+    {
+      "seed": 42,
+      "initial_theta": 0.13697802427798167,
+      "optimal_theta": -0.2235369757220183,
+      "electronic_energy_hartree": -1.8572750302023802,
+      "total_energy_hartree": -1.1373060357534004,
+      "energy_error_mhartree": 6.661338147750939e-13,
+      "correlation_energy_recovered_percent": 100.0,
+      "evaluations": 39,
+      "optimizer_success": true
+    },
+    {
+      "seed": 123,
+      "initial_theta": 0.09117593162407173,
+      "optimal_theta": -0.22353700837592824,
+      "electronic_energy_hartree": -1.8572750302023804,
+      "total_energy_hartree": -1.1373060357534008,
+      "energy_error_mhartree": 8.881784197001252e-13,
+      "correlation_energy_recovered_percent": 100.0,
+      "evaluations": 46,
+      "optimizer_success": true
+    },
+    {
+      "seed": 456,
+      "initial_theta": -0.015163377817617174,
+      "optimal_theta": -0.22353700281761707,
+      "electronic_energy_hartree": -1.8572750302023804,
+      "total_energy_hartree": -1.1373060357534008,
+      "energy_error_mhartree": 8.881784197001252e-13,
+      "correlation_energy_recovered_percent": 100.0,
+      "evaluations": 45,
+      "optimizer_success": true
+    }
   ],
   "command": "python -m algorithms.vqe",
   "artifact_paths": [
@@ -20,12 +62,14 @@
   ],
   "backend": "cqlib.StatevectorSimulator",
   "qubits": 2,
-  "circuit_depth": 6,
-  "ansatz": "hardware_efficient",
-  "layers": 2,
+  "circuit_depth": 2,
+  "parameters": 1,
+  "ansatz": "particle_conserving_h2_subspace",
   "optimizer": "COBYLA",
+  "bond_distance_angstrom": 0.735,
   "limitations": [
-    "Simulator-only results",
-    "H2 minimal basis only"
+    "Exact statevector simulation; no sampling or device noise",
+    "Fixed H2/STO-3G two-qubit instance",
+    "The example validates the TYQA workflow and does not establish quantum advantage"
   ]
 }

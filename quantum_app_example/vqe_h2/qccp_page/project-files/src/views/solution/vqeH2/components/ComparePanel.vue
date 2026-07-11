@@ -73,8 +73,8 @@ const data = ref(null);
 
 const vqeWins = computed(() => {
   if (!data.value) return false;
-  const vqeError = Math.abs(data.value.vqe_error_mhartree ?? Infinity);
-  const hfError = Math.abs(data.value.hf_error_mhartree ?? 0);
+  const vqeError = Math.abs(data.value.vqe?.energy_error_mhartree ?? Infinity);
+  const hfError = Math.abs(data.value.baseline?.hf_error_mhartree ?? 0);
   return vqeError <= 1.6 && vqeError < hfError;
 });
 
@@ -84,30 +84,30 @@ const tableData = computed(() => {
   return [
     {
       metric: t('vqeH2.compare.energy'),
-      classical: formatEnergy(d.hf_energy_hartree),
-      quantum: formatEnergy(d.vqe_energy_hartree)
+      classical: formatEnergy(d.baseline.hf_total_energy_hartree),
+      quantum: formatEnergy(d.vqe.total_energy_hartree)
     },
     {
       metric: t('vqeH2.compare.exactEnergy'),
-      classical: formatEnergy(d.exact_energy_hartree),
-      quantum: formatEnergy(d.exact_energy_hartree)
+      classical: formatEnergy(d.baseline.exact_total_energy_hartree),
+      quantum: formatEnergy(d.baseline.exact_total_energy_hartree)
     },
     {
       metric: t('vqeH2.compare.error'),
-      classical: formatError(d.hf_error_mhartree),
-      quantum: formatError(d.vqe_error_mhartree)
+      classical: formatError(d.baseline.hf_error_mhartree),
+      quantum: formatError(d.vqe.energy_error_mhartree)
     },
     {
       metric: t('vqeH2.compare.chemicalAccuracy'),
       classical: t('vqeH2.compare.notAchieved'),
-      quantum: Math.abs(d.vqe_error_mhartree) <= 1.6
+      quantum: Math.abs(d.vqe.energy_error_mhartree) <= 1.6
         ? t('vqeH2.compare.achieved')
         : t('vqeH2.compare.notAchieved')
     },
     {
       metric: t('vqeH2.compare.circuitDepth'),
       classical: t('vqeH2.compare.notApplicable'),
-      quantum: String(d.circuit_depth ?? '--')
+      quantum: String(d.vqe.circuit_depth ?? '--')
     }
   ];
 });

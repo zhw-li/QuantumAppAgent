@@ -1,92 +1,43 @@
-# VQE H2 分子基态能量计算 — 天衍量子应用
+# H2 基态能量 VQE 验证应用
 
-## 概述
+该应用使用 Cqlib 在精确状态矢量模拟器上求解固定的 H2 两比特电子哈密顿量，并以 Hartree--Fock（HF）结果作为经典基线、以精确对角化作为数值参考。电子能与核排斥能始终分开记录，分子总能量定义为二者之和。
 
-本应用使用变分量子本征求解器 (VQE) 计算 H2 分子在 STO-3G 基组下的基态能量，并与经典 Hartree-Fock 基线进行对比。VQE 量子算法成功捕获了电子关联效应，达到化学精度要求。
+## 已验证结果
 
-## 量子 vs 经典结果
+体系固定为 H2、STO-3G 基组、键长 0.735 埃。Cqlib 比特串采用 `|q1 q0>`，HF 初态为 `|01>`。
 
-| 方法 | 能量 (Hartree) | 与精确值误差 (mHartree) |
-|------|----------------|------------------------|
-| Hartree-Fock (经典基线) | -1.0637 | 793.62 |
-| VQE (量子算法) | **-1.8573** | **0.00** |
-| 精确对角化 (参考) | -1.8573 | 0.00 (定义) |
+| 方法 | 电子能量 (Ha) | 总能量 (Ha) | 绝对误差 (mHa) |
+|---|---:|---:|---:|
+| Hartree--Fock | -1.836967991203 | -1.116998996754 | 20.307039 |
+| Cqlib VQE，3 个初始种子均值 | -1.857275030202 | -1.137306035753 | < 1e-9 |
+| 精确对角化 | -1.857275030202 | -1.137306035753 | 0（参考定义） |
 
-**VQE 相对经典基线改进 793.6 mHartree，达到化学精度 (≤1.6 mHartree)。**
+核排斥能为 `0.719968994449 Ha`。VQE 使用单参数、粒子数守恒的 H2 子空间拟设和 COBYLA 优化器。该结果验证固定仿真实例的算法与应用链路，不构成量子优势证据。
 
-## 算法配置
-
-- **分子**: H2 (STO-3G, 键长 0.735 Å)
-- **量子比特**: 2 (Bravyi-Kitaev parity mapping)
-- **Ansatz**: 硬件高效 (RY-RZ-CX, 2 layers, 8 参数)
-- **优化器**: COBYLA (maxiter=500, tol=1e-6)
-- **后端**: cqlib.StatevectorSimulator
-- **电路深度**: 6
-
-## 项目结构
-
-```
-vqe_h2/
-├── algorithms/
-│   ├── __init__.py
-│   ├── hamiltonian.py      # H2 Hamiltonian 定义
-│   ├── baseline.py         # 经典基线 (HF + 精确对角化)
-│   └── vqe.py              # VQE 量子算法
-├── app/
-│   ├── __init__.py
-│   ├── main.py             # FastAPI 后端
-│   └── static/
-│       └── index.html      # 本地演示页面
-├── qccp_page/              # 天衍云页面 (Vue SFC)
-│   ├── project-files/src/
-│   ├── locales/
-├── application_brief.md
-├── requirements.json
-├── application_manifest.json
-├── solution_plan.md
-├── algorithm_route.md
-├── validation_plan.md
-├── baseline_report.json
-├── quantum_report.json
-├── convergence.json
-├── README.md
-├── INTEGRATE.md
-└── verification_report.md
-```
-
-## 快速开始
-
-### 运行算法
+## 复现
 
 ```bash
-# 经典基线
-cd /code/cqlib_app/vqe_h2 && python -m algorithms.baseline
-
-# VQE 量子算法
-cd /code/cqlib_app/vqe_h2 && python -m algorithms.vqe
+python -m algorithms.baseline
+python -m algorithms.vqe
+python -m pytest tests/test_vqe_h2.py -q
+python -m app.main --check
+python -m app.main
 ```
 
-### 启动本地演示
+启动后访问 `http://127.0.0.1:8080`。API 和页面由同一 FastAPI 进程提供。
 
-```bash
-cd /code/cqlib_app/vqe_h2 && python -m app.main
-# 浏览器访问本地服务端口
-```
+## 验证覆盖
 
-### API 端点
+- 公共 H2 参考能量与核排斥项；
+- HF 初态、比特序和 4x4 稠密矩阵；
+- Cqlib 线路期望值与独立矩阵计算的一致性；
+- 三个随机初始参数下的变分下界和 1.6 mHa 化学精度；
+- FastAPI 返回字段、电子能/总能口径和前端契约；
+- `baseline_report.json` 与 `quantum_report.json` 的报告模式。
 
-端点详情见 `application_manifest.json` 的 `local_demo.endpoints` 字段。
+## 边界
 
-## 依赖
-
-- cqlib (量子计算 SDK)
-- numpy
-- scipy
-- fastapi
-- uvicorn
-
-## 局限性
-
-- 所有结果基于模拟器 (cqlib.StatevectorSimulator)，非真实硬件
-- 仅覆盖 H2 分子最小基组 (STO-3G)
-- 化学精度阈值 (1.6 mHartree) 为约定标准
+- 仅验证固定的两比特 H2/STO-3G 实例；
+- 使用精确状态矢量模拟，不含采样噪声和器件噪声；
+- 未报告云端模拟器或真实量子计算机结果；
+- 精确对角化在该规模上可行，因此本案例用于验证 TYQA 的跨层工程一致性。

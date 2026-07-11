@@ -1,185 +1,164 @@
-"""FastAPI backend for VQE H2 Molecular Energy application.
+"""FastAPI backend for the validated H2 VQE reference application."""
 
-Single-origin server: serves static frontend at / and API under /api on port 8080.
-"""
+from __future__ import annotations
 
 import os
 import sys
 
-# Allow importing algorithms from the parent package
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from fastapi import FastAPI, Query
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
-from algorithms.baseline import compute_hf_energy, run_baseline
-from algorithms.vqe import build_ansatz, run_vqe
+from algorithms.baseline import compute_reference
+from algorithms.hamiltonian import BOND_DISTANCE_ANGSTROM, HF_BITSTRING, N_QUBITS
+from algorithms.vqe import OPTIMIZER, build_ansatz, run_vqe
 
-# ---------------------------------------------------------------------------
-# App
-# ---------------------------------------------------------------------------
+app = FastAPI(title="H2 Ground-State Energy with VQE", version="2.0.0")
 
-app = FastAPI(title="VQE H2 Molecular Energy", version="1.0.0")
 
-# ---------------------------------------------------------------------------
-# API endpoints (all query-params, no path params)
-# ---------------------------------------------------------------------------
+def _reference_payload() -> dict[str, float | str]:
+    reference = compute_reference()
+    return {
+        "hf_bitstring": HF_BITSTRING,
+        "bitstring_convention": "|q1 q0>; qubit 0 is the least-significant bit",
+        "hf_electronic_energy_hartree": round(
+            reference.hf_electronic_energy_hartree, 12
+        ),
+        "hf_total_energy_hartree": round(reference.hf_total_energy_hartree, 12),
+        "exact_electronic_energy_hartree": round(
+            reference.exact_electronic_energy_hartree, 12
+        ),
+        "exact_total_energy_hartree": round(
+            reference.exact_total_energy_hartree, 12
+        ),
+        "nuclear_repulsion_energy_hartree": round(
+            reference.nuclear_repulsion_energy_hartree, 12
+        ),
+        "hf_error_mhartree": round(reference.hf_error_mhartree, 9),
+    }
+
+
+def _vqe_payload(seed: int) -> dict[str, object]:
+    result = run_vqe(seed)
+    reference = compute_reference()
+    circuit, _ = build_ansatz()
+    bound_circuit = circuit.assign_parameters(result.optimal_parameters)
+    return {
+        "seed": seed,
+        "initial_theta": result.initial_theta,
+        "optimal_theta": result.optimal_theta,
+        "electronic_energy_hartree": round(result.electronic_energy_hartree, 12),
+        "total_energy_hartree": round(result.total_energy_hartree, 12),
+        "energy_error_mhartree": round(result.energy_error_mhartree, 9),
+        "correlation_energy_recovered_percent": round(
+            result.correlation_energy_recovered_percent, 9
+        ),
+        "parameters": 1,
+        "circuit_depth": circuit.depth(),
+        "evaluations": result.evaluations,
+        "optimizer_success": result.optimizer_success,
+        "optimizer_message": result.optimizer_message,
+        "qcis": bound_circuit.qcis,
+        "convergence": [
+            {
+                "evaluation": evaluation,
+                "electronic_energy_hartree": round(electronic_energy, 12),
+                "total_energy_hartree": round(
+                    electronic_energy + reference.nuclear_repulsion_energy_hartree,
+                    12,
+                ),
+            }
+            for evaluation, electronic_energy in result.convergence
+        ],
+    }
 
 
 @app.get("/api/info")
 async def api_info():
-    """Return application metadata."""
+    """Return the fixed scientific and execution configuration."""
     return {
-        "name": "VQE H2 Molecular Energy",
+        "name": "H2 Ground-State Energy with VQE",
         "molecule": "H2",
         "basis": "STO-3G",
-        "bond_distance_angstrom": 0.735,
-        "qubits": 2,
-        "ansatz": "hardware_efficient",
-        "default_layers": 2,
-        "optimizer": "COBYLA",
+        "bond_distance_angstrom": BOND_DISTANCE_ANGSTROM,
+        "qubits": N_QUBITS,
+        "ansatz": "particle_conserving_h2_subspace",
+        "parameters": 1,
+        "optimizer": OPTIMIZER,
         "backend": "cqlib.StatevectorSimulator",
+        "energy_convention": "electronic_plus_nuclear_repulsion",
+        "evidence_scope": "exact statevector simulation of one fixed H2 instance",
     }
 
 
 @app.get("/api/baseline")
 async def api_baseline():
-    """Run exact diagonalization and return baseline results."""
+    """Return Hartree--Fock and exact-diagonalization references."""
     try:
-        exact_energy = run_baseline()
-        hf_energy = compute_hf_energy()
-        hf_error_mhartree = (hf_energy - exact_energy) * 1000
-        return {
-            "hf_energy_hartree": round(hf_energy, 10),
-            "exact_energy_hartree": round(exact_energy, 10),
-            "hf_error_mhartree": round(hf_error_mhartree, 6),
-        }
-    except Exception as e:
-        return JSONResponse(status_code=500, content={"error": str(e)})
+        return _reference_payload()
+    except Exception as exc:
+        return JSONResponse(status_code=500, content={"error": str(exc)})
 
 
 @app.get("/api/vqe")
 async def api_vqe(
-    seed: int = Query(default=42, description="Random seed for optimization"),
-    layers: int = Query(default=2, description="Number of ansatz layers"),
+    seed: int = Query(
+        default=42,
+        ge=0,
+        le=2**32 - 1,
+        description="Seed controlling the random initial variational angle",
+    ),
 ):
-    """Run VQE with the given seed and layers, return quantum results."""
+    """Run one reproducible VQE optimization."""
     try:
-        energy, convergence = run_vqe(seed=seed, layers=layers)
-        exact_energy = run_baseline()
-        error_mhartree = (energy - exact_energy) * 1000
-
-        # Build circuit and bind optimal parameters for QCIS output
-        circuit, param_names = build_ansatz(layers=layers)
-        from scipy.optimize import minimize
-        import numpy as np
-
-        np.random.seed(seed)
-        initial_params = np.zeros(len(param_names))
-
-        # Re-run optimization to get final params
-        # We already have convergence from run_vqe; re-optimise to get params
-        from algorithms.hamiltonian import H2_HAMILTONIAN
-        from algorithms.vqe import compute_energy
-
-        def _cost(params):
-            pd = dict(zip(param_names, params))
-            return compute_energy(circuit, pd, H2_HAMILTONIAN)
-
-        result = minimize(
-            _cost,
-            initial_params,
-            method="COBYLA",
-            options={"maxiter": 500, "tol": 1e-6},
-        )
-        final_params = result.x
-        param_dict = dict(zip(param_names, final_params))
-        bound_circuit = circuit.assign_parameters(param_dict)
-        qcis_str = bound_circuit.qcis
-
-        circuit_depth = circuit.depth()
-
-        # Format convergence trace as list of {iteration, energy}
-        conv_trace = [{"iteration": it, "energy": round(e, 10)} for it, e in convergence]
-
-        return {
-            "energy_hartree": round(energy, 10),
-            "exact_energy_hartree": round(exact_energy, 10),
-            "energy_error_mhartree": round(error_mhartree, 6),
-            "circuit_depth": circuit_depth,
-            "qcis": qcis_str,
-            "convergence": conv_trace,
-            "seed": seed,
-            "layers": layers,
-        }
-    except Exception as e:
-        return JSONResponse(status_code=500, content={"error": str(e)})
+        return _vqe_payload(seed)
+    except Exception as exc:
+        return JSONResponse(status_code=500, content={"error": str(exc)})
 
 
 @app.get("/api/compare")
 async def api_compare():
-    """Return both baseline and VQE results for side-by-side comparison."""
+    """Return like-for-like HF, exact and VQE results for seed 42."""
     try:
-        # Baseline
-        exact_energy = run_baseline()
-        hf_energy = compute_hf_energy()
-        hf_error_mhartree = (hf_energy - exact_energy) * 1000
-
-        # VQE with default seed=42, layers=2
-        vqe_energy, convergence = run_vqe(seed=42, layers=2)
-        vqe_error_mhartree = (vqe_energy - exact_energy) * 1000
-
-        circuit, _ = build_ansatz(layers=2)
-        circuit_depth = circuit.depth()
-
+        baseline = _reference_payload()
+        vqe = _vqe_payload(42)
         return {
-            "baseline": {
-                "method": "Hartree-Fock",
-                "energy_hartree": round(hf_energy, 10),
-                "exact_energy_hartree": round(exact_energy, 10),
-                "error_mhartree": round(hf_error_mhartree, 6),
-            },
-            "vqe": {
-                "method": "VQE (hardware_efficient, 2 layers, COBYLA)",
-                "energy_hartree": round(vqe_energy, 10),
-                "exact_energy_hartree": round(exact_energy, 10),
-                "error_mhartree": round(vqe_error_mhartree, 6),
-                "circuit_depth": circuit_depth,
-            },
-            "improvement_mhartree": round(hf_error_mhartree - vqe_error_mhartree, 6),
+            "baseline": baseline,
+            "vqe": vqe,
+            "correlation_energy_recovered_percent": vqe[
+                "correlation_energy_recovered_percent"
+            ],
+            "comparison_scope": (
+                "All energies use the same fixed two-qubit H2 Hamiltonian and "
+                "the same nuclear-repulsion constant."
+            ),
         }
-    except Exception as e:
-        return JSONResponse(status_code=500, content={"error": str(e)})
+    except Exception as exc:
+        return JSONResponse(status_code=500, content={"error": str(exc)})
 
 
 @app.get("/health")
 async def health():
-    """Health check endpoint."""
     return {"status": "ok"}
 
-
-# ---------------------------------------------------------------------------
-# Static frontend (must be last — catches all remaining routes)
-# ---------------------------------------------------------------------------
 
 _static_dir = os.path.join(os.path.dirname(__file__), "static")
 app.mount("/", StaticFiles(directory=_static_dir, html=True), name="static")
 
 
-# ---------------------------------------------------------------------------
-# CLI entry point
-# ---------------------------------------------------------------------------
-
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(description="VQE H2 FastAPI server")
-    parser.add_argument("--check", action="store_true", help="Verify server can start (import check)")
+    parser = argparse.ArgumentParser(description="H2 VQE FastAPI server")
+    parser.add_argument(
+        "--check", action="store_true", help="Verify that the application imports"
+    )
     args = parser.parse_args()
 
     if args.check:
-        print("Import check passed — FastAPI app created successfully")
+        print("Import check passed: FastAPI application created successfully")
     else:
         import uvicorn
 

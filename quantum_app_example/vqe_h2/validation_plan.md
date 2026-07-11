@@ -1,32 +1,28 @@
-# Validation Plan — VQE H2
+# Validation Plan: H2 VQE
 
-## Baseline vs Quantum Comparability
-- Same Hamiltonian (same Pauli terms, same coefficients, same qubit mapping)
-- Same metric: energy_error (mHartree, lower_is_better)
-- Same reference: exact diagonalization ground-state energy
-- Both compute on the same 2-qubit system
+## Scientific Gates
 
-## Primary Metric
-- **Name**: energy_error
-- **Definition**: |E_quantum - E_exact| × 1000 (mHartree)
-- **Direction**: lower_is_better
-- **Threshold**: ≤ 1.6 mHartree (chemical accuracy)
-- **Success**: VQE energy_error ≤ baseline energy_error (baseline is ~0 by definition for exact diagonalization)
+- The 4x4 Hamiltonian is Hermitian and has exact electronic ground energy `-1.857275030202 Ha`.
+- The nuclear-repulsion term is `0.719968994449 Ha`; every total energy equals electronic energy plus this constant.
+- The HF determinant is `|01>` in the `|q1 q0>` convention and its error is `20.307038999 mHa`.
+- Cqlib expectation values match an independent dense-matrix calculation.
+- Every reported VQE result respects the variational lower bound and has absolute error at most `1.6 mHa`.
 
-## Validation Commands
-1. `cd /code/cqlib_app/vqe_h2 && python -m algorithms.baseline` → baseline_report.json
-2. `cd /code/cqlib_app/vqe_h2 && python -m algorithms.vqe` → quantum_report.json
-3. `cd /code/cqlib_app/vqe_h2 && python -m app.main --check` → API health check
-4. `validate_quantum_application(app_dir="/code/cqlib_app/vqe_h2")`
+## Engineering Gates
 
-## Seeds
-Multiple seeds for VQE: [42, 123, 456] — report mean and std of energy_error across seeds.
+- `/api/info`, `/api/baseline`, `/api/vqe` and `/api/compare` return self-describing, mutually consistent fields.
+- Standalone and QCCP pages consume the nested API schema and distinguish electronic from total energy.
+- Baseline and quantum reports use the same task, instance and primary metric.
 
-## Blockers
-- VQE fails to converge → increase layers or switch optimizer
-- Hamiltonian coefficients incorrect → verify against exact diagonalization
-- API/frontend contract mismatch → check manifest network config
-- validate_quantum_application blockers → fix per layer
+## Commands
 
-## Simulator vs Hardware Caveat
-All results are simulator-only. Do not describe as real-hardware performance.
+```bash
+python -m algorithms.baseline
+python -m algorithms.vqe
+python -m pytest tests/test_vqe_h2.py -q
+python -m app.main --check
+```
+
+## Claim Gate
+
+The application may state that VQE reaches chemical accuracy for this fixed exact-statevector instance. It may not infer quantum advantage, noisy-device performance or transfer to larger molecular systems.
