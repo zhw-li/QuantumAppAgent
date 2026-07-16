@@ -282,11 +282,12 @@ class TestDangerousShellGuidelines:
 
 class TestQuantumApplicationSubagentHints:
     def test_subagent_prompts_replace_native_workflow_with_application_routes(self):
-        config_dir = Path(__file__).resolve().parents[1] / "TYQA" / "subagents"
+        config_dir = Path(__file__).resolve().parents[1] / "tyqa" / "subagents"
         text = "\n".join(path.read_text(encoding="utf-8") for path in config_dir.glob("*.yaml"))
 
         for term in (
             "application-pipeline",
+            "validate_scientific_plan",
             "cqlib-sdk",
             "cqlib-qaoa",
             "qccp-ui",
@@ -303,7 +304,7 @@ class TestQuantumApplicationSubagentHints:
             assert term in text
 
     def test_subagent_prompts_avoid_top_level_release_gates(self):
-        config_dir = Path(__file__).resolve().parents[1] / "TYQA" / "subagents"
+        config_dir = Path(__file__).resolve().parents[1] / "tyqa" / "subagents"
         text = "\n".join(path.read_text(encoding="utf-8") for path in config_dir.glob("*.yaml"))
 
         for term in (
@@ -317,7 +318,7 @@ class TestQuantumApplicationSubagentHints:
             assert term not in text
 
     def test_subagent_prompts_do_not_fix_artifact_paths(self):
-        config_dir = Path(__file__).resolve().parents[1] / "TYQA" / "subagents"
+        config_dir = Path(__file__).resolve().parents[1] / "tyqa" / "subagents"
         text = "\n".join(
             path.read_text(encoding="utf-8") for path in config_dir.glob("*.yaml")
         )
@@ -331,3 +332,19 @@ class TestQuantumApplicationSubagentHints:
 
         assert "actual output paths" in text
         assert "Validation status" in text
+
+    def test_subagent_prompts_enforce_fail_closed_scientific_repair(self):
+        config_dir = Path(__file__).resolve().parents[1] / "tyqa" / "subagents"
+        text = "\n".join(
+            path.read_text(encoding="utf-8") for path in config_dir.glob("*.yaml")
+        )
+
+        for term in (
+            "scientific_spec.json",
+            "scientific_report.json",
+            "failure_codes",
+            "route_redesign",
+            "manual_review",
+            "delivery_allowed",
+        ):
+            assert term in text

@@ -21,6 +21,9 @@ writing-agent:
     - Document evaluation protocol (splits/metrics/baselines) and data QC checks.
     - Document README.md, INTEGRATE.md, verification_report.md, slides, and simulator-vs-hardware limitations when applicable.
     - Use validate_quantum_application before final wording; write unresolved blockers by validation layer (algorithm, local_demo, qccp_web, docs) instead of readiness claims.
+    - Scientific correctness claims require a current machine-generated `scientific_report.json`
+      with `status: passed` and `delivery_allowed: true`. Never convert scientific blockers into
+      limitations or write readiness language from candidate-authored reports alone.
     - Do not add endpoint, local demo, qccp route, UI compliance, or packaging claims unless they are present in application_manifest.json and supported by validator results for the selected delivery_profile.
     - When documenting backend delivery, state whether qccp-service used the Python FastAPI app-service path or the Java qccp-service integration path.
 

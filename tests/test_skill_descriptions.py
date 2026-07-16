@@ -158,7 +158,12 @@ def test_experiment_pipeline_mentions_deterministic_validator():
     assert "baseline_report.json" in text
     assert "quantum_report.json" in text
     assert "higher_is_better" in text
-    assert "Blockers must be fixed or reported by layer" in text
+    assert "scientific_spec.json" in text
+    assert "scientific_report.json" in text
+    assert "Scientific failure is fail-closed" in text
+    assert "three changed-source attempts" in text
+    assert "two route redesigns" in text
+    assert "manual_review" in text
 
 
 def test_experiment_pipeline_does_not_prescribe_fixed_artifact_dirs():

@@ -19,6 +19,10 @@ data-analysis-agent:
     - Compare baseline_report.json, quantum_report.json, application_manifest.json delivery_profile, app evidence, and application-pipeline stage conditions.
     - Only compute and review metrics; do not rewrite delivery claims, API contracts, or integration readiness statements.
     - Use validate_quantum_application for the deterministic artifact check before summarizing verification status.
+    - Treat `scientific_report.json` as machine-owned evidence. Only describe algorithm results as
+      validated when its source hash is current, `status` is `passed`, and `delivery_allowed` is
+      true. Otherwise report the stable failure codes and do not infer correctness from plots or
+      candidate-authored reports.
     - Report effect sizes and uncertainty (confidence intervals/error bars) when applicable.
     - Apply multiple-testing corrections when comparing many conditions.
     - Distinguish exploratory vs confirmatory findings.

@@ -39,7 +39,7 @@ It combines planning, research, coding, debugging, analysis, and delivery agents
 
 ## 🧪 Quantum Application Examples
 
-Current release-tracked quantum application examples live under [`quantum_app_example/`](./quantum_app_example). Each example is expected to include an `application_manifest.json`, algorithm reports, a local FastAPI demo, and qccp-web showcase artifacts.
+Current release-tracked quantum application examples live under [`quantum_app_example/`](./quantum_app_example). Each example is expected to include an `application_manifest.json`, `scientific_spec.json`, machine-generated scientific reports, algorithm reports, a local FastAPI demo, and qccp-web showcase artifacts.
 
 | Example | Quantum method | Classical baseline | Primary metric |
 | --- | --- | --- | --- |
@@ -54,10 +54,14 @@ solution-landscape / evidence-navigator   ←  methods, datasets, baselines, pri
         │
 application-intake / delivery-planning  ←  application framing, validation & artifact plan
         │
-   application-pipeline               ←  stage-gated execution (baseline → quantum → app → verify)
+validate_scientific_plan              ←  pre-code contract gate (semantics, oracles, invariants)
+        │
+   application-pipeline               ←  stage-gated execution (baseline → quantum → scientific gate)
         │
 cqlib-sdk → cqlib-qaoa / cqlib-vqe   ←  quantum algorithm + quantum_report.json
           / cqlib-qml / cqlib-hybrid
+        │
+validate_quantum_application          ←  fail-closed scientific validation + 3/2 repair routing
         │
 qccp-ui → qccp-frontend /     ←  cloud showcase UI + API/service + deploy evidence
                  qccp-service  ←  FastAPI app service by default; Java qccp-service integration when explicit
@@ -154,7 +158,7 @@ tyqa -h
 For broader local validation:
 
 ```bash
-python -m pytest tests/test_prompts.py tests/test_skill_descriptions.py tests/test_quantum_application_validation.py -q
+python -m pytest tests/test_prompts.py tests/test_skill_descriptions.py tests/test_scientific_validation.py tests/test_quantum_application_validation.py -q
 ```
 
 ### Update an existing source checkout

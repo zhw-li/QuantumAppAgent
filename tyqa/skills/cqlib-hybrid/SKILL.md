@@ -12,6 +12,13 @@ metadata:
 
 Use after `cqlib-sdk`; often also use `cqlib-qml`. Hybrid work must keep classical model, quantum circuit, backend execution, optimizer, and evaluation separately testable.
 
+Before implementation, create the `hybrid` scientific contract with data/split semantics,
+classical and quantum interfaces, tensor shape and dtype conventions, gradient path, parameter
+ownership, update invariants, ablation oracle, reproducibility settings, tolerances, and claim
+boundaries. Require focused supplementary tests proving that quantum parameters affect outputs and
+receive effective updates, plus a current scientific pass before packaging. Never edit the
+machine-owned report, repair state, oracle, or tolerance to force a pass.
+
 ## When to Use
 
 - User needs a hybrid quantum-classical model with classical feature extractor, projection, quantum layer, and classical head.

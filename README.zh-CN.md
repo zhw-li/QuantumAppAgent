@@ -40,7 +40,7 @@
 
 ## 🧪 量子应用示例
 
-当前发布跟踪的量子应用示例位于 [`quantum_app_example/`](./quantum_app_example)。每个示例都应包含 `application_manifest.json`、算法报告、本地 FastAPI demo 和 qccp-web 展示产物。
+当前发布跟踪的量子应用示例位于 [`quantum_app_example/`](./quantum_app_example)。每个示例都应包含 `application_manifest.json`、`scientific_spec.json`、机器生成的科学验证报告、算法报告、本地 FastAPI demo 和 qccp-web 展示产物。
 
 | 示例 | 量子方法 | 经典基线 | 主要指标 |
 | --- | --- | --- | --- |
@@ -55,10 +55,14 @@ solution-landscape / evidence-navigator   ←  方法、数据集、基线、已
         │
 application-intake / delivery-planning  ←  应用定位、验证与产物计划
         │
-   application-pipeline               ←  阶段门禁执行（基线 → 量子 → 应用 → 验证）
+validate_scientific_plan              ←  编码前合同门禁（语义、独立参考、不变量）
+        │
+   application-pipeline               ←  阶段门禁执行（基线 → 量子 → 科学门禁）
         │
 cqlib-sdk → cqlib-qaoa / cqlib-vqe   ←  量子算法 + quantum_report.json
           / cqlib-qml / cqlib-hybrid
+        │
+validate_quantum_application          ←  失败即阻断的科学验证 + 3/2 修复路由
         │
 qccp-ui → qccp-frontend /     ←  云展示 UI + API/服务 + 部署证据
                  qccp-service  ←  默认 FastAPI 应用服务；明确 Java 集成时走 qccp-service Java 路径
@@ -155,7 +159,7 @@ tyqa -h
 更完整的本地验证可运行：
 
 ```bash
-python -m pytest tests/test_prompts.py tests/test_skill_descriptions.py tests/test_quantum_application_validation.py -q
+python -m pytest tests/test_prompts.py tests/test_skill_descriptions.py tests/test_scientific_validation.py tests/test_quantum_application_validation.py -q
 ```
 
 ### 更新已有源码 checkout

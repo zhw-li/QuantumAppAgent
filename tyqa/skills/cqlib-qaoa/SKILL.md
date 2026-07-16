@@ -33,6 +33,9 @@ Use after `cqlib-sdk` selects the QAOA route. This skill owns the algorithm laye
 3. Record objective direction. A QUBO minimization value, a MaxCut value, and an optimality gap are different metrics and must not be mixed.
 4. Use normalized coefficients only for circuit stability. Always evaluate and report the original business objective or the agreed primary metric on decoded bitstrings.
 5. Do not run TianYan/GuoDun hardware jobs unless the user explicitly authorizes the run and credentials are provided through environment variables or ignored local config.
+6. Create the `qaoa` scientific contract first: objective direction, variable-to-qubit and
+   bitstring conventions, original constraints, QUBO/Ising mapping including offsets and penalty
+   semantics, a brute-force or trusted classical oracle for small instances, tolerances, and claims.
 
 ## Required outputs for application delivery
 
@@ -58,6 +61,8 @@ A minimal `quantum_report.json` must include the validator-required fields: `tas
 7. Decode top-k samples/probabilities; check feasibility against the original constraints; compute the original business metric.
 8. Compare against brute force for small cases, or against a documented classical baseline for larger cases using the same task/data/metric.
 9. Write artifacts and hand them to `application-pipeline` for staged validation.
+10. Run route-specific supplementary tests and require a current `qaoa` scientific pass before
+    packaging. Never edit the machine report, repair state, oracle, or tolerance to force a pass.
 
 ## QUBO modeling contract
 

@@ -77,6 +77,17 @@ This skill owns the `algorithm` layer and comparable algorithm evidence only. It
 - `circuit_depth` when available
 - `limitations`
 
+Before writing algorithm code, require `scientific_spec.json` and a matching
+`application_manifest.json.scientific_validation.profile`. The specification owns problem
+semantics, units and ordering conventions, independent references/oracles, invariants,
+tolerances, required checks, and claim boundaries. Algorithm code and its generated reports are
+candidate evidence and must not define their own acceptance oracle.
+
+Every non-generic profile must provide focused supplementary scientific tests. Do not edit the
+machine-owned `scientific_report.json` or `.tyqa/scientific_repair_state.json`. A Cqlib method can
+advance to application packaging only after `validate_quantum_application` returns a current
+scientific pass and `delivery_allowed: true`.
+
 Do not decide delivery readiness from this skill. Produce comparable evidence and let `application-pipeline` and `validate_quantum_application` advance or block the next stage.
 
 ## Circuit contract
@@ -161,3 +172,5 @@ Rules:
 - Use local simulators or mocks for tests; avoid real cloud calls in tests.
 - For user-facing examples, include expected output shape and limitations.
 - When producing application artifacts, hand off `baseline_report.json` and `quantum_report.json` to `application-pipeline` for staged comparison and verification.
+- Verify the route-specific scientific profile and supplementary tests before handoff; a runnable
+  circuit is not sufficient evidence of algorithm correctness.

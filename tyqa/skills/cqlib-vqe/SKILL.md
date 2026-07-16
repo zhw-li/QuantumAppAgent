@@ -27,12 +27,16 @@ Use after `cqlib-sdk`. VQE work must separate Hamiltonian definition, ansatz, me
 
 ## Workflow
 
-1. Define Hamiltonian as explicit Pauli terms: `(coefficient, [(qubit, "X"|"Y"|"Z")])`.
-2. Choose ansatz: hardware-efficient for PoC, chemistry-inspired only when the mapping is known.
-3. Declare all cqlib parameters before adding parameterized gates.
-4. Compute expectation term by term, or group commuting terms when the implementation supports it.
-5. Optimize with deterministic initial values or recorded random seed.
-6. Validate against a small exact diagonalization or known reference value when possible.
+1. Create the `vqe` scientific contract before implementation. State Hamiltonian kind, electronic
+   versus total-energy convention, nuclear repulsion, orbital/qubit mapping, qubit and bitstring
+   order, Hartree-Fock bitstring, independent exact/HF references, and numeric tolerances.
+2. Define Hamiltonian as explicit Pauli terms: `(coefficient, [(qubit, "X"|"Y"|"Z")])`.
+3. Choose ansatz: hardware-efficient for PoC, chemistry-inspired only when the mapping is known.
+4. Declare all cqlib parameters before adding parameterized gates.
+5. Compute expectation term by term, or group commuting terms when the implementation supports it.
+6. Optimize with deterministic initial values or recorded random seed.
+7. Validate against independent exact diagonalization or a traceable reference, then run the
+   `vqe` scientific profile and supplementary tests.
 
 ## Hamiltonian representation
 
@@ -116,9 +120,16 @@ Check the Y-basis convention against a known single-qubit case if changing rotat
 - [ ] Optimizer method, tolerance, max iterations, and seed are recorded.
 - [ ] Result reports final energy, parameter vector, iterations, and convergence trace.
 - [ ] Hardware execution, if any, uses shot-based estimates and never assumes exact simulator agreement.
+- [ ] Electronic, nuclear-repulsion, and total energies satisfy one declared convention.
+- [ ] Hartree-Fock state preparation matches the declared qubit/bitstring ordering.
+- [ ] VQE energy respects the variational lower bound within the declared tolerance.
+- [ ] Reported absolute error is recomputed from independent reference values.
+- [ ] Multiple optimizer seeds or initial points are effective when stochastic robustness is claimed.
+- [ ] `validate_quantum_application` reports `scientific_validation.status: passed` before packaging.
 
 ## Application handoff
 
 For application delivery, write the VQE result into `quantum_report.json` using the `cqlib-sdk` artifact contract. Include Hamiltonian source, units, qubit mapping, ansatz depth, measurement strategy, optimizer settings, final energy, convergence trace path, backend, shots/seed, command, and limitations.
 
 Do not decide delivery readiness from this skill. Hand the reports to `application-pipeline` for baseline comparison and staged verification.
+Never edit `scientific_report.json`, repair state, reference values, or tolerances to force a pass.

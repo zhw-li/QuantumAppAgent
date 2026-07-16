@@ -12,6 +12,13 @@ metadata:
 
 Use after `cqlib-sdk`. QML work must produce task-specific engineering code, not only circuit snippets. Keep state preparation, encoding, ansatz, measurement, output mapping, loss, optimizer, backend, validation, and report artifacts separate.
 
+Before implementation, create the `qml` scientific contract with dataset identity and immutable
+split, preprocessing/normalization fit boundary, label and metric conventions, feature-to-qubit
+mapping, measurement and prediction semantics, classical oracle/baseline, tolerances, leakage
+checks, and allowed claims. Require focused supplementary tests and a current scientific pass
+before packaging. Candidate training metrics are not an independent correctness oracle; never edit
+the machine report, repair state, reference values, or tolerances to force a pass.
+
 ## When to Use
 
 - User needs runnable VQC classifier/regressor code, a quantum feature map, a quantum probability/expectation layer, or a QML baseline comparison.

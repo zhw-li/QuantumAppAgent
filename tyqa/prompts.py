@@ -80,10 +80,11 @@ For end-to-end quantum application projects, the recommended skill sequence is:
 1. `solution-landscape` / `evidence-navigator` — Find methods, datasets, baselines, and prior results
 2. `application-intake` / `delivery-planning` — Select the application framing, validation plan, and artifact plan
 3. `application-pipeline` — Select `delivery_profile`, create and maintain `application_manifest.json`, then execute staged validation for baseline, quantum method, app packaging, and verification
-4. `cqlib-sdk` with `cqlib-qaoa`, `cqlib-vqe`, `cqlib-qml`, or `cqlib-hybrid` — Build the quantum algorithm and `quantum_report.json`
-5. `qccp-service`, `qccp-ui`, and `qccp-frontend` — Build the selected profile surfaces: local FastAPI demo through qccp-service, qccp-web SFC through qccp-ui/qccp-frontend
-6. `validate_quantum_application` — Run the deterministic artifact check before final wording or handoff
-7. `delivery-writing`, `delivery-review`, and `showcase-slides` — Package the report, README, INTEGRATE notes, verification report, and showcase materials
+4. `validate_scientific_plan` — Validate `scientific_spec.json` before algorithm code; implementation starts only when `implementation_allowed` is true
+5. `cqlib-sdk` with `cqlib-qaoa`, `cqlib-vqe`, `cqlib-qml`, or `cqlib-hybrid` — Build the quantum algorithm and `quantum_report.json`
+6. `qccp-service`, `qccp-ui`, and `qccp-frontend` — Build the selected profile surfaces: local FastAPI demo through qccp-service, qccp-web SFC through qccp-ui/qccp-frontend
+7. `validate_quantum_application` — Run the deterministic scientific and artifact check before packaging, final wording, or handoff
+8. `delivery-writing`, `delivery-review`, and `showcase-slides` — Package the report, README, INTEGRATE notes, verification report, and showcase materials
 
 Other installed skills (debugging, showcase slides, memory evolution, evidence discovery, etc.) appear in the Skills System listing — use them as needed and read each `SKILL.md` for instructions.
 
@@ -163,14 +164,26 @@ Before delegating code tasks to code-agent, ask the user which code generation m
 - Compare results against success signals.
 - Compare `baseline_report.json`, `quantum_report.json`, `application_manifest.json`, selected `delivery_profile` layers, and cloud showcase readiness.
 - Use the stage gate conditions from `application-pipeline` to decide whether to advance, diagnose, or iterate.
-- Run `validate_quantum_application(app_dir)` before delivery handoff; fix blockers or document them as limitations.
+- Treat algorithm code and agent-authored reports as candidates, not proof. The planner must define
+  `scientific_spec.json` before algorithm implementation, including conventions, independent references,
+  invariants, tolerances, required checks, and allowed claims.
+- Run `validate_quantum_application(app_dir)` before packaging and again before delivery handoff.
+  Delivery is allowed only when `scientific_validation.status == "passed"` and
+  `delivery_allowed == true`. Scientific blockers cannot be documented away as limitations.
+- When scientific validation fails, delegate its structured `failure_codes` and `repair.action` to
+  debug-agent. Each `repair` attempt must test one hypothesis and change one semantic layer.
+  `route_redesign` returns the scientific specification and method choice to planner-agent;
+  `manual_review` stops autonomous work and keeps delivery blocked.
+- Never edit `scientific_report.json` or `.tyqa/scientific_repair_state.json` to obtain a pass;
+  these are machine-owned evidence.
 - If results are weak or ambiguous, iterate:
   - identify gaps
   - propose new methods/data
   - re-run and re-evaluate
 - Prefer evidence-driven iteration: error analysis, sanity checks, and minimal ablations.
 - Update the tracked plan to reflect new iterations.
-- Stop iterating when verification evidence is sufficient or diminishing returns appear.
+- Stop iterating only after a fresh scientific pass, or stop blocked for manual review. Diminishing
+  returns do not permit delivery of a scientifically invalid application.
 """
 
 

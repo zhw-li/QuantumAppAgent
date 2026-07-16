@@ -55,6 +55,8 @@ Recommended artifacts:
 
 ```text
 application_manifest.json
+scientific_spec.json
+scientific_report.json
 requirements.json
 solution_plan.md
 baseline_report.json
@@ -94,17 +96,24 @@ Gate: Requirements, inputs, outputs, task type, primary metric, `higher_is_bette
 Process:
 
 1. Write or update `requirements.json`.
-2. Write or update `application_manifest.json` with profile-specific contracts, artifact paths, validation commands, and limitations.
-3. Write or update `solution_plan.md`.
-4. Implement or locate the classical baseline.
-5. Produce `baseline_report.json` with metric value, command, data reference, seed when relevant, and limitations.
-6. Record anomalies, leakage risks, missing data, or unresolved assumptions.
+2. Write `scientific_spec.json` before algorithm code. It must define the scientific profile,
+   problem semantics, conventions, independent references/oracles, invariants, tolerances,
+   required checks, allowed claims, and forbidden claims.
+3. Write or update `application_manifest.json` with `scientific_validation`, profile-specific contracts, artifact paths, validation commands, and limitations.
+4. Run `validate_scientific_plan(app_dir)` and do not start algorithm implementation unless
+   `implementation_allowed == true`.
+5. Write or update `solution_plan.md`.
+6. Implement or locate the classical baseline.
+7. Produce `baseline_report.json` with metric value, command, data reference, seed when relevant, and limitations.
+8. Record anomalies, leakage risks, missing data, or unresolved assumptions.
 
 ## Stage 2: Quantum Method Implementation
 
 Goal: Implement the quantum method with Cqlib and compare it against Stage 1.
 
-Gate: `quantum_report.json` is produced from the same task/data/metric as `baseline_report.json`, records backend/shots/seed when relevant, and supports a fair comparison.
+Gate: `quantum_report.json` is produced from the same task/data/metric as `baseline_report.json`,
+records backend/shots/seed when relevant, supports a fair comparison, and the deterministic
+scientific profile plus supplementary tests pass. Candidate reports alone never satisfy this gate.
 
 Skill routing:
 
@@ -121,10 +130,25 @@ Process:
 4. Produce `quantum_report.json` using the application artifact contract.
 5. Update `application_manifest.json` with the actual `quantum_report.json` path and relevant quantum evidence paths.
 6. Compare against `baseline_report.json`; if the method underperforms or is not comparable, diagnose before changing multiple variables.
+7. Run `validate_quantum_application(app_dir)`. Advance only when
+   `scientific_validation.status == "passed"` and `delivery_allowed == true`.
+
+### Scientific repair loop
+
+Scientific failure is fail-closed and cannot be downgraded to a documented limitation:
+
+1. Pass stable `failure_codes`, check details, and `repair.action` to `debug-agent`.
+2. For `repair`, test one hypothesis and change one semantic layer per attempt. The default budget
+   is three changed-source attempts.
+3. For `route_redesign`, return to `planner-agent` and revise the method or scientific contract as
+   one reviewed route change. The default budget is two route redesigns.
+4. For `manual_review`, stop autonomous edits. Keep packaging and delivery blocked until a human
+   reviews the method/specification and a fresh validation run passes.
+5. Never edit machine-owned `scientific_report.json` or `.tyqa/scientific_repair_state.json`.
 
 ## Stage 3: Application Packaging
 
-Goal: Package the validated workflow into a reviewable local or qccp showcase surface.
+Goal: Package the scientifically validated workflow into a reviewable local or qccp showcase surface.
 
 Gate: UI, API/service contract, deployment notes, and build/test evidence are reviewable, or the caller explicitly marks packaging out of scope.
 
@@ -136,13 +160,14 @@ Skill routing:
 
 Process:
 
-1. Read `application_manifest.json` and define the selected profile workflow.
-2. For `local_fastapi_demo`, use `qccp-service` to build the FastAPI backend, local HTML demo, endpoint contract, static asset contract, and single-origin network contract; apply `qccp-ui` as the standalone local-demo visual profile.
-3. For `qccp_web_page`, use `qccp-ui` and `qccp-frontend` to build Vue SFC, scoped SCSS, Element Plus, i18n, route snippet, and API paths consumed from the manifest contract.
-4. For `local_fastapi_demo` and `full_delivery`, require `application_manifest.json.network.mode = single_origin`: one backend process serves `/`, `/static/*`, and `/api/*` on the configured generated-app bind port, while handoff docs use `network.public_base_url` exactly as configured.
-5. Keep local FastAPI demo frontend separate from qccp-web SFC artifacts.
-6. Keep simulator, cloud, and real-hardware execution assumptions explicit.
-7. Update `INTEGRATE.md` with copy destinations, route, endpoint contract, profile-specific verification status, generated-app public URL, and commands.
+1. Confirm a fresh scientific pass before creating or updating delivery UI and packaging.
+2. Read `application_manifest.json` and define the selected profile workflow.
+3. For `local_fastapi_demo`, use `qccp-service` to build the FastAPI backend, local HTML demo, endpoint contract, static asset contract, and single-origin network contract; apply `qccp-ui` as the standalone local-demo visual profile.
+4. For `qccp_web_page`, use `qccp-ui` and `qccp-frontend` to build Vue SFC, scoped SCSS, Element Plus, i18n, route snippet, and API paths consumed from the manifest contract.
+5. For `local_fastapi_demo` and `full_delivery`, require `application_manifest.json.network.mode = single_origin`: one backend process serves `/`, `/static/*`, and `/api/*` on the configured generated-app bind port, while handoff docs use `network.public_base_url` exactly as configured.
+6. Keep local FastAPI demo frontend separate from qccp-web SFC artifacts.
+7. Keep simulator, cloud, and real-hardware execution assumptions explicit.
+8. Update `INTEGRATE.md` with copy destinations, route, endpoint contract, profile-specific verification status, generated-app public URL, and commands.
 
 ## Stage 4: Verification & Handoff
 
@@ -158,7 +183,8 @@ Process:
 4. Write `verification_report.md` with comparison, missing evidence, validation blockers, failures, and limitations.
 5. Write or update `README.md` and `INTEGRATE.md`.
 6. Prepare slide/showcase text through `showcase-slides` when needed.
-7. Blockers must be fixed or reported by layer instead of hidden in final wording.
+7. Scientific blockers must be fixed and revalidated; they cannot be hidden or downgraded to
+   limitations. Non-scientific blockers must be fixed or reported by layer.
 
 ## Integrating application-debugging for Diagnosis
 
@@ -193,7 +219,10 @@ See `references/code-trajectory-logging.md` for the full logging format and how 
 
 `validate_quantum_application(app_dir, require_quantum_improvement=True, require_packaging=True)` is the deterministic delivery check.
 
-Use it after Stage 4 artifacts exist and before final readiness claims. It checks the manifest, requirements, baseline and quantum reports, packaging evidence, documentation, and claim boundaries. It does not replace engineering review.
+Use it at the Stage 2 gate, before packaging, and again before final readiness claims. It checks the
+manifest, scientific contract, algorithm profile, restricted supplementary tests, reports,
+packaging evidence, documentation, and claim boundaries. Scientific validation is fail-closed;
+manual engineering review remains necessary for high-risk or exhausted-repair cases.
 
 ## Handoff to Writing and Slides
 

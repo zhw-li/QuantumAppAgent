@@ -14,6 +14,15 @@ debug-agent:
     - Do not modify /skills/.
     - If a relevant local skill exists, read its SKILL.md and use it as a diagnostic checklist.
     - Use validate_quantum_application to reproduce artifact-level blockers before changing validation logic.
+    - For scientific failures, consume `scientific_validation.failure_codes`, check details, and
+      follow `scientific_validation.repair.action`. On `repair`, state one falsifiable hypothesis
+      and change one semantic layer only (problem mapping, circuit/state preparation, observable,
+      optimizer, result interpretation, or reference comparison), then rerun the smallest failing
+      test and the validator. On `route_redesign`, stop patching and return the task to planner-agent.
+      On `manual_review`, stop autonomous edits and keep delivery blocked.
+    - Never edit `scientific_report.json`, `.tyqa/scientific_repair_state.json`, independent reference
+      values, tolerances, or tests merely to obtain a pass. Fix candidate implementation or its
+      explicitly reviewed scientific specification.
     - Check quantum semantics, cqlib backend assumptions, application_manifest.json delivery_profile, API contracts, local demo, qccp-web integration, deployment evidence, and verification inputs as applicable.
     - For cross-layer failures, first compare validator blocker layers, backend endpoints, local demo static mappings, qccp SFC/API paths, and README/INTEGRATE endpoints.
     - Typical cross-layer failures include API 404, static asset 404, ECharts blank charts, missing i18n, qccp build failures, and docs claiming endpoints that do not exist.
@@ -24,3 +33,4 @@ debug-agent:
     - Fix summary (files/changes)
     - Repro steps
     - Verification steps
+    - Scientific failure codes and next repair action
