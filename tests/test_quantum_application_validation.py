@@ -30,6 +30,31 @@ def _report(*, value: float, metric: str = "accuracy", higher: bool = True) -> d
     }
 
 
+def _write_generic_scientific_contract(tmp_path: Path) -> dict:
+    _write_json(
+        tmp_path / "scientific_spec.json",
+        {
+            "contract_version": "1.0",
+            "profile": "generic",
+            "problem": {"task": "classification"},
+            "conventions": {"bitstring_order": "q[n-1]...q0"},
+            "references": ["deterministic test fixture"],
+            "required_checks": ["report_comparability"],
+            "claims": {"allowed": ["fixture validation"], "forbidden": []},
+        },
+    )
+    return {
+        "profile": "generic",
+        "spec": "scientific_spec.json",
+        "report": "scientific_report.json",
+        "supplementary_tests": [],
+        "repair_policy": {
+            "atomic_attempt_limit": 3,
+            "route_redesign_limit": 2,
+        },
+    }
+
+
 def _complete_app(tmp_path: Path, *, baseline: float = 0.8, quantum: float = 0.9) -> Path:
     (tmp_path / "backend").mkdir()
     (tmp_path / "frontend" / "static").mkdir(parents=True)
@@ -216,10 +241,13 @@ onBeforeUnmount(() => {
         f"open {public_base_url}; qccp route /solution/vqlsSolver uses /api/solve and /api/params",
         encoding="utf-8",
     )
+    scientific_validation = _write_generic_scientific_contract(tmp_path)
     _write_json(
         tmp_path / "application_manifest.json",
         {
             "delivery_profile": "full_delivery",
+            "scientific_contract_version": "1.0",
+            "scientific_validation": scientific_validation,
             "algorithm": {
                 "name": "Fixture VQLS",
                 "task": "classification",
@@ -373,10 +401,13 @@ def test_algorithm_only_profile_does_not_require_frontend_or_backend(tmp_path):
     _write_json(tmp_path / "baseline_report.json", _report(value=0.8))
     _write_json(tmp_path / "quantum_report.json", _report(value=0.9))
     (tmp_path / "verification_report.md").write_text("verified", encoding="utf-8")
+    scientific_validation = _write_generic_scientific_contract(tmp_path)
     _write_json(
         tmp_path / "application_manifest.json",
         {
             "delivery_profile": "algorithm_only",
+            "scientific_contract_version": "1.0",
+            "scientific_validation": scientific_validation,
             "algorithm": {
                 "name": "Algorithm Only",
                 "task": "classification",
@@ -582,10 +613,13 @@ def test_requirements_can_disable_packaging_contract_for_feasibility(tmp_path):
     _write_json(tmp_path / "baseline_report.json", _report(value=0.8))
     _write_json(tmp_path / "quantum_report.json", _report(value=0.9))
     (tmp_path / "verification_report.md").write_text("verified", encoding="utf-8")
+    scientific_validation = _write_generic_scientific_contract(tmp_path)
     _write_json(
         tmp_path / "application_manifest.json",
         {
             "delivery_profile": "algorithm_only",
+            "scientific_contract_version": "1.0",
+            "scientific_validation": scientific_validation,
             "algorithm": {
                 "name": "Feasibility",
                 "task": "classification",

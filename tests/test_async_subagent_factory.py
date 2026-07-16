@@ -89,6 +89,7 @@ def test_factory_requests_async_safe_middleware(
     registry = mock_load_subs.call_args.kwargs["tool_registry"]
     assert "skill_manager" in registry
     assert "validate_quantum_application" in registry
+    assert "validate_scientific_plan" in registry
 
     # The contract: factory MUST pass async-safe mode and the source agent name.
     mock_get_mw.assert_called_once_with(

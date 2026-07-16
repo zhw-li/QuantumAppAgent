@@ -2,15 +2,22 @@
 
 from __future__ import annotations
 
+import importlib.util
 import json
 import re
 import sys
-import importlib.util
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 
 from langchain_core.tools import tool
+
+from tyqa.scientific_validation import (
+    validate_scientific_application,
+)
+from tyqa.scientific_validation import (
+    validate_scientific_plan as validate_scientific_plan_artifacts,
+)
 
 REQUIRED_REPORT_FIELDS = (
     "task",
@@ -1158,6 +1165,32 @@ def validate_quantum_application_artifacts(
     _validate_report_schema("baseline_report", baseline, checks, blockers, layer="algorithm")
     _validate_report_schema("quantum_report", quantum, checks, blockers, layer="algorithm")
 
+    scientific_validation = validate_scientific_application(
+        app_path,
+        manifest,
+        baseline,
+        quantum,
+    )
+    scientific_passed = scientific_validation.get("status") == "passed"
+    checks.append(
+        {
+            "name": "algorithm.scientific_validation",
+            "status": "passed" if scientific_passed else "blocked",
+            "profile": scientific_validation.get("profile"),
+            "failure_codes": scientific_validation.get("failure_codes", []),
+            "repair_action": _nested_get(scientific_validation, "repair", "action"),
+        }
+    )
+    if not scientific_passed:
+        codes = scientific_validation.get("failure_codes") or [
+            "SCIENTIFIC.VALIDATION_NOT_PASSED"
+        ]
+        _add_blocker(
+            blockers,
+            "scientific",
+            "scientific validation did not pass: " + ", ".join(codes),
+        )
+
     metric_comparison = _compare_metrics(
         baseline,
         quantum,
@@ -1190,6 +1223,7 @@ def validate_quantum_application_artifacts(
     blockers = list(dict.fromkeys(blockers))
     return {
         "status": "passed" if not blockers else "blocked",
+        "delivery_allowed": not blockers and scientific_passed,
         "app_dir": str(app_path),
         "delivery_profile": profile,
         "validation_layers": list(layers),
@@ -1201,8 +1235,37 @@ def validate_quantum_application_artifacts(
             "algorithm": _as_dict((manifest or {}).get("algorithm")),
         },
         "metric_comparison": metric_comparison,
+        "scientific_validation": scientific_validation,
         "blockers": blockers,
     }
+
+
+@tool(parse_docstring=True)
+def validate_scientific_plan(app_dir: str) -> str:
+    """Validate a scientific specification before algorithm implementation.
+
+    Args:
+        app_dir: Application artifact directory containing application_manifest.json
+            and scientific_spec.json.
+
+    Returns:
+        A JSON object string with plan checks, stable failure codes, and
+        implementation_allowed.
+    """
+    app_path = _resolve_app_dir(app_dir)
+    manifest_path = app_path / "application_manifest.json"
+    blockers: list[str] = []
+    manifest = _read_json(manifest_path, blockers) if manifest_path.is_file() else None
+    result = validate_scientific_plan_artifacts(app_path, manifest)
+    if blockers:
+        result["status"] = "failed"
+        result["implementation_allowed"] = False
+        result["failure_codes"] = list(
+            dict.fromkeys(
+                [*result.get("failure_codes", []), "SCIENTIFIC.MANIFEST_JSON_INVALID"]
+            )
+        )
+    return json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True)
 
 
 @tool(parse_docstring=True)

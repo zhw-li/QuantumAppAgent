@@ -509,6 +509,7 @@ def _build_base_kwargs(
         tavily_search,
         think_tool,
         validate_quantum_application,
+        validate_scientific_plan,
     )
     from .utils import load_subagents
 
@@ -516,10 +517,16 @@ def _build_base_kwargs(
     tool_registry = {
         "think_tool": think_tool,
         "validate_quantum_application": validate_quantum_application,
+        "validate_scientific_plan": validate_scientific_plan,
     }
     if os.environ.get("TAVILY_API_KEY"):
         tool_registry["tavily_search"] = tavily_search
-    base_tools = [think_tool, skill_manager, validate_quantum_application]
+    base_tools = [
+        think_tool,
+        skill_manager,
+        validate_scientific_plan,
+        validate_quantum_application,
+    ]
 
     subs = load_subagents(
         SUBAGENTS_CONFIG,
@@ -569,6 +576,7 @@ def load_mcp_and_build_kwargs(
         tavily_search,
         think_tool,
         validate_quantum_application,
+        validate_scientific_plan,
     )
     from .utils import load_subagents
 
@@ -586,10 +594,16 @@ def load_mcp_and_build_kwargs(
     tool_registry = {
         "think_tool": think_tool,
         "validate_quantum_application": validate_quantum_application,
+        "validate_scientific_plan": validate_scientific_plan,
     }
     if os.environ.get("TAVILY_API_KEY"):
         tool_registry["tavily_search"] = tavily_search
-    base_tools = [think_tool, skill_manager, validate_quantum_application]
+    base_tools = [
+        think_tool,
+        skill_manager,
+        validate_scientific_plan,
+        validate_quantum_application,
+    ]
 
     # Fresh tool registry — start from base tools + MCP tools
     registry = dict(tool_registry)

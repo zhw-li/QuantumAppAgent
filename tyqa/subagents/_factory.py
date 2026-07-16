@@ -37,7 +37,6 @@ def build_async_subagent_graph(name: str) -> Any:
     # at package import.
     from deepagents import create_deep_agent
 
-    from tyqa.config import apply_config_to_env, get_effective_config
     from tyqa.agent_graph import (
         SUBAGENTS_CONFIG,
         _ensure_chat_model,
@@ -46,11 +45,13 @@ def build_async_subagent_graph(name: str) -> Any:
         _get_default_middleware,
         _inject_subagent_middleware,
     )
+    from tyqa.config import apply_config_to_env, get_effective_config
     from tyqa.tools import (
         skill_manager,
         tavily_search,
         think_tool,
         validate_quantum_application,
+        validate_scientific_plan,
     )
     from tyqa.utils import load_subagents
 
@@ -64,6 +65,7 @@ def build_async_subagent_graph(name: str) -> Any:
         "think_tool": think_tool,
         "skill_manager": skill_manager,
         "validate_quantum_application": validate_quantum_application,
+        "validate_scientific_plan": validate_scientific_plan,
     }
     if os.environ.get("TAVILY_API_KEY"):
         tool_registry["tavily_search"] = tavily_search
